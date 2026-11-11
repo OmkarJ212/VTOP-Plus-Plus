@@ -259,7 +259,32 @@
     handleSearch(query) {
       const q = (query || '').trim().toLowerCase();
       const crawler = window.VTOP_PLUS.Crawler;
-      const allItems = crawler ? crawler.getAllItems() : [];
+      const crawledItems = crawler ? crawler.getAllItems() : [];
+
+      const builtInActions = [
+        {
+          id: 'vtop-action-dark-mode',
+          title: 'Toggle Dark Mode (🌙/☀️)',
+          category: 'VTOP++ Power Tool',
+          isAction: true,
+          action: () => window.VTOP_PLUS.DarkMode?.toggle(),
+          acronym: 'dm',
+          words: ['toggle', 'dark', 'mode', 'theme', 'night'],
+          synonyms: ['dark', 'night', 'theme', 'black', 'mode', 'light']
+        },
+        {
+          id: 'vtop-action-privacy-mode',
+          title: 'Toggle Privacy Blur (🔒)',
+          category: 'VTOP++ Power Tool',
+          isAction: true,
+          action: () => window.VTOP_PLUS.PrivacyMode?.toggle(),
+          acronym: 'pm',
+          words: ['toggle', 'privacy', 'blur', 'mode', 'incognito'],
+          synonyms: ['privacy', 'blur', 'hide', 'censor', 'incognito']
+        }
+      ];
+
+      const allItems = [...builtInActions, ...crawledItems];
 
       if (!q) {
         this.filteredItems = allItems.slice(0, POOL_SIZE);
@@ -386,6 +411,10 @@
     }
 
     dispatchNavigation(item) {
+      if (item.isAction && typeof item.action === 'function') {
+        item.action();
+        return;
+      }
       const qd = window.VTOP_PLUS?.QuickDock;
       if (qd && typeof qd.requestNavigation === 'function') {
         qd.requestNavigation({ title: item.title, targetItem: item });

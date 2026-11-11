@@ -17,6 +17,7 @@
     enableSpotlight: true,
     enableQuickDock: true,
     enablePrivacyMode: false,
+    enableDarkMode: false,
     downloadPacing: 'fast', // 'safe', 'fast', 'stealth'
     attendanceTarget: 75 // 75, 80, 85, 90
   };

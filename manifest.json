@@ -23,7 +23,31 @@
     {
       "matches": [
         "*://vtop.vit.ac.in/*",
-        "*://vtop2.vit.ac.in/*"
+        "*://vtop2.vit.ac.in/*",
+        "*://vtopcc.vit.ac.in/*",
+        "*://vtopchennai.vit.ac.in/*",
+        "*://vtopbh.vit.ac.in/*",
+        "*://vtopap.vit.ac.in/*",
+        "*://*.vit.ac.in/*"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
+      "js": [
+        "src/modules/dark-mode.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "*://vtop.vit.ac.in/*",
+        "*://vtop2.vit.ac.in/*",
+        "*://vtopcc.vit.ac.in/*",
+        "*://vtopchennai.vit.ac.in/*",
+        "*://vtopbh.vit.ac.in/*",
+        "*://vtopap.vit.ac.in/*",
+        "*://*.vit.ac.in/*"
       ],
       "js": [
         "jszip.min.js",
@@ -43,22 +67,24 @@
         "src/modules/privacy-mode.js",
         "src/content/content.js"
       ],
-      "css": [
-        "src/content/content.css"
-      ],
       "run_at": "document_idle",
-      "all_frames": false
+      "all_frames": true
     }
   ],
   "permissions": [
     "storage",
-    "downloads",
     "activeTab",
     "alarms"
   ],
   "host_permissions": [
     "*://vtop.vit.ac.in/*",
-    "*://vtop2.vit.ac.in/*"
+    "*://vtop2.vit.ac.in/*",
+    "*://vtopcc.vit.ac.in/*",
+    "*://vtopchennai.vit.ac.in/*",
+    "*://vtopbh.vit.ac.in/*",
+    "*://vtopap.vit.ac.in/*",
+    "*://*.vit.ac.in/*",
+    "https://*.amazonaws.com/*"
   ],
   "web_accessible_resources": [
     {
@@ -68,7 +94,12 @@
       ],
       "matches": [
         "*://vtop.vit.ac.in/*",
-        "*://vtop2.vit.ac.in/*"
+        "*://vtop2.vit.ac.in/*",
+        "*://vtopcc.vit.ac.in/*",
+        "*://vtopchennai.vit.ac.in/*",
+        "*://vtopbh.vit.ac.in/*",
+        "*://vtopap.vit.ac.in/*",
+        "*://*.vit.ac.in/*"
       ]
     }
   ]

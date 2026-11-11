@@ -11,9 +11,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnDownloader = document.getElementById('btn-scan-downloader');
   const btnSpotlight = document.getElementById('btn-trigger-spotlight');
   const btnPrivacy = document.getElementById('btn-toggle-privacy');
+  const btnDark = document.getElementById('btn-toggle-dark');
 
   // Toggles
   const toggles = {
+    enableDarkMode: document.getElementById('toggle-dark-mode'),
     enableDownloader: document.getElementById('toggle-downloader'),
     enableCourseFilter: document.getElementById('toggle-filter'),
     enableSpotlight: document.getElementById('toggle-spotlight'),
@@ -34,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       activeTab = tab;
       const url = activeTab?.url || '';
 
-      if (url.includes('vtop.vit.ac.in') || url.includes('vtop2.vit.ac.in')) {
+      if (url.includes('vit.ac.in') || url.includes('vtop')) {
         statusBadge.textContent = '● Connected';
         statusBadge.style.background = '#ecfdf5';
         statusBadge.style.color = '#059669';
@@ -58,6 +60,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           elem.checked = Boolean(items[key]);
         }
       }
+      if (btnDark && items?.enableDarkMode !== undefined) {
+        btnDark.classList.toggle('active', Boolean(items.enableDarkMode));
+      }
+      if (btnPrivacy && items?.enablePrivacyMode !== undefined) {
+        btnPrivacy.classList.toggle('active', Boolean(items.enablePrivacyMode));
+      }
     });
   }
 
@@ -69,6 +77,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (chrome?.storage?.local) {
         chrome.storage.local.set(update);
       }
+      if (key === 'enableDarkMode' && btnDark) {
+        btnDark.classList.toggle('active', elem.checked);
+      }
+      if (key === 'enablePrivacyMode' && btnPrivacy) {
+        btnPrivacy.classList.toggle('active', elem.checked);
+      }
       notifyActiveTab({ action: 'APPLY_SETTINGS', settings: update });
     });
   }
@@ -79,7 +93,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       showStatus('Opening Downloader widget...', 'success');
       notifyActiveTab({ action: 'FORCE_SCAN' }, (resp) => {
         if (resp && resp.success) {
-          showStatus('Downloader widget opened in bottom-right!', 'success');
+          if (resp.fileCount > 0) {
+            showStatus(`✅ Found ${resp.fileCount} files (${resp.activeCourse})! Downloader opened.`, 'success');
+          } else if (resp.hasButtons) {
+            showStatus('✅ Course materials detected! Downloader opened.', 'success');
+          } else {
+            showStatus('Downloader widget opened in bottom-right!', 'success');
+          }
         } else {
           showStatus('Opened. Make sure you are viewing a course.', 'warn');
         }
@@ -101,11 +121,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnPrivacy) {
     btnPrivacy.addEventListener('click', () => {
-      notifyActiveTab({ action: 'TOGGLE_PRIVACY' }, (resp) => {
-        if (resp) {
-          showStatus(`Privacy Mode ${resp.active ? 'Activated 🔒' : 'Disabled 🔓'}`, 'success');
-        }
-      });
+      const newState = !toggles.enablePrivacyMode?.checked;
+      if (toggles.enablePrivacyMode) {
+        toggles.enablePrivacyMode.checked = newState;
+      }
+      if (chrome?.storage?.local) {
+        chrome.storage.local.set({ enablePrivacyMode: newState });
+      }
+      btnPrivacy.classList.toggle('active', newState);
+      notifyActiveTab({ action: 'TOGGLE_PRIVACY', active: newState });
+      showStatus(`Privacy Mode ${newState ? 'Activated 🔒' : 'Disabled 🔓'}`, 'success');
+    });
+  }
+
+  if (btnDark) {
+    btnDark.addEventListener('click', () => {
+      const newState = !toggles.enableDarkMode?.checked;
+      if (toggles.enableDarkMode) {
+        toggles.enableDarkMode.checked = newState;
+      }
+      if (chrome?.storage?.local) {
+        chrome.storage.local.set({ enableDarkMode: newState });
+      }
+      btnDark.classList.toggle('active', newState);
+      notifyActiveTab({ action: 'TOGGLE_DARK_MODE', active: newState });
+      showStatus(`Universal Dark Mode ${newState ? 'Enabled 🌙' : 'Disabled ☀️'}`, 'success');
     });
   }
 

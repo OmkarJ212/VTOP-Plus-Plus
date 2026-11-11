@@ -23,7 +23,6 @@
   const CACHE_MAX = 80;
   const POLL_MS = 150;
   const STALE_MS = 3000;
-  const DT_GRACE_MS = 1500;
 
   const SELECTOR_DOWNLOAD_BTNS = 'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]';
 
@@ -44,10 +43,7 @@
     native: null,
     loadTs: 0,
     timer: null,
-    hooked: false,
-    hookTable: null,
-    pending: null,
-    crawling: false
+    pending: null
   };
 
   let persist = { sem: '', fac: {} };
@@ -108,7 +104,17 @@
       if (!opt.value || text.includes('-- Registered Courses --')) continue;
       // Robust split supporting standard hyphen, en-dash (–), and em-dash (—)
       const parts = text.split(/\s*[-–—]\s*/);
-      if (parts.length < 2) continue;
+      if (parts.length < 2) {
+        // Fallback: If no hyphen, treat as Current Semester so courses are never lost
+        const sem = 'Current Semester';
+        if (!data[sem]) data[sem] = [];
+        data[sem].push({ value: opt.value, label: text, labelLower: text.toLowerCase() });
+        if (opt.selected) {
+          selSem = sem;
+          selVal = opt.value;
+        }
+        continue;
+      }
       const sem = parts[0].trim();
       if (!data[sem]) data[sem] = [];
       const label = parts.slice(1).join(' - ').trim();
@@ -249,17 +255,25 @@
         sib.style.display = 'none';
       }
 
+      const isDark = document.documentElement.classList.contains('vtop-dark-theme');
+      const boxBg = isDark ? '#131c2e' : '#ffffff';
+      const boxBorder = isDark ? '#293548' : '#cbd5e1';
+      const selBg = isDark ? '#0f172a' : '#fff';
+      const selBorder = isDark ? '#293548' : '#cbd5e1';
+      const textColor = isDark ? '#f8fafc' : '#0f172a';
+      const lblColor = isDark ? '#94a3b8' : '#334155';
+
       const box = document.createElement('div');
       box.id = UI_ID;
       box.className = 'vtop-plus-course-filter-panel';
       box.style.cssText =
         'display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding:16px;' +
-        'background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;margin:12px 0 16px;width:100%;' +
-        'box-sizing:border-box;box-shadow:0 4px 14px rgba(0,0,0,0.06);font-family:inherit;';
+        `background:${boxBg};border:1px solid ${boxBorder};border-radius:12px;margin:12px 0 16px;width:100%;` +
+        'box-sizing:border-box;box-shadow:0 4px 14px rgba(0,0,0,0.15);font-family:inherit;';
 
-      const selCss = 'width:100%;height:38px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;font-size:13px;color:#0f172a;';
-      const lblCss = 'font-weight:700;font-size:12px;color:#334155;margin-bottom:6px;display:block;';
-      const inCss = 'width:58%;padding:4px 8px;font-size:12px;border:1px solid #cbd5e1;border-radius:4px;outline:none;';
+      const selCss = `width:100%;height:38px;padding:6px 12px;border:1px solid ${selBorder};border-radius:6px;background:${selBg};font-size:13px;color:${textColor};`;
+      const lblCss = `font-weight:700;font-size:12px;color:${lblColor};margin-bottom:6px;display:block;`;
+      const inCss = `width:58%;padding:4px 8px;font-size:12px;border:1px solid ${selBorder};border-radius:4px;outline:none;background:${selBg};color:${textColor};`;
       const headCss = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
 
       box.innerHTML = `
@@ -484,8 +498,8 @@
     autoExpandLength(table) {
       const lengthSelect = document.querySelector('select[name="materialTable_length"], select[name$="_length"]');
       if (lengthSelect && lengthSelect.value !== '100' && lengthSelect.value !== '-1') {
-        let targetOption = lengthSelect.querySelector('option[value="100"]') ||
-                           lengthSelect.querySelector('option[value="-1"]');
+        let targetOption = lengthSelect.querySelector('option[value="-1"]') ||
+                           lengthSelect.querySelector('option[value="100"]');
         if (!targetOption) {
           let maxVal = 0;
           for (const opt of lengthSelect.options) {
@@ -553,28 +567,34 @@
       container.id = TABLE_BAR_ID;
       container.className = 'vtop-plus-filter-container';
 
+      const isDark = document.documentElement.classList.contains('vtop-dark-theme') ||
+                     document.body?.classList.contains('vtop-dark-theme') ||
+                     window.VTOP_PLUS?.DarkMode?.isActive;
+
+      const barBg = isDark ? '#131c2e' : '#ffffff';
+      const barBorder = isDark ? '#293548' : '#e2e8f0';
+      const inBg = isDark ? '#0f172a' : '#ffffff';
+      const inBorder = isDark ? '#293548' : '#cbd5e1';
+      const inColor = isDark ? '#f1f5f9' : '#0f172a';
+      const btnBg = isDark ? '#1e293b' : '#f1f5f9';
+      const btnBorder = isDark ? '#293548' : '#cbd5e1';
+      const btnColor = isDark ? '#f1f5f9' : '#475569';
+
+      container.style.cssText = `display:block;width:100%;box-sizing:border-box;background:${barBg} !important;background-color:${barBg} !important;border:1px solid ${barBorder} !important;border-radius:10px;padding:12px 16px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,0.25);`;
+
       container.innerHTML = `
-        <div class="vtop-filter-row">
-          <div class="vtop-filter-group" style="flex: 2;">
-            <span class="vtop-filter-icon">🔍</span>
-            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Quick filter by topic, module, keyword..." />
+        <div class="vtop-filter-row" style="display:flex;align-items:center;gap:12px;width:100%;">
+          <div class="vtop-filter-group" style="flex:1;display:flex;align-items:center;gap:8px;">
+            <span class="vtop-filter-icon" style="font-size:14px;">🔍</span>
+            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Quick filter by topic, module, keyword..." style="width:100%;padding:8px 12px;border:1px solid ${inBorder} !important;border-radius:6px;font-size:13px;outline:none;background:${inBg} !important;background-color:${inBg} !important;color:${inColor} !important;box-sizing:border-box;" />
           </div>
-          <div class="vtop-filter-group" style="flex: 1;">
-            <label class="vtop-filter-label" for="vtop-table-filter-type">Type:</label>
-            <select id="vtop-table-filter-type" class="vtop-filter-select">
-              <option value="ALL">All Types</option>
-              <option value="THEORY">Theory (ETH/TH)</option>
-              <option value="LAB">Lab (ELA/LO)</option>
-            </select>
-          </div>
-          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters">Clear</button>
+          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters" style="background:${btnBg} !important;background-color:${btnBg} !important;border:1px solid ${btnBorder} !important;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:${btnColor} !important;white-space:nowrap;">Clear</button>
         </div>
       `;
 
       targetParent.insertBefore(container, targetParent.firstChild);
 
       const searchInput = document.getElementById('vtop-table-filter-search');
-      const typeSelect = document.getElementById('vtop-table-filter-type');
       const resetBtn = document.getElementById('vtop-table-filter-reset');
 
       searchInput?.addEventListener('input', () => {
@@ -582,14 +602,8 @@
         this.applyFilter();
       });
 
-      typeSelect?.addEventListener('change', () => {
-        state.type = typeSelect.value;
-        this.applyFilter();
-      });
-
       resetBtn?.addEventListener('click', () => {
         if (searchInput) searchInput.value = '';
-        if (typeSelect) typeSelect.value = 'ALL';
         state.topicQ = '';
         state.type = 'ALL';
         state.fac = 'ALL';
@@ -600,6 +614,20 @@
           window.VTOP_PLUS.CourseDownloader.selectFaculty('ALL');
         }
       });
+
+      // Observe tbody so DataTables page changes automatically re-apply active filter
+      const tbody = table.querySelector('tbody');
+      if (tbody && !tbody.dataset.vtopFilterBound) {
+        tbody.dataset.vtopFilterBound = 'true';
+        let debounceTimer = null;
+        const bodyObs = new MutationObserver(() => {
+          if (state.topicQ || state.fac !== 'ALL' || state.type !== 'ALL') {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => this.applyFilter(), 40);
+          }
+        });
+        bodyObs.observe(tbody, { childList: true });
+      }
     },
 
     applyFilter() {
@@ -691,6 +719,46 @@
         state.fac = matchedValue;
         facSel.value = matchedValue;
         this.applyFilter();
+      }
+    },
+
+    syncTheme(isDark) {
+      const container = document.getElementById(TABLE_BAR_ID);
+      if (container) {
+        const barBg = isDark ? '#131c2e' : '#ffffff';
+        const barBorder = isDark ? '#293548' : '#e2e8f0';
+        container.style.backgroundColor = barBg;
+        container.style.background = barBg;
+        container.style.borderColor = barBorder;
+
+        const searchInput = document.getElementById('vtop-table-filter-search');
+        if (searchInput) {
+          const inBg = isDark ? '#0f172a' : '#ffffff';
+          const inBorder = isDark ? '#293548' : '#cbd5e1';
+          const inColor = isDark ? '#f1f5f9' : '#0f172a';
+          searchInput.style.backgroundColor = inBg;
+          searchInput.style.background = inBg;
+          searchInput.style.borderColor = inBorder;
+          searchInput.style.color = inColor;
+        }
+
+        const resetBtn = document.getElementById('vtop-table-filter-reset');
+        if (resetBtn) {
+          const btnBg = isDark ? '#1e293b' : '#f1f5f9';
+          const btnBorder = isDark ? '#293548' : '#cbd5e1';
+          const btnColor = isDark ? '#f1f5f9' : '#475569';
+          resetBtn.style.backgroundColor = btnBg;
+          resetBtn.style.background = btnBg;
+          resetBtn.style.borderColor = btnBorder;
+          resetBtn.style.color = btnColor;
+        }
+      }
+
+      const topFilter = document.getElementById(UI_ID);
+      if (topFilter) {
+        topFilter.style.backgroundColor = isDark ? '#131c2e' : '#ffffff';
+        topFilter.style.background = isDark ? '#131c2e' : '#ffffff';
+        topFilter.style.borderColor = isDark ? '#293548' : '#cbd5e1';
       }
     }
   };

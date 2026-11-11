@@ -43,17 +43,14 @@
 
       try {
         const basePath = window.location.pathname.split('/')[1] || 'vtop';
-        const pingUrl = window.location.href || `/${basePath}/content`;
-        const urlWithParam = pingUrl.includes('?') 
-          ? `${pingUrl}&_vtop_ping=${Date.now()}` 
-          : `${pingUrl}?_vtop_ping=${Date.now()}`;
+        const pingUrl = `${window.location.origin}/${basePath}/content`;
 
-        await fetch(urlWithParam, {
+        await fetch(pingUrl, {
           method: 'GET',
           credentials: 'include',
           cache: 'no-store'
         }).catch(() => {
-          return fetch(`/${basePath}/content?_vtop_ping=${Date.now()}`, {
+          return fetch(`${window.location.origin}/${basePath}/`, {
             method: 'GET',
             credentials: 'include',
             cache: 'no-store'

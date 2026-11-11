@@ -8,10 +8,17 @@ chrome.runtime.onInstalled.addListener(() => {
   setupKeepAliveAlarm();
 });
 
+// Ensure alarm is active on worker spin-up
+setupKeepAliveAlarm();
+
 // Setup 9-minute alarm for session keep-alive
 function setupKeepAliveAlarm() {
   if (chrome.alarms) {
-    chrome.alarms.create('vtop_keep_alive_alarm', { periodInMinutes: 9 });
+    chrome.alarms.get('vtop_keep_alive_alarm', (existing) => {
+      if (!existing) {
+        chrome.alarms.create('vtop_keep_alive_alarm', { periodInMinutes: 9 });
+      }
+    });
   }
 }
 
@@ -112,6 +119,15 @@ async function handleFetchMaterial({ url, body, headers, timeoutMs = 25000 }) {
       };
     }
 
+    // Guard against Chrome IPC message payload limits (~64MB)
+    if (arrayBuffer.byteLength > 45 * 1024 * 1024) {
+      return {
+        success: false,
+        status,
+        error: `File is too large (${Math.round(arrayBuffer.byteLength / 1024 / 1024)}MB) for background IPC bridge.`
+      };
+    }
+
     const base64Data = arrayBufferToBase64(arrayBuffer);
 
     return {
@@ -132,16 +148,16 @@ async function handleFetchMaterial({ url, body, headers, timeoutMs = 25000 }) {
 }
 
 /**
- * Efficient chunked conversion of ArrayBuffer to Base64 string
+ * High-performance chunked conversion of ArrayBuffer to Base64 string
  */
 function arrayBufferToBase64(buffer) {
-  const chunks = [];
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
-  const chunkSize = 8192;
+  const chunkSize = 32768; // 32KB chunks for optimal memory throughput
+  let binary = '';
   for (let i = 0; i < len; i += chunkSize) {
     const chunk = bytes.subarray(i, Math.min(i + chunkSize, len));
-    chunks.push(String.fromCharCode.apply(null, chunk));
+    binary += String.fromCharCode.apply(null, chunk);
   }
-  return btoa(chunks.join(''));
+  return btoa(binary);
 }

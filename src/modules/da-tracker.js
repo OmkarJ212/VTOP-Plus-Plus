@@ -1,10 +1,15 @@
 /**
  * VTOP++ - Digital Assignment (DA) Tracker Module
- * Replaces bulky intrusive cards with an elegant native column in VTOP's Assignment Upload table.
- * Shows remaining days for the next assignment with dynamic color coding:
- * - Purple: Due today (0 days left)
- * - Red: 3 or less days left (or overdue)
- * - Green: More than 3 days left OR all submissions done
+ * Comprehensive DA Deadline & Countdown Tracker for VIT VTOP.
+ * Supports:
+ * 1. Single-Course Assignment Upload Page: Injects a high-visibility countdown banner
+ *    and inline deadline badges directly into the Due Date column.
+ * 2. Course Overview Page: Injects the "Next Assignment" column into VTOP's Course Overview table.
+ * 
+ * Dynamic color coding:
+ * - Purple: Due today (0 days left or <24h remaining)
+ * - Red: 3 or fewer days left (or overdue)
+ * - Green: More than 3 days left OR submitted
  */
 
 (function () {
@@ -16,19 +21,37 @@
     if (!str) return null;
     str = str.trim();
 
+    // Extract optional time component (e.g. 11:59:00 PM, 23:59, 11:59 PM)
+    let hours = 23;
+    let minutes = 59;
+    let seconds = 59;
+    const timeMatch = str.match(/\b(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?\b/);
+    if (timeMatch) {
+      let h = parseInt(timeMatch[1], 10);
+      const m = parseInt(timeMatch[2], 10);
+      const s = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
+      const meridiem = timeMatch[4] ? timeMatch[4].toUpperCase() : null;
+
+      if (meridiem === 'PM' && h < 12) h += 12;
+      if (meridiem === 'AM' && h === 12) h = 0;
+      hours = h;
+      minutes = m;
+      seconds = s;
+    }
+
     // 1. DD-MM-YYYY, DD/MM/YYYY, or DD.MM.YYYY
-    const numMatch = str.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})$/);
+    const numMatch = str.match(/\b(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})\b/);
     if (numMatch) {
       const d = parseInt(numMatch[1], 10);
       const m = parseInt(numMatch[2], 10) - 1;
       let y = parseInt(numMatch[3], 10);
       if (y < 100) y += 2000;
-      const dt = new Date(y, m, d, 23, 59, 59);
+      const dt = new Date(y, m, d, hours, minutes, seconds);
       return isNaN(dt.getTime()) ? null : dt;
     }
 
-    // 2. DD-MMM-YYYY or DD MMM YYYY (e.g. 22-Oct-2026, 22 Oct 2026, 05-Jan-2025)
-    const alphaMatch = str.match(/^(\d{1,2})[-\/\s]([A-Za-z]{3,})[-\/\s](\d{2,4})$/);
+    // 2. DD-MMM-YYYY or DD MMM YYYY (e.g. 25-Nov-2026, 22 Oct 2026, 05-Jan-2025)
+    const alphaMatch = str.match(/\b(\d{1,2})[-\/\s]([A-Za-z]{3,})[-\/\s](\d{2,4})\b/);
     if (alphaMatch) {
       const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
       const d = parseInt(alphaMatch[1], 10);
@@ -37,7 +60,7 @@
       let y = parseInt(alphaMatch[3], 10);
       if (y < 100) y += 2000;
       if (m !== undefined) {
-        const dt = new Date(y, m, d, 23, 59, 59);
+        const dt = new Date(y, m, d, hours, minutes, seconds);
         return isNaN(dt.getTime()) ? null : dt;
       }
     }
@@ -47,6 +70,48 @@
     return isNaN(fallback.getTime()) ? null : fallback;
   }
 
+  function getRemainingTime(targetDate) {
+    if (!targetDate) return null;
+    const now = new Date();
+    const diffMs = targetDate.getTime() - now.getTime();
+
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const dueDayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()).getTime();
+    const diffDays = Math.round((dueDayStart - todayStart) / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    const isOverdue = diffMs < 0;
+    const isToday = diffDays === 0;
+
+    let badgeType = 'green';
+    let badgeText = '';
+
+    if (isOverdue) {
+      badgeType = 'red';
+      const absDays = Math.abs(diffDays);
+      badgeText = absDays <= 1 ? 'Overdue (today) ⚠️' : `Overdue (${absDays}d ago) ⚠️`;
+    } else if (isToday) {
+      badgeType = 'purple';
+      badgeText = diffHours > 1 ? `Due Today (${diffHours}h left) ⏰` : 'Due Today ⏰';
+    } else if (diffDays <= 3) {
+      badgeType = 'red';
+      badgeText = `${diffDays} day${diffDays === 1 ? '' : 's'} left ⚠️`;
+    } else {
+      badgeType = 'green';
+      badgeText = `${diffDays} days left`;
+    }
+
+    return {
+      diffMs,
+      diffDays,
+      diffHours,
+      isOverdue,
+      isToday,
+      badgeType,
+      badgeText
+    };
+  }
+
   const DaTracker = {
     isScanning: false,
 
@@ -54,59 +119,296 @@
       this.checkAndTrack();
     },
 
-    /**
-     * Check if currently on the Digital Assignment module
-     */
-    isDaPage() {
-      if (this.findCourseOverviewTable()) return true;
+    destroy() {
+      const banner = document.getElementById('vtop-da-countdown-banner');
+      if (banner) banner.remove();
 
-      const bodyText = (document.body?.textContent || '').toLowerCase();
+      document.querySelectorAll('.vtop-th-da-status, .vtop-td-da-status').forEach((el) => el.remove());
+      document.querySelectorAll('.vtop-da-cell-augmented').forEach((el) => {
+        el.classList.remove('vtop-da-cell-augmented');
+        const badge = el.querySelector('.vtop-da-badge');
+        if (badge) badge.remove();
+      });
+      document.querySelectorAll('.vtop-da-urgent-row').forEach((el) => {
+        el.classList.remove('vtop-da-urgent-row');
+      });
+      this.isScanning = false;
+    },
+
+    isDaPage() {
+      if (this.findSingleCourseDaTable() || this.findCourseOverviewTable()) return true;
+
+      const href = window.location.href.toLowerCase();
+      if (href.includes('digitalassignment') || href.includes('studentda')) return true;
+
+      const bodyText = (document.body?.innerText || document.body?.textContent || '').toLowerCase();
       if (bodyText.includes('assignment upload') || bodyText.includes('digital assignment')) {
         return true;
       }
 
       return Boolean(
         document.querySelector(
-          '#daUpload, #studDaUpload, form[action*="DigitalAssignment"], button[name="downloadQuestion"], button[name="downloadStudentDA"], [onclick*="myFunction"]'
+          '#daUpload, #studDaUpload, form[action*="DigitalAssignment"], button[name="downloadQuestion"], button[name="downloadStudentDA"], [onclick*="myFunction"], [onclick*="processDigitalAssignment"], [onclick*="doStudentDA"]'
         )
       );
     },
 
     checkAndTrack() {
-      // Permanently remove any legacy bulky DA Hub card from DOM
-      const existingCard = document.getElementById('vtop-da-summary-card');
-      if (existingCard) existingCard.remove();
-
-      const table = this.findCourseOverviewTable();
-      if (!table) {
+      // 1. Check for single-course assignment upload view (where student actually views/uploads files)
+      const singleTable = this.findSingleCourseDaTable();
+      if (singleTable) {
+        this.augmentSingleCourseDaTable(singleTable);
         return;
       }
 
-      this.augmentCourseOverviewTable(table);
+      // 2. Check for course overview table (where student selects a course)
+      const overviewTable = this.findCourseOverviewTable();
+      if (overviewTable) {
+        this.augmentCourseOverviewTable(overviewTable);
+      }
     },
 
-    findCourseOverviewTable() {
+    // =========================================================================
+    // 1. SINGLE-COURSE ASSIGNMENT UPLOAD VIEW (Inner DA View)
+    // =========================================================================
+
+    findSingleCourseDaTable() {
+      const overview = this.findCourseOverviewTable();
       const allTables = Array.from(document.querySelectorAll('table'));
+
       for (const table of allTables) {
-        const text = (table.textContent || '').toLowerCase();
-        if (
-          (text.includes('class nbr') || text.includes('class number')) &&
-          text.includes('course code') &&
-          (text.includes('dashboard') ||
-            text.includes('faculty') ||
-            Boolean(table.querySelector('.bi-folder-symlink-fill, [onclick*="myFunction"]')))
-        ) {
+        if (table === overview) continue;
+
+        const text = (table.innerText || table.textContent || '').toLowerCase();
+        const hasDueDate = text.includes('due date') || text.includes('deadline') || text.includes('last date');
+        const hasAssignment =
+          text.includes('assignment') ||
+          text.includes('case study') ||
+          text.includes('download question') ||
+          text.includes('upload') ||
+          Boolean(table.querySelector('button[name="downloadQuestion"], input[type="file"], #studDaUpload'));
+
+        if (hasDueDate && hasAssignment) {
           return table;
         }
       }
       return null;
     },
 
-    /**
-     * Injects the native "Next Assignment" column directly into the Course Overview table
-     */
+    augmentSingleCourseDaTable(table) {
+      const headerRow =
+        table.querySelector('thead tr') ||
+        table.querySelector('tr.tableHeader') ||
+        table.querySelector('tr:has(th)') ||
+        table.querySelector('tr:first-child');
+
+      if (!headerRow) return;
+
+      const headerCells = Array.from(headerRow.querySelectorAll('th, td'));
+      let dueDateColIdx = -1;
+      let titleColIdx = -1;
+
+      headerCells.forEach((cell, idx) => {
+        const txt = (cell.innerText || cell.textContent || '').toLowerCase();
+        if (txt.includes('due date') || txt.includes('deadline') || txt.includes('last date')) {
+          dueDateColIdx = idx;
+        }
+        if (txt.includes('title') || txt.includes('assignment') || txt.includes('description')) {
+          titleColIdx = idx;
+        }
+      });
+
+      // Fallback column index if header text not explicitly found
+      if (dueDateColIdx === -1) dueDateColIdx = 4;
+      if (titleColIdx === -1) titleColIdx = 1;
+
+      const allRows = Array.from(table.querySelectorAll('tr'));
+      const dataRows = allRows.filter((r) => {
+        if (r.classList.contains('tableHeader') || r.closest('thead') || r === headerRow) return false;
+        if (r.querySelector('th')) return false;
+        const cells = r.querySelectorAll('td');
+        return cells.length >= 3;
+      });
+
+      if (dataRows.length === 0) return;
+
+      let closestPending = null;
+      let totalAssignments = 0;
+      let submittedAssignments = 0;
+
+      dataRows.forEach((row) => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 3) return;
+        totalAssignments++;
+
+        // Determine assignment title
+        const titleCell = cells[titleColIdx] || cells[1] || cells[0];
+        const title = (titleCell?.innerText || titleCell?.textContent || `Assignment ${totalAssignments}`).trim();
+
+        // Determine submission status
+        const hasStudentDownload = Boolean(
+          row.querySelector(
+            'button[name="downloadStudentDA"], button[id="downloadStudentDA"], a[href*="downloadSTudentDA"], [data-code][id*="StudentDA" i]'
+          )
+        );
+        const cellTexts = Array.from(cells).map((c) => (c.innerText || c.textContent || '').trim());
+        const hasTimestamp = cellTexts.some(
+          (txt) =>
+            /\b\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b|\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/.test(txt) &&
+            (txt.includes('AM') || txt.includes('PM') || txt.includes(':'))
+        );
+        const rowText = (row.innerText || row.textContent || '').toLowerCase();
+        const hasSubmittedText =
+          rowText.includes('uploaded') || rowText.includes('submitted') || rowText.includes('view file');
+        const hasUploadAction = Boolean(
+          row.querySelector(
+            'input[type="file"], #studDaUpload, button[name="digitalAssignmentSubmit"], button[name="editAssignment"]'
+          )
+        );
+
+        let isSubmitted = false;
+        if (hasStudentDownload || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
+          isSubmitted = true;
+        }
+        if (rowText.includes('not applicable') || rowText.includes('n/a')) {
+          isSubmitted = true;
+        }
+
+        // Extract due date from the specific due date cell or row text
+        const dueCell = cells[dueDateColIdx] || cells[3] || cells[2];
+        const dateSource = (dueCell?.innerText || dueCell?.textContent || row.innerText || row.textContent || '').trim();
+        const dateMatch =
+          dateSource.match(/\b(\d{1,2}[-\/\s][A-Za-z]{3,}[-\/\s]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/) ||
+          dateSource.match(/\b(\d{1,2}[-\/\.][0-9]{1,2}[-\/\.]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/);
+
+        let parsedDate = null;
+        let dateFormatted = '';
+        if (dateMatch) {
+          parsedDate = parseIndianDate(dateMatch[1]);
+          dateFormatted = dateMatch[1];
+        }
+
+        if (isSubmitted) {
+          submittedAssignments++;
+          if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
+            dueCell.classList.add('vtop-da-cell-augmented');
+            const badge = document.createElement('div');
+            badge.className = 'vtop-da-cell-badge';
+            badge.innerHTML = '<span class="vtop-da-badge vtop-da-badge-green">Submitted ✅</span>';
+            dueCell.appendChild(badge);
+          }
+        } else if (parsedDate) {
+          const rem = getRemainingTime(parsedDate);
+          if (rem) {
+            // Check if this is the closest upcoming deadline
+            if (rem.diffMs >= 0) {
+              if (!closestPending || rem.diffMs < closestPending.diffMs) {
+                closestPending = { ...rem, title, dateFormatted, date: parsedDate };
+              }
+            } else if (!closestPending || closestPending.isOverdue) {
+              if (!closestPending || rem.diffMs > closestPending.diffMs) {
+                closestPending = { ...rem, title, dateFormatted, date: parsedDate };
+              }
+            }
+
+            // Augment the table cell with an inline countdown badge
+            if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
+              dueCell.classList.add('vtop-da-cell-augmented');
+              const badge = document.createElement('div');
+              badge.className = 'vtop-da-cell-badge';
+              badge.innerHTML = `<span class="vtop-da-badge vtop-da-badge-${rem.badgeType}">${rem.badgeText}</span>`;
+              dueCell.appendChild(badge);
+
+              if (rem.badgeType === 'purple' || rem.badgeType === 'red') {
+                row.classList.add('vtop-da-urgent-row');
+              }
+            }
+          }
+        }
+      });
+
+      // Render or update the Top Banner above the assignments table
+      this.renderCountdownBanner(table, closestPending, totalAssignments, submittedAssignments);
+    },
+
+    renderCountdownBanner(table, closest, total, submitted) {
+      let banner = document.getElementById('vtop-da-countdown-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'vtop-da-countdown-banner';
+        const mountTarget = table.closest('.table-responsive') || table.parentElement || table;
+        mountTarget.parentElement.insertBefore(banner, mountTarget);
+      }
+
+      if (closest) {
+        banner.className = `vtop-da-banner vtop-da-banner-${closest.badgeType}`;
+        banner.innerHTML = `
+          <div class="vtop-da-banner-left">
+            <span class="vtop-da-banner-icon">${closest.isToday ? '⏰' : closest.isOverdue ? '⚠️' : '📅'}</span>
+            <div class="vtop-da-banner-info">
+              <div class="vtop-da-banner-title">
+                Next Deadline: <strong>${closest.title}</strong>
+              </div>
+              <div class="vtop-da-banner-sub">
+                Due on <strong>${closest.dateFormatted || closest.date.toLocaleDateString()}</strong> &bull; ${submitted}/${total} assignments completed
+              </div>
+            </div>
+          </div>
+          <div class="vtop-da-banner-right">
+            <span class="vtop-da-badge vtop-da-badge-${closest.badgeType} vtop-da-badge-lg">${closest.badgeText}</span>
+          </div>
+        `;
+      } else if (total > 0 && submitted >= total) {
+        banner.className = 'vtop-da-banner vtop-da-banner-green';
+        banner.innerHTML = `
+          <div class="vtop-da-banner-left">
+            <span class="vtop-da-banner-icon">🎉</span>
+            <div class="vtop-da-banner-info">
+              <div class="vtop-da-banner-title">
+                <strong>All Digital Assignments Completed!</strong>
+              </div>
+              <div class="vtop-da-banner-sub">
+                Great job! All ${total} assignments for this course have been uploaded and submitted.
+              </div>
+            </div>
+          </div>
+          <div class="vtop-da-banner-right">
+            <span class="vtop-da-badge vtop-da-badge-green vtop-da-badge-lg">All Done ✅</span>
+          </div>
+        `;
+      } else {
+        banner.className = 'vtop-da-banner vtop-da-banner-green';
+        banner.innerHTML = `
+          <div class="vtop-da-banner-left">
+            <span class="vtop-da-banner-icon">📋</span>
+            <div class="vtop-da-banner-info">
+              <div class="vtop-da-banner-title">Digital Assignment Tracker Active</div>
+              <div class="vtop-da-banner-sub">${total} assignments listed for this course</div>
+            </div>
+          </div>
+        `;
+      }
+    },
+
+    // =========================================================================
+    // 2. COURSE OVERVIEW TABLE (Outer Course Selection View)
+    // =========================================================================
+
+    findCourseOverviewTable() {
+      const allTables = Array.from(document.querySelectorAll('table'));
+      for (const table of allTables) {
+        const text = (table.innerText || table.textContent || '').toLowerCase();
+        const hasClassNbr = text.includes('class nbr') || text.includes('class number') || text.includes('class no');
+        const hasCourseCode = text.includes('course code') || text.includes('course title');
+
+        if (hasClassNbr && hasCourseCode) {
+          return table;
+        }
+      }
+      return null;
+    },
+
     augmentCourseOverviewTable(table) {
-      // 1. Add Header Cell
       const headerRow =
         table.querySelector('thead tr') ||
         table.querySelector('tr.tableHeader') ||
@@ -118,17 +420,16 @@
         const th = document.createElement(headerRow.querySelector('th') ? 'th' : 'td');
         th.className = 'vtop-th-da-status fixedContent tableHeader';
         th.textContent = 'Next Assignment';
-        th.style.cssText = 'text-align: center; vertical-align: middle; width: 15%; min-width: 135px;';
+        th.style.cssText = 'text-align: center; vertical-align: middle; width: 15%; min-width: 140px;';
         headerRow.appendChild(th);
       }
 
-      // 2. Add Data Cells to each course row
       const allRows = Array.from(table.querySelectorAll('tr'));
       const dataRows = allRows.filter((r) => {
-        if (r.classList.contains('tableHeader') || r.closest('thead')) return false;
+        if (r.classList.contains('tableHeader') || r.closest('thead') || r === headerRow) return false;
         if (r.querySelector('th')) return false;
         const cells = r.querySelectorAll('td');
-        return cells.length >= 6;
+        return cells.length >= 4;
       });
 
       dataRows.forEach((row) => {
@@ -142,7 +443,6 @@
         }
       });
 
-      // 3. Trigger background scan
       this.scanCourseDeadlines(dataRows);
     },
 
@@ -154,15 +454,15 @@
         document.querySelector('input[name*="regNo" i]')?.value;
       if (fromDom) return fromDom.trim();
 
-      try {
-        const match = document.cookie.match(/(?:^|;\s*)(?:authorizedID|regNo)=([^;]+)/i);
-        if (match) return decodeURIComponent(match[1]).trim();
-      } catch (_) {}
+      const userImg = document.querySelector('img[src*="/vtop/users/image/?id="]');
+      if (userImg) {
+        const idMatch = userImg.src.match(/id=([a-zA-Z0-9]+)/);
+        if (idMatch && idMatch[1]) return idMatch[1].toUpperCase();
+      }
 
-      const profileEl = document.querySelector('.user-profile, .username, #regNo, .navbar-custom-menu');
-      const profileText = profileEl?.textContent || '';
-      const regMatch = profileText.match(/\b\d{2}[A-Z]{3}\d{4,5}\b/i);
-      if (regMatch) return regMatch[0].toUpperCase();
+      const bodyText = document.body?.innerText || document.body?.textContent || '';
+      const regMatch = bodyText.match(/\b(2[0-9][A-Z]{3}[0-9]{4,5})\b/i);
+      if (regMatch) return regMatch[1].toUpperCase();
 
       return '';
     },
@@ -176,7 +476,7 @@
 
       try {
         const match = document.cookie.match(/(?:^|;\s*)(?:XSRF-TOKEN|_csrf)=([^;]+)/i);
-        if (match) return decodeURIComponent(match[1]);
+        if (match && match[1]) return decodeURIComponent(match[1]);
       } catch (_) {}
 
       if (window._csrf) return window._csrf;
@@ -199,16 +499,15 @@
         const cell = row.querySelector('.vtop-td-da-status');
         if (!cell) return;
 
-        // If already resolved to a final badge, don't re-fetch
         if (cell.querySelector('.vtop-da-badge:not(.vtop-da-badge-loading)')) return;
 
         const cells = row.querySelectorAll('td');
-        const classNbrText = (cells[1]?.textContent || '').trim();
+        const classNbrText = (cells[1]?.innerText || cells[1]?.textContent || '').trim();
         const button = row.querySelector('button, a');
         const onclickAttr = button?.getAttribute('onclick') || '';
         const onclickMatch =
-          onclickAttr.match(/(?:myFunction|processDigitalAssignment|viewDA|doDownloadQuestion)\s*\(\s*['"]([^'"]+)['"]/i) ||
-          onclickAttr.match(/\(['"](VL[A-Za-z0-9]+|\d+)['"]\)/i);
+          onclickAttr.match(/(?:myFunction|processDigitalAssignment|viewDA|doDownloadQuestion|doStudentDA)\s*\(\s*['"]?([a-zA-Z0-9_\-]+)['"]?/i) ||
+          onclickAttr.match(/\(['"]?([a-zA-Z0-9_\-]+)['"]?\)/i);
 
         const classId =
           button?.dataset?.classid ||
@@ -224,7 +523,6 @@
           return;
         }
 
-        // Check sessionStorage cache first (20 minute TTL)
         const cacheKey = `vtop_da_status_${classId}`;
         let status = null;
         try {
@@ -259,12 +557,10 @@
       };
 
       try {
-        const BATCH_SIZE = 3;
-        for (let i = 0; i < pendingRows.length; i += BATCH_SIZE) {
-          const batch = pendingRows.slice(i, i + BATCH_SIZE);
-          await Promise.all(batch.map((row) => processRow(row)));
-          if (i + BATCH_SIZE < pendingRows.length) {
-            await new Promise((r) => setTimeout(r, 150));
+        for (let i = 0; i < pendingRows.length; i++) {
+          await processRow(pendingRows[i]);
+          if (i < pendingRows.length - 1) {
+            await new Promise((r) => setTimeout(r, Math.floor(300 + Math.random() * 150)));
           }
         }
       } finally {
@@ -277,7 +573,8 @@
       const endpoints = [
         `${window.location.origin}/${basePath}/examinations/processDigitalAssignment`,
         `${window.location.origin}/${basePath}/processDigitalAssignment`,
-        `${window.location.origin}/${basePath}/examinations/StudentDAUpload`
+        `${window.location.origin}/${basePath}/examinations/StudentDAUpload`,
+        `${window.location.origin}/${basePath}/examinations/doStudentDA`
       ];
 
       const params = new URLSearchParams();
@@ -301,6 +598,11 @@
             },
             body: params.toString()
           });
+
+          if (res.status === 429) {
+            console.warn('[VTOP++] VTOP rate limited DA checks (HTTP 429).');
+            return { type: 'error', text: 'Rate limited' };
+          }
 
           if (!res.ok) continue;
 
@@ -327,7 +629,7 @@
 
       const tables = Array.from(doc.querySelectorAll('table'));
       let daTable = tables.find((t) => {
-        const txt = (t.textContent || '').toLowerCase();
+        const txt = (t.innerText || t.textContent || '').toLowerCase();
         return (
           txt.includes('due date') ||
           txt.includes('download question') ||
@@ -352,8 +654,8 @@
         if (r.classList.contains('tableHeader') || r.closest('thead')) return false;
         if (r.querySelector('th')) return false;
         const cells = r.querySelectorAll('td');
-        if (cells.length < 5) return false;
-        const firstText = (cells[0].textContent || '').trim().toLowerCase();
+        if (cells.length < 3) return false;
+        const firstText = (cells[0].innerText || cells[0].textContent || '').trim().toLowerCase();
         if (firstText.includes('sl.no') || firstText.includes('last updated')) return false;
         return true;
       });
@@ -362,27 +664,26 @@
         return { type: 'done', text: 'All submissions done' };
       }
 
-      let closestUpcomingDays = null;
-      let closestOverdueDays = null;
+      let closestPending = null;
       let hasUnsubmitted = false;
 
       dataRows.forEach((row) => {
         const cells = row.querySelectorAll('td');
-        if (cells.length < 5) return;
+        if (cells.length < 3) return;
 
         // Check if submitted
-        const hasStudentDownloadBtn = Boolean(
+        const hasStudentDownload = Boolean(
           row.querySelector(
             'button[name="downloadStudentDA"], button[id="downloadStudentDA"], a[href*="downloadSTudentDA"], [data-code][id*="StudentDA" i]'
           )
         );
-        const cellTexts = Array.from(cells).map((c) => c.textContent || '');
+        const cellTexts = Array.from(cells).map((c) => (c.innerText || c.textContent || '').trim());
         const hasTimestamp = cellTexts.some(
           (txt) =>
             /\b\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b|\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/.test(txt) &&
             (txt.includes('AM') || txt.includes('PM') || txt.includes(':'))
         );
-        const rowText = (row.textContent || '').toLowerCase();
+        const rowText = (row.innerText || row.textContent || '').toLowerCase();
         const hasSubmittedText =
           rowText.includes('uploaded') || rowText.includes('submitted') || rowText.includes('view file');
         const hasUploadAction = Boolean(
@@ -392,7 +693,7 @@
         );
 
         let isSubmitted = false;
-        if (hasStudentDownloadBtn || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
+        if (hasStudentDownload || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
           isSubmitted = true;
         }
         if (rowText.includes('not applicable') || rowText.includes('n/a')) {
@@ -401,32 +702,33 @@
 
         if (!isSubmitted) {
           hasUnsubmitted = true;
-          const dateSourceText = (cells[4]?.textContent || row.textContent || '').trim();
-          const allDateMatches = Array.from(
-            dateSourceText.matchAll(
-              /\b(\d{1,2}[-\/\s][A-Za-z]{3,}[-\/\s]\d{2,4}|\d{1,2}[-\/\.][0-9]{1,2}[-\/\.]\d{2,4})\b/g
-            )
-          );
 
-          if (allDateMatches.length > 0) {
-            const parsedDates = allDateMatches.map((m) => parseIndianDate(m[1])).filter(Boolean);
+          // Search all cells for due date patterns
+          let foundDate = null;
+          for (let i = 0; i < cells.length; i++) {
+            const cellTxt = (cells[i].innerText || cells[i].textContent || '').trim();
+            const dateMatch =
+              cellTxt.match(/\b(\d{1,2}[-\/\s][A-Za-z]{3,}[-\/\s]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/) ||
+              cellTxt.match(/\b(\d{1,2}[-\/\.][0-9]{1,2}[-\/\.]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/);
+            if (dateMatch) {
+              const dt = parseIndianDate(dateMatch[1]);
+              if (dt) {
+                foundDate = dt;
+                break;
+              }
+            }
+          }
 
-            if (parsedDates.length > 0) {
-              parsedDates.sort((a, b) => a.getTime() - b.getTime());
-              const parsedDate = parsedDates[0];
-
-              const now = new Date();
-              const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-              const dueDayStart = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate()).getTime();
-              const diffDays = Math.round((dueDayStart - todayStart) / (1000 * 60 * 60 * 24));
-
-              if (diffDays >= 0) {
-                if (closestUpcomingDays === null || diffDays < closestUpcomingDays) {
-                  closestUpcomingDays = diffDays;
+          if (foundDate) {
+            const rem = getRemainingTime(foundDate);
+            if (rem) {
+              if (rem.diffMs >= 0) {
+                if (!closestPending || rem.diffMs < closestPending.diffMs) {
+                  closestPending = rem;
                 }
-              } else {
-                if (closestOverdueDays === null || diffDays > closestOverdueDays) {
-                  closestOverdueDays = diffDays;
+              } else if (!closestPending || closestPending.isOverdue) {
+                if (!closestPending || rem.diffMs > closestPending.diffMs) {
+                  closestPending = rem;
                 }
               }
             }
@@ -438,22 +740,11 @@
         return { type: 'done', text: 'All submissions done' };
       }
 
-      // Design rules:
-      // - Purple: Due today (0 days left)
-      // - Red: 3 or less days left (or overdue)
-      // - Green: More than 3 days left
-      if (closestUpcomingDays !== null) {
-        if (closestUpcomingDays === 0) {
-          return { type: 'purple', text: 'Due today' };
-        } else if (closestUpcomingDays <= 3) {
-          return { type: 'red', text: `${closestUpcomingDays} day${closestUpcomingDays === 1 ? '' : 's'} left` };
-        } else {
-          return { type: 'green', text: `${closestUpcomingDays} days left` };
-        }
-      }
-
-      if (closestOverdueDays !== null) {
-        return { type: 'red', text: 'Overdue' };
+      if (closestPending) {
+        return {
+          type: closestPending.badgeType,
+          text: closestPending.badgeText
+        };
       }
 
       return { type: 'done', text: 'All submissions done' };

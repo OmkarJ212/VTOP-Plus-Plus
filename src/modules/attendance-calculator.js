@@ -250,7 +250,18 @@
 
       dataRows.forEach((row) => {
         const data = this.extractAttendanceData(row, attendedIdx, totalIdx, odIdx);
-        if (!data || data.total === 0) return;
+        if (!data || data.total === 0) {
+          // Ensure placeholder cell exists to prevent column count distortion across rows
+          let bunkCell = row.querySelector('.vtop-td-bunk');
+          if (!bunkCell) {
+            bunkCell = document.createElement('td');
+            bunkCell.className = 'vtop-td-bunk fixedContent tableContent';
+            bunkCell.style.cssText = 'text-align: center; vertical-align: middle; padding: 8px 10px;';
+            bunkCell.innerHTML = '<span style="color:#94a3b8;font-size:12px;">--</span>';
+            row.appendChild(bunkCell);
+          }
+          return;
+        }
 
         totalAttendedSum += data.attended;
         totalConductedSum += data.total;

@@ -102,8 +102,8 @@ body::-webkit-scrollbar-thumb:hover {
 
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
   margin-bottom: 14px;
 }
 
@@ -146,6 +146,16 @@ body::-webkit-scrollbar-thumb:hover {
 
 .action-btn:active {
   transform: translateY(0) scale(0.98);
+}
+
+.action-btn.active {
+  background: #f0f9ff;
+  border-color: #38bdf8;
+  color: #0284c7;
+}
+
+.action-btn.active svg {
+  color: #0284c7;
 }
 
 .status-message {
