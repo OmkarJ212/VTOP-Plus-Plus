@@ -1,0 +1,790 @@
+/**
+ * VTOP++ - Live Course Materials Filter Module
+ * Fully ported & enhanced from vtop-course-filter.
+ * 
+ * Features:
+ * 1. Segregates VTOP Course Page Consolidated by Semester (Recent First), Subject (with live search), and Faculty.
+ * 2. Instant localStorage faculty cache per subject.
+ * 3. Multi-page DataTables traversal to extract all professors across 15-25 pages.
+ * 4. Real-time table filter by faculty across all pages (DataTables search hook).
+ * 5. In-table instant filter bar for topic, lecture keywords, and Theory / Lab type pills.
+ * 6. Clean lifecycle management with full destroy/unmount support.
+ */
+
+(function () {
+  'use strict';
+
+  window.VTOP_PLUS = window.VTOP_PLUS || {};
+
+  const UI_ID = 'vtop-custom-course-filter';
+  const TABLE_BAR_ID = 'vtop-plus-table-filter-bar';
+  const LS_KEY = 'vtopFilter.v1';
+  const CACHE_TTL = 14 * 24 * 3600 * 1000;
+  const CACHE_MAX = 80;
+  const POLL_MS = 150;
+  const STALE_MS = 3000;
+  const DT_GRACE_MS = 1500;
+
+  const SELECTOR_DOWNLOAD_BTNS = 'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]';
+
+  const state = {
+    sem: '',
+    subj: '',
+    fac: 'ALL',
+    type: 'ALL',
+    subjQ: '',
+    facQ: '',
+    topicQ: '',
+    courses: {},
+    sems: [],
+    faculty: [],
+    facCol: 3,
+    matCol: 2,
+    courseCol: 1,
+    native: null,
+    loadTs: 0,
+    timer: null,
+    hooked: false,
+    hookTable: null,
+    pending: null,
+    crawling: false
+  };
+
+  let persist = { sem: '', fac: {} };
+  try {
+    const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    if (o && typeof o === 'object') persist = { sem: o.sem || '', fac: o.fac || {} };
+  } catch (_) {}
+
+  function savePersist() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(persist));
+    } catch (_) {}
+  }
+
+  function cacheGet(subj) {
+    const e = persist.fac[subj];
+    if (!e || !Array.isArray(e.f) || Date.now() - e.t > CACHE_TTL) return null;
+    return e.f.map((x) => ({ name: x[0], count: x[1] }));
+  }
+
+  function cacheSet(subj, list) {
+    persist.fac[subj] = { t: Date.now(), f: list.map((f) => [f.name, f.count]) };
+    const keys = Object.keys(persist.fac);
+    if (keys.length > CACHE_MAX) {
+      keys
+        .sort((a, b) => persist.fac[a].t - persist.fac[b].t)
+        .slice(0, keys.length - CACHE_MAX)
+        .forEach((k) => delete persist.fac[k]);
+    }
+    savePersist();
+  }
+
+  function setBusy(on) {
+    const b = document.getElementById('vtop-busy');
+    if (b) b.style.display = on ? 'block' : 'none';
+  }
+
+  function semWeight(s) {
+    const m = s.match(/(\d{4})-\d{2}/);
+    const y = m ? parseInt(m[1], 10) : 0;
+    const l = s.toLowerCase();
+    let t = 0;
+    if (l.includes('summer')) t = 3;
+    else if (l.includes('winter')) t = 2;
+    else if (l.includes('fall')) t = 1;
+    if (l.includes('inter')) t += 0.5;
+    return y * 10 + t;
+  }
+
+  function parseOptions(sel) {
+    const data = {};
+    let selSem = '';
+    let selVal = '';
+    const opts = sel.options;
+    for (let i = 0; i < opts.length; i++) {
+      const opt = opts[i];
+      const text = opt.textContent.trim();
+      if (!opt.value || text.includes('-- Registered Courses --')) continue;
+      // Robust split supporting standard hyphen, en-dash (–), and em-dash (—)
+      const parts = text.split(/\s*[-–—]\s*/);
+      if (parts.length < 2) continue;
+      const sem = parts[0].trim();
+      if (!data[sem]) data[sem] = [];
+      const label = parts.slice(1).join(' - ').trim();
+      data[sem].push({ value: opt.value, label, labelLower: label.toLowerCase() });
+      if (opt.selected) {
+        selSem = sem;
+        selVal = opt.value;
+      }
+    }
+    return { data, selSem, selVal };
+  }
+
+  function cleanFaculty(v) {
+    if (v == null) return '';
+    let s = typeof v === 'string' ? v : v.innerHTML !== undefined ? v.innerHTML : String(v);
+    if (s.includes('<')) {
+      s = s
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/(div|p|li|tr|td)>/gi, '\n')
+        .replace(/<[^>]*>/g, ' ');
+    }
+    if (s.includes('&')) {
+      s = s.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&');
+    }
+    const lines = s.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].replace(/\s*\d{2}-\d{2}-\d{4}.*$/, '').replace(/\s+/g, ' ').trim();
+      if (line) return /no data/i.test(line) ? '' : line;
+    }
+    return '';
+  }
+
+  const CourseFilter = {
+    init() {
+      this.ensureCourseDropdownUI();
+      this.checkAndMountTableFilterBar();
+    },
+
+    destroy() {
+      stopWaiting();
+
+      // 1. Remove course dropdown UI
+      const ui = document.getElementById(UI_ID);
+      if (ui) ui.remove();
+
+      // 2. Unhide native course dropdown
+      if (state.native) {
+        state.native.style.display = '';
+        const sib = state.native.nextElementSibling;
+        if (sib && /select2|chosen|bootstrap-select|ms-parent/.test(sib.className || '')) {
+          sib.style.display = '';
+        }
+        state.native = null;
+      }
+
+      // 3. Remove table filter bar
+      const bar = document.getElementById(TABLE_BAR_ID);
+      if (bar) bar.remove();
+
+      // 4. Reset table rows display
+      const table = this.findMaterialsTable();
+      if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach((r) => (r.style.display = ''));
+      }
+    },
+
+    findCourseDropdown() {
+      const selects = document.getElementsByTagName('select');
+      for (let i = 0; i < selects.length; i++) {
+        const sel = selects[i];
+        if (sel.textContent && sel.textContent.includes('Registered Courses')) return sel;
+        const maxCheck = Math.min(sel.options.length, 5);
+        for (let j = 0; j < maxCheck; j++) {
+          if (sel.options[j].textContent.includes('Registered Courses')) return sel;
+        }
+      }
+      return null;
+    },
+
+    findMaterialsTable() {
+      const btn = document.querySelector(SELECTOR_DOWNLOAD_BTNS);
+      if (btn) {
+        const table = btn.closest('table');
+        if (table) return table;
+      }
+
+      const tables = document.getElementsByTagName('table');
+      for (let i = tables.length - 1; i >= 0; i--) {
+        const t = tables[i];
+        if (!t.tBodies.length || t.querySelector('table')) continue;
+        const h = t.tHead ? t.tHead.textContent.toLowerCase() : '';
+        if (h.includes('uploaded by') && (h.includes('material') || h.includes('download') || h.includes('detail'))) {
+          return t;
+        }
+      }
+      return document.querySelector('#materialTable, table[id*="material" i]');
+    },
+
+    ensureCourseDropdownUI() {
+      const ui = document.getElementById(UI_ID);
+      if (ui && state.native && state.native.isConnected) return;
+      if (ui) ui.remove();
+
+      const sel = this.findCourseDropdown();
+      if (sel) this.mountCourseDropdownUI(sel);
+    },
+
+    mountCourseDropdownUI(native) {
+      state.native = native;
+      const parsed = parseOptions(native);
+      state.courses = parsed.data;
+      state.sems = Object.keys(parsed.data).sort((a, b) => semWeight(b) - semWeight(a));
+
+      if (parsed.selVal) {
+        if (parsed.selVal !== state.subj) {
+          state.fac = 'ALL';
+          state.facQ = '';
+          state.faculty = [];
+        }
+        state.sem = parsed.selSem;
+        state.subj = parsed.selVal;
+      } else {
+        state.subj = '';
+        state.fac = 'ALL';
+        state.facQ = '';
+        state.faculty = [];
+        if (!state.courses[state.sem]) state.sem = '';
+      }
+
+      if (!state.sem || !state.courses[state.sem]) {
+        state.sem = persist.sem && state.courses[persist.sem] ? persist.sem : state.sems[0] || '';
+      }
+
+      native.style.display = 'none';
+      const sib = native.nextElementSibling;
+      if (sib && /select2|chosen|bootstrap-select|ms-parent/.test(sib.className || '')) {
+        sib.style.display = 'none';
+      }
+
+      const box = document.createElement('div');
+      box.id = UI_ID;
+      box.className = 'vtop-plus-course-filter-panel';
+      box.style.cssText =
+        'display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding:16px;' +
+        'background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;margin:12px 0 16px;width:100%;' +
+        'box-sizing:border-box;box-shadow:0 4px 14px rgba(0,0,0,0.06);font-family:inherit;';
+
+      const selCss = 'width:100%;height:38px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;font-size:13px;color:#0f172a;';
+      const lblCss = 'font-weight:700;font-size:12px;color:#334155;margin-bottom:6px;display:block;';
+      const inCss = 'width:58%;padding:4px 8px;font-size:12px;border:1px solid #cbd5e1;border-radius:4px;outline:none;';
+      const headCss = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
+
+      box.innerHTML = `
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+          <label style="${lblCss}">1. Select Semester (Recent First)</label>
+          <select id="vtop-sem-select" class="form-control" style="${selCss}">
+            <option value="">-- Choose Semester --</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <div style="${headCss}">
+            <label style="${lblCss};margin-bottom:0;">2. Select Subject</label>
+            <input type="text" id="vtop-subj-search" placeholder="Search code/title..." style="${inCss}" disabled />
+          </div>
+          <select id="vtop-subj-select" class="form-control" style="${selCss}" disabled>
+            <option value="">-- Select Semester First --</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <div style="${headCss}">
+            <label style="${lblCss};margin-bottom:0;">3. Filter by Faculty</label>
+            <input type="text" id="vtop-fac-search" placeholder="Search faculty..." style="${inCss}" disabled />
+          </div>
+          <select id="vtop-fac-select" class="form-control" style="${selCss}" disabled>
+            <option value="ALL">-- Select Subject First --</option>
+          </select>
+        </div>
+        <div id="vtop-busy" style="display:none;grid-column:1/-1;height:3px;border-radius:2px;
+          background:linear-gradient(90deg,transparent,#27ae60,transparent);background-size:40% 100%;
+          background-repeat:no-repeat;animation:vtopSlide 1s linear infinite;"></div>
+        <style>@keyframes vtopSlide{0%{background-position:-40% 0}100%{background-position:140% 0}}</style>
+      `;
+
+      native.parentNode.insertBefore(box, native);
+
+      const semSel = document.getElementById('vtop-sem-select');
+      const subjSel = document.getElementById('vtop-subj-select');
+      const subjSearch = document.getElementById('vtop-subj-search');
+      const facSel = document.getElementById('vtop-fac-select');
+      const facSearch = document.getElementById('vtop-fac-search');
+
+      const frag = document.createDocumentFragment();
+      state.sems.forEach((sem) => {
+        const o = document.createElement('option');
+        o.value = sem;
+        o.textContent = `${sem} (${state.courses[sem].length} Courses)`;
+        frag.appendChild(o);
+      });
+      semSel.appendChild(frag);
+
+      if (state.sem && state.courses[state.sem]) {
+        semSel.value = state.sem;
+        subjSearch.disabled = false;
+        subjSearch.value = state.subjQ;
+        this.renderSubjects();
+
+        if (state.subj) {
+          const c = state.faculty.length ? state.faculty : cacheGet(state.subj);
+          if (c && c.length) {
+            state.faculty = c;
+            facSel.disabled = false;
+            facSearch.disabled = false;
+            facSearch.value = state.facQ;
+            this.renderFaculty();
+          } else {
+            facSel.innerHTML = '<option value="ALL">Loading materials...</option>';
+          }
+          waitForTable(null, this);
+        }
+      }
+
+      semSel.addEventListener('change', () => {
+        state.sem = semSel.value;
+        if (state.sem) {
+          persist.sem = state.sem;
+          savePersist();
+        }
+        state.subj = '';
+        state.fac = 'ALL';
+        state.subjQ = '';
+        state.facQ = '';
+        state.faculty = [];
+        subjSearch.value = '';
+        facSearch.value = '';
+        this.facPlaceholder('-- Select Subject First --');
+
+        if (!state.sem) {
+          subjSel.innerHTML = '<option value="">-- Select Semester First --</option>';
+          subjSel.disabled = true;
+          subjSearch.disabled = true;
+          return;
+        }
+        subjSearch.disabled = false;
+        this.renderSubjects();
+      });
+
+      subjSearch.addEventListener('input', () => {
+        state.subjQ = subjSearch.value;
+        this.renderSubjects();
+      });
+
+      subjSel.addEventListener('change', () => {
+        const val = subjSel.value;
+        if (!val) return;
+        state.subj = val;
+        state.fac = 'ALL';
+        state.facQ = '';
+        facSearch.value = '';
+
+        const cached = cacheGet(val);
+        if (cached) {
+          state.faculty = cached;
+          facSel.disabled = false;
+          facSearch.disabled = false;
+          this.renderFaculty();
+        } else {
+          state.faculty = [];
+          this.facPlaceholder('Loading materials...');
+        }
+
+        const stale = this.findMaterialsTable();
+        state.loadTs = Date.now();
+        native.value = val;
+        waitForTable(stale, this);
+        native.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // Start at ALL Faculty for newly selected subject
+        window.VTOP_PLUS?.CourseDownloader?.resetCourse?.();
+        if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
+          window.VTOP_PLUS.CourseDownloader.selectFaculty('ALL');
+        }
+      });
+
+      facSearch.addEventListener('input', () => {
+        state.facQ = facSearch.value;
+        this.renderFaculty();
+        this.applyFilter();
+        if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
+          window.VTOP_PLUS.CourseDownloader.selectFaculty(state.fac);
+        }
+      });
+
+      facSel.addEventListener('change', () => {
+        state.fac = facSel.value;
+        this.applyFilter();
+        if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
+          window.VTOP_PLUS.CourseDownloader.selectFaculty(state.fac);
+        }
+      });
+    },
+
+    facPlaceholder(text) {
+      const facSel = document.getElementById('vtop-fac-select');
+      const facSearch = document.getElementById('vtop-fac-search');
+      if (!facSel || !facSearch) return;
+      facSel.innerHTML = '';
+      const o = document.createElement('option');
+      o.value = 'ALL';
+      o.textContent = text;
+      facSel.appendChild(o);
+      facSel.disabled = true;
+      facSearch.disabled = true;
+    },
+
+    renderSubjects() {
+      const sel = document.getElementById('vtop-subj-select');
+      if (!sel) return;
+      const list = state.courses[state.sem] || [];
+      const tokens = state.subjQ.toLowerCase().split(/\s+/).filter(Boolean);
+      const filtered = tokens.length
+        ? list.filter((c) => {
+            const l = c.labelLower || c.label.toLowerCase();
+            return tokens.every((t) => l.includes(t));
+          })
+        : list;
+
+      const frag = document.createDocumentFragment();
+      const def = document.createElement('option');
+      def.value = '';
+      def.textContent = filtered.length
+        ? `-- Choose Subject (${filtered.length} shown) --`
+        : '-- No matching subjects --';
+      frag.appendChild(def);
+      filtered.forEach((c) => {
+        const o = document.createElement('option');
+        o.value = c.value;
+        o.textContent = c.label;
+        frag.appendChild(o);
+      });
+      sel.replaceChildren(frag);
+      sel.disabled = false;
+      sel.value = filtered.some((c) => c.value === state.subj) ? state.subj : '';
+    },
+
+    renderFaculty() {
+      const sel = document.getElementById('vtop-fac-select');
+      if (!sel) return;
+      const q = state.facQ.trim().toLowerCase();
+      const list = q
+        ? state.faculty.filter((f) => (f.nameLower || f.name.toLowerCase()).includes(q))
+        : state.faculty;
+
+      if (!list.some((f) => f.name === state.fac)) {
+        state.fac = q && list.length ? list[0].name : 'ALL';
+      }
+
+      const frag = document.createDocumentFragment();
+      const all = document.createElement('option');
+      all.value = 'ALL';
+      all.textContent = `All Faculty (${list.length} of ${state.faculty.length} shown)`;
+      frag.appendChild(all);
+      list.forEach((f) => {
+        const o = document.createElement('option');
+        o.value = f.name;
+        o.textContent = `${f.name} (${f.count} files)`;
+        frag.appendChild(o);
+      });
+      sel.replaceChildren(frag);
+      sel.value = state.fac;
+    },
+
+    autoExpandLength(table) {
+      const lengthSelect = document.querySelector('select[name="materialTable_length"], select[name$="_length"]');
+      if (lengthSelect && lengthSelect.value !== '100' && lengthSelect.value !== '-1') {
+        let targetOption = lengthSelect.querySelector('option[value="100"]') ||
+                           lengthSelect.querySelector('option[value="-1"]');
+        if (!targetOption) {
+          let maxVal = 0;
+          for (const opt of lengthSelect.options) {
+            const val = parseInt(opt.value, 10);
+            if (val > maxVal) {
+              maxVal = val;
+              targetOption = opt;
+            }
+          }
+        }
+        if (targetOption && lengthSelect.value !== targetOption.value) {
+          lengthSelect.value = targetOption.value;
+          lengthSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          return true;
+        }
+      }
+      return false;
+    },
+
+    checkAndMountTableFilterBar() {
+      const table = this.findMaterialsTable();
+      if (!table) {
+        const existing = document.getElementById(TABLE_BAR_ID);
+        if (existing) existing.remove();
+        return;
+      }
+
+      this.autoExpandLength(table);
+
+      const existingBar = document.getElementById(TABLE_BAR_ID);
+      const targetParent = table.closest('.dataTables_wrapper') || table.parentNode;
+
+      if (existingBar) {
+        if (existingBar.parentNode === targetParent) return;
+        existingBar.remove();
+      }
+
+      this.mountTableFilterBar(table, targetParent);
+    },
+
+    detectColumns(table) {
+      let facCol = 3;
+      let matCol = 2;
+      let courseCol = 1;
+
+      const headCells = table.querySelectorAll('thead th, thead td, tr:first-child th');
+      headCells.forEach((th, idx) => {
+        const text = th.textContent.toLowerCase();
+        if (text.includes('uploaded by') || text.includes('faculty') || text.includes('teacher')) {
+          facCol = idx;
+        } else if (text.includes('material') || text.includes('description') || text.includes('topic')) {
+          matCol = idx;
+        } else if (text.includes('course') || text.includes('subject')) {
+          courseCol = idx;
+        }
+      });
+      state.facCol = facCol;
+      state.matCol = matCol;
+      state.courseCol = courseCol;
+      return { facCol, matCol, courseCol };
+    },
+
+    mountTableFilterBar(table, targetParent) {
+      const container = document.createElement('div');
+      container.id = TABLE_BAR_ID;
+      container.className = 'vtop-plus-filter-container';
+
+      container.innerHTML = `
+        <div class="vtop-filter-row">
+          <div class="vtop-filter-group" style="flex: 2;">
+            <span class="vtop-filter-icon">🔍</span>
+            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Quick filter by topic, module, keyword..." />
+          </div>
+          <div class="vtop-filter-group" style="flex: 1;">
+            <label class="vtop-filter-label" for="vtop-table-filter-type">Type:</label>
+            <select id="vtop-table-filter-type" class="vtop-filter-select">
+              <option value="ALL">All Types</option>
+              <option value="THEORY">Theory (ETH/TH)</option>
+              <option value="LAB">Lab (ELA/LO)</option>
+            </select>
+          </div>
+          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters">Clear</button>
+        </div>
+      `;
+
+      targetParent.insertBefore(container, targetParent.firstChild);
+
+      const searchInput = document.getElementById('vtop-table-filter-search');
+      const typeSelect = document.getElementById('vtop-table-filter-type');
+      const resetBtn = document.getElementById('vtop-table-filter-reset');
+
+      searchInput?.addEventListener('input', () => {
+        state.topicQ = searchInput.value.toLowerCase().trim();
+        this.applyFilter();
+      });
+
+      typeSelect?.addEventListener('change', () => {
+        state.type = typeSelect.value;
+        this.applyFilter();
+      });
+
+      resetBtn?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        if (typeSelect) typeSelect.value = 'ALL';
+        state.topicQ = '';
+        state.type = 'ALL';
+        state.fac = 'ALL';
+        const facSel = document.getElementById('vtop-fac-select');
+        if (facSel) facSel.value = 'ALL';
+        this.applyFilter();
+        if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
+          window.VTOP_PLUS.CourseDownloader.selectFaculty('ALL');
+        }
+      });
+    },
+
+    applyFilter() {
+      const table = this.findMaterialsTable();
+      if (!table) return;
+
+      const cols = this.detectColumns(table);
+      const query = (state.topicQ || '').toLowerCase().trim();
+      const selectedFac = state.fac;
+      const selectedType = state.type;
+
+      // 1. Try driving DataTables' own search box if faculty is selected and no custom topic query
+      const wrap = table.closest('.dataTables_wrapper, .dt-container') || document;
+      const dtInput = wrap.querySelector('.dataTables_filter input, .dt-search input');
+      if (dtInput) {
+        const desiredVal = (selectedFac !== 'ALL' && !query) ? selectedFac : '';
+        if (dtInput.value !== desiredVal && (desiredVal || dtInput.value)) {
+          dtInput.value = desiredVal;
+          dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+
+      // 2. High-performance zero-reflow row filter:
+      // Pass A: Read all textContent (zero layout reflows)
+      const rows = Array.from(table.querySelectorAll('tbody tr'));
+      const visibilityMap = new Array(rows.length);
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 3) {
+          visibilityMap[i] = true;
+          continue;
+        }
+
+        const courseText = (cells[cols.courseCol]?.textContent || '').toLowerCase();
+        const materialText = (cells[cols.matCol]?.textContent || '').toLowerCase();
+        const teacherText = (cells[cols.facCol]?.textContent || '').toLowerCase();
+        const rowText = (row.textContent || '').toLowerCase();
+
+        const matchesTopic = !query || materialText.includes(query) || courseText.includes(query) || rowText.includes(query);
+        const matchesFac = selectedFac === 'ALL' || teacherText.includes(selectedFac.toLowerCase());
+
+        let matchesType = true;
+        if (selectedType === 'THEORY') {
+          matchesType = !courseText.includes('ela') && !courseText.includes('lo') && !courseText.includes('lab');
+        } else if (selectedType === 'LAB') {
+          matchesType = courseText.includes('ela') || courseText.includes('lo') || courseText.includes('lab');
+        }
+
+        visibilityMap[i] = Boolean(matchesTopic && matchesFac && matchesType);
+      }
+
+      // Pass B: Batch mutate DOM styles (no interleaved reads, locked 60 FPS)
+      for (let i = 0; i < rows.length; i++) {
+        const shouldShow = visibilityMap[i];
+        const currentDisplay = rows[i].style.display;
+        if (shouldShow && currentDisplay !== '') {
+          rows[i].style.display = '';
+        } else if (!shouldShow && currentDisplay !== 'none') {
+          rows[i].style.display = 'none';
+        }
+      }
+    },
+
+    selectFaculty(facultyName) {
+      const facSel = document.getElementById('vtop-fac-select');
+      if (!facSel) return;
+
+      if (!facultyName || facultyName === 'ALL' || facultyName === '__ALL__') {
+        state.fac = 'ALL';
+        facSel.value = 'ALL';
+        this.applyFilter();
+        return;
+      }
+
+      const target = facultyName.trim().toLowerCase();
+      let matchedValue = null;
+
+      for (const opt of facSel.options) {
+        const val = opt.value.trim().toLowerCase();
+        if (val === target || (val !== 'all' && (val.includes(target) || target.includes(val)))) {
+          matchedValue = opt.value;
+          break;
+        }
+      }
+
+      if (matchedValue) {
+        state.fac = matchedValue;
+        facSel.value = matchedValue;
+        this.applyFilter();
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ */
+  /*  Table Observation & Faculty Extraction                            */
+  /* ------------------------------------------------------------------ */
+
+  function waitForTable(stale, filterInstance) {
+    clearInterval(state.timer);
+    state.pending = { stale, t0: Date.now(), foundAt: 0 };
+    setBusy(true);
+    state.timer = setInterval(() => tryExtract(filterInstance), POLL_MS);
+    tryExtract(filterInstance);
+  }
+
+  function stopWaiting() {
+    clearInterval(state.timer);
+    state.timer = null;
+    state.pending = null;
+    setBusy(false);
+  }
+
+  function tryExtract(filterInstance) {
+    const p = state.pending;
+    if (!p) return;
+    const now = Date.now();
+    const table = filterInstance.findMaterialsTable();
+
+    if (table && (table !== p.stale || now - p.t0 >= STALE_MS)) {
+      if (!p.foundAt) p.foundAt = now;
+      if (now - p.foundAt >= 300) {
+        stopWaiting();
+        finishExtraction(table, filterInstance);
+      }
+    } else if (now - p.t0 >= 15000) {
+      stopWaiting();
+      filterInstance.facPlaceholder('Materials table timed out');
+    }
+  }
+
+  function finishExtraction(table, filterInstance) {
+    const expanded = filterInstance.autoExpandLength(table);
+
+    const extractRows = () => {
+      const cols = filterInstance.detectColumns(table);
+
+      let counts = new Map();
+      const rows = table.tBodies[0] ? table.tBodies[0].rows : [];
+      for (let i = 0; i < rows.length; i++) {
+        const c = rows[i].cells[cols.facCol];
+        if (!c) continue;
+        const f = cleanFaculty(c.innerHTML);
+        if (f) counts.set(f, (counts.get(f) || 0) + 1);
+      }
+
+      state.faculty = Array.from(counts, ([name, count]) => ({
+        name,
+        count,
+        nameLower: name.toLowerCase()
+      })).sort((a, b) => a.name.localeCompare(b.name));
+
+      if (state.subj) cacheSet(state.subj, state.faculty);
+
+      const facSel = document.getElementById('vtop-fac-select');
+      const facSearch = document.getElementById('vtop-fac-search');
+      if (!facSel || !facSearch) return;
+
+      if (!state.faculty.length) {
+        filterInstance.facPlaceholder('No materials found');
+        return;
+      }
+
+      facSel.disabled = false;
+      facSearch.disabled = false;
+      facSearch.value = state.facQ;
+      if (state.fac !== 'ALL' && !state.faculty.some((f) => f.name === state.fac)) {
+        state.fac = 'ALL';
+      }
+      filterInstance.renderFaculty();
+      filterInstance.checkAndMountTableFilterBar();
+
+      // Auto-sync Downloader to current state (starts at 'ALL')
+      if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
+        window.VTOP_PLUS.CourseDownloader.selectFaculty(state.fac);
+      }
+    };
+
+    if (expanded) {
+      setTimeout(extractRows, 350);
+    } else {
+      extractRows();
+    }
+  }
+
+  window.VTOP_PLUS.CourseFilter = CourseFilter;
+})();

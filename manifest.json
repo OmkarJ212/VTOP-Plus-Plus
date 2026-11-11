@@ -1,0 +1,75 @@
+{
+  "manifest_version": 3,
+  "name": "VTOP++",
+  "version": "1.0.0",
+  "description": "The Ultimate All-in-One God Extension for VIT Vellore VTOP. Fast Course Material Downloader, Course Filter, Attendance Bunk Calculator, FAT Exam Predictor, DA Tracker, Search Pages (Ctrl+K), and Smart Login Helper.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "VTOP++ Settings & Dashboard (VIT Vellore)",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://vtop.vit.ac.in/*",
+        "*://vtop2.vit.ac.in/*"
+      ],
+      "js": [
+        "jszip.min.js",
+        "src/utils/storage.js",
+        "src/utils/dom.js",
+        "src/modules/auto-captcha.js",
+        "src/modules/session-keeper.js",
+        "src/modules/crawler.js",
+        "src/modules/menu-drawer.js",
+        "src/modules/course-filter.js",
+        "src/modules/course-downloader.js",
+        "src/modules/attendance-calculator.js",
+        "src/modules/da-tracker.js",
+        "src/modules/marks-fat-predictor.js",
+        "src/modules/quick-dock.js",
+        "src/modules/command-palette.js",
+        "src/modules/privacy-mode.js",
+        "src/content/content.js"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+    "storage",
+    "downloads",
+    "activeTab",
+    "alarms"
+  ],
+  "host_permissions": [
+    "*://vtop.vit.ac.in/*",
+    "*://vtop2.vit.ac.in/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "models/velloreWeights.json",
+        "src/content/content.css"
+      ],
+      "matches": [
+        "*://vtop.vit.ac.in/*",
+        "*://vtop2.vit.ac.in/*"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1055 @@
+/**
+ * VTOP++ - Unified Stylesheet
+ * Complete UI styling for all VTOP++ widgets, dark mode theme, dock, and overlays.
+ */
+
+/* ==========================================================================
+   1. PRIVACY MODE (Blur sensitive data in public spaces)
+   ========================================================================== */
+.vtop-privacy-active #authorizedID,
+.vtop-privacy-active #authorizedIDX,
+.vtop-privacy-active input[name*="regNo" i],
+.vtop-privacy-active .student-photo,
+.vtop-privacy-active img[src*="StudentPhoto" i],
+.vtop-privacy-active img[src*="photo" i],
+.vtop-privacy-active .cgpa-score,
+.vtop-privacy-active td[aria-describedby*="cgpa"],
+.vtop-privacy-active #navbarDropdown,
+.vtop-privacy-active .dropdown-toggle,
+.vtop-privacy-active .user-profile,
+.vtop-privacy-active .img-circle,
+.vtop-privacy-active .user-image,
+.vtop-privacy-active .profile-user-img,
+.vtop-privacy-active img[class*="avatar" i],
+.vtop-privacy-active img[class*="circle" i],
+.vtop-privacy-active .navbar-custom-menu img:not([src*="logo" i]):not([src*="icon" i]),
+.vtop-privacy-active .navbar-nav img:not([src*="logo" i]):not([src*="icon" i]),
+.vtop-privacy-active .user-menu img,
+.vtop-privacy-active .user-panel img,
+.vtop-privacy-active img[alt*="student" i],
+.vtop-privacy-active img[alt*="user" i],
+.vtop-privacy-active img[alt*="profile" i],
+.vtop-privacy-active .vtop-privacy-blur-photo,
+.vtop-privacy-active .vtop-privacy-blur-target {
+  filter: blur(8px) !important;
+  user-select: none !important;
+  transition: filter 0.2s ease-in-out;
+}
+
+/* Smooth hover-to-reveal for convenience */
+.vtop-privacy-active #authorizedID:hover,
+.vtop-privacy-active #navbarDropdown:hover,
+.vtop-privacy-active .dropdown-toggle:hover,
+.vtop-privacy-active .img-circle:hover,
+.vtop-privacy-active .user-image:hover,
+.vtop-privacy-active .profile-user-img:hover,
+.vtop-privacy-active img[src*="StudentPhoto" i]:hover,
+.vtop-privacy-active .vtop-privacy-blur-photo:hover,
+.vtop-privacy-active .vtop-privacy-blur-target:hover {
+  filter: blur(0px) !important;
+}
+
+/* ==========================================================================
+   2. NAVBAR INTEGRATED QUICK DOCK & TOP LINEAR PROGRESS BAR
+   ========================================================================== */
+.vtop-top-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: transparent;
+  z-index: 100000;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+.vtop-top-progress.vtop-progress-active {
+  background: linear-gradient(90deg, #38bdf8, #0284c7, #10b981, #38bdf8);
+  background-size: 200% 100%;
+  animation: vtopProgressAnim 1.2s linear infinite;
+}
+@keyframes vtopProgressAnim {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Permanently remove unused Campus Etiquette button */
+#campusEtiquetteBtn,
+button[id*="campusEtiquette" i],
+a[href*="campusEtiquette" i] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Navbar Integrated Quick Dock */
+.vtop-plus-dock.vtop-dock-navbar {
+  position: static !important;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 auto;
+  padding: 3px 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  vertical-align: middle;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.vtop-plus-dock.vtop-dock-navbar:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.vtop-dock-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.vtop-dock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.vtop-dock-pill:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.38);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.vtop-dock-pill:active {
+  background: rgba(255, 255, 255, 0.32);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(0);
+}
+
+.vtop-dock-pill.vtop-pill-spotlight,
+.vtop-dock-pill.vtop-pill-search {
+  background: rgba(2, 132, 199, 0.28);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #ffffff;
+}
+
+.vtop-dock-pill.vtop-pill-spotlight:hover,
+.vtop-dock-pill.vtop-pill-search:hover {
+  background: rgba(2, 132, 199, 0.45);
+  border-color: rgba(56, 189, 248, 0.7);
+  color: #ffffff;
+}
+
+.vtop-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.vtop-kbd-shortcut {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #e0f2fe;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+}
+
+.vtop-dock-sep {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
+}
+
+.vtop-dock-icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+
+.vtop-dock-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.38);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.vtop-dock-icon-btn:active {
+  background: rgba(255, 255, 255, 0.32);
+  transform: translateY(0);
+}
+
+.vtop-pill-spinner {
+  display: none;
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: vtopSpin 0.7s linear infinite;
+}
+
+.vtop-pill-loading .vtop-pill-spinner {
+  display: inline-block;
+}
+.vtop-pill-loading .vtop-pill-icon {
+  display: none;
+}
+.vtop-pill-queued {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #b45309 !important;
+}
+
+@media (max-width: 991px) {
+  .vtop-plus-dock.vtop-dock-navbar {
+    display: flex;
+    margin: 8px 0;
+    width: 100%;
+    overflow-x: auto;
+    padding: 4px;
+  }
+  .vtop-dock-pills {
+    flex-wrap: nowrap;
+  }
+}
+.vtop-pill-spinner {
+  display: none;
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: vtopSpin 0.7s linear infinite;
+}
+@keyframes vtopSpin {
+  100% { transform: rotate(360deg); }
+}
+.vtop-pill-loading .vtop-pill-spinner {
+  display: inline-block;
+}
+.vtop-pill-loading .vtop-pill-icon {
+  display: none;
+}
+.vtop-pill-queued {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #b45309 !important;
+}
+
+/* ==========================================================================
+   2b. MEGA-MENU DRAWER BACKDROP & CLOSE BUTTON
+   ========================================================================== */
+.vtop-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1020;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  transition: opacity 0.2s ease;
+}
+.vtop-drawer-backdrop.vtop-backdrop-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.vtop-drawer-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.vtop-drawer-close-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #dc2626;
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   3. CARDS & WIDGET CONTAINERS (Attendance, Marks, DA)
+   ========================================================================== */
+.vtop-plus-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+}
+.vtop-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+.vtop-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.vtop-target-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.vtop-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+.vtop-stat-box {
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.vtop-stat-num {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.vtop-stat-lbl {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   3b. FAT TARGET MARKS INLINE TABLE SECTION (Issue 2)
+   ========================================================================== */
+.vtop-fat-inline-tfoot {
+  background: #f8fafc;
+  border-top: 2px solid #cbd5e1;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+.vtop-fat-tfoot-cell {
+  padding: 12px 14px !important;
+  border: 1px solid #cbd5e1 !important;
+}
+.vtop-fat-summary-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vtop-fat-summary-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.vtop-fat-summary-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.vtop-fat-title-icon {
+  font-size: 14px;
+}
+.vtop-fat-course-tag {
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+.vtop-fat-internals-badge {
+  font-size: 12px;
+  color: #1e293b;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+}
+.vtop-fat-internals-badge strong {
+  color: #0284c7;
+  font-weight: 700;
+}
+.vtop-fat-weightage-tag {
+  color: #64748b;
+  font-size: 11px;
+  margin-left: 4px;
+}
+.vtop-fat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+@media (max-width: 768px) {
+  .vtop-fat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.vtop-fat-target-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 8px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.vtop-fat-grade-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+.vtop-fat-target-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.vtop-fat-val-num {
+  font-weight: 800;
+  font-size: 15px;
+}
+.vtop-fat-val-num.vtop-fat-val-safe {
+  color: #16a34a;
+}
+.vtop-fat-val-num.vtop-fat-val-warn {
+  color: #d97706;
+}
+.vtop-fat-val-den {
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+}
+.vtop-fat-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.vtop-fat-badge-secured {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+.vtop-fat-badge-impossible {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+.vtop-fat-badge-na {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+/* ==========================================================================
+   3c. DIGITAL ASSIGNMENT INLINE COLUMN & BADGES
+   ========================================================================== */
+.vtop-th-da-status {
+  text-align: center !important;
+  vertical-align: middle !important;
+  width: 15% !important;
+  min-width: 135px;
+}
+.vtop-td-da-status {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 6px 10px !important;
+}
+.vtop-da-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+/* Purple: Due Today (0 days left) */
+.vtop-da-badge-purple {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #d8b4fe;
+  font-weight: 700;
+}
+/* Red: 3 or less days left (or overdue) */
+.vtop-da-badge-red {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-weight: 700;
+}
+/* Green: More than 3 days left OR all submissions done */
+.vtop-da-badge-green {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-weight: 600;
+}
+/* Loading placeholder */
+.vtop-da-badge-loading {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+}
+
+/* Badges */
+.vtop-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.vtop-badge-safe {
+  background: #eafaf1;
+  color: #27ae60;
+  border: 1px solid #d4efdf;
+}
+.vtop-badge-warn {
+  background: #fef9e7;
+  color: #d35400;
+  border: 1px solid #fceec5;
+}
+.vtop-badge-danger {
+  background: #fdedec;
+  color: #c0392b;
+  border: 1px solid #fadbd8;
+}
+.vtop-badge-impossible {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  font-weight: 700;
+}
+.vtop-badge-semester-safe {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  font-weight: 700;
+}
+.vtop-debarment-warning {
+  margin: 0 16px 12px 16px;
+  padding: 6px 12px;
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fef3c7;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vtop-attendance-card {
+  border-top: 3px solid #1b75bb !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+.vtop-th-bunk {
+  text-align: center !important;
+  vertical-align: middle !important;
+  min-width: 160px;
+}
+.vtop-td-bunk {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 8px 10px !important;
+}
+.vtop-badge-captcha {
+  font-size: 11px;
+  color: #2980b9;
+  font-weight: 600;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   4. COURSE MATERIALS LIVE FILTER BAR
+   ========================================================================== */
+.vtop-plus-filter-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.vtop-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.vtop-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vtop-filter-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}
+.vtop-filter-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.vtop-filter-select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+.vtop-filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+.vtop-filter-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #475569;
+}
+.vtop-filter-btn:hover {
+  background: #e2e8f0;
+}
+
+/* ==========================================================================
+   5. FLOATING MATERIAL DOWNLOADER PANEL
+   ========================================================================== */
+.vtop-plus-panel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #cbd5e1;
+  z-index: 99999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+}
+.vtop-plus-panel.vtop-minimized .vtop-panel-body {
+  display: none;
+}
+.vtop-panel-header {
+  background: #1b4f72;
+  color: #fff;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.vtop-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.vtop-icon-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.vtop-panel-body {
+  padding: 14px;
+}
+.vtop-form-group {
+  margin-bottom: 10px;
+}
+.vtop-form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 4px;
+}
+.vtop-form-select,
+.vtop-form-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+.vtop-meta-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+.vtop-btn-row {
+  display: flex;
+  gap: 8px;
+}
+.vtop-download-btn {
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.vtop-download-btn:hover {
+  background: #219653;
+}
+.vtop-cancel-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+}
+.vtop-progress-container {
+  display: none;
+  flex-direction: column;
+  margin-top: 10px;
+}
+.vtop-progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.vtop-progress-bar-fill {
+  height: 100%;
+  background: #27ae60;
+  width: 0%;
+  transition: width 0.15s ease;
+}
+.vtop-progress-text {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 4px;
+  text-align: center;
+}
+.vtop-status-msg {
+  display: none;
+  margin-top: 8px;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: center;
+  background: #eafaf1;
+  color: #27ae60;
+}
+
+/* ==========================================================================
+   6. SEARCH PAGES MODAL OVERLAY (Ctrl+K)
+   ========================================================================== */
+.vtop-palette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.72);
+  z-index: 999999;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 14vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transform: translateZ(0);
+  will-change: opacity;
+}
+
+.vtop-palette-dialog {
+  position: relative;
+  width: 560px;
+  max-width: 92vw;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px -12px rgba(0, 50, 95, 0.25), 0 0 1px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  display: flex;
+  flex-direction: column;
+  transform: translateZ(0);
+  contain: layout style;
+}
+
+/* Subtle top brand accent line */
+.vtop-palette-dialog::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1b4f72, #0284c7, #38bdf8);
+}
+
+.vtop-palette-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.vtop-palette-search-svg {
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.vtop-palette-input {
+  flex: 1;
+  border: none;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  outline: none;
+  color: #0f172a;
+  background: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+.vtop-palette-input::placeholder {
+  color: #94a3b8;
+  font-size: 13.5px;
+}
+
+.vtop-palette-esc {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  font-family: inherit;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.vtop-palette-list {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  contain: content;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}
+
+/* Sleek WebKit scrollbar for Command Palette */
+.vtop-palette-list::-webkit-scrollbar {
+  width: 6px;
+}
+.vtop-palette-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.vtop-palette-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+.vtop-palette-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.vtop-palette-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  margin-bottom: 2px;
+  transition: background-color 0.08s linear, border-color 0.08s linear;
+}
+
+.vtop-palette-item:hover,
+.vtop-palette-item.selected {
+  background: #f0f7ff;
+  border-left: 3px solid #0284c7;
+}
+
+.vtop-palette-item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.vtop-palette-item-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vtop-palette-item-sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vtop-palette-empty {
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.vtop-match {
+  background: rgba(2, 132, 199, 0.15);
+  color: #0369a1;
+  border-radius: 3px;
+  padding: 0 3px;
+  font-weight: 700;
+}
+
+.vtop-palette-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.vtop-palette-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vtop-palette-hint kbd {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #475569;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.vtop-palette-item-action {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #e0f2fe;
+  color: #0369a1;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.08s linear;
+}
+
+.vtop-palette-item:hover .vtop-palette-item-action,
+.vtop-palette-item.selected .vtop-palette-item-action {
+  opacity: 1;
+}
+
+.vtop-da-urgent-row {
+  background-color: #fef2f2 !important;
+  border-left: 4px solid #ef4444 !important;
+}
