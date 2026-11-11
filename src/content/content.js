@@ -24,7 +24,8 @@
     MarksFatPredictor,
     CommandPalette,
     QuickDock,
-    PrivacyMode
+    PrivacyMode,
+    DarkMode
   } = window.VTOP_PLUS;
 
   let currentSettings = { ...Storage.DEFAULT_SETTINGS };
@@ -44,13 +45,12 @@
   }
 
   function bootModules() {
-    // 0. Pre-crawl VTOP routes and initialize mega-menu drawer dismiss
-    if (Crawler) {
-      Crawler.scan();
-    }
+    const isTopFrame = window.self === window.top;
 
-    if (MenuDrawer) {
-      MenuDrawer.init();
+    // 0. Pre-crawl VTOP routes and initialize mega-menu drawer dismiss (top frame only)
+    if (isTopFrame) {
+      if (Crawler) Crawler.scan();
+      if (MenuDrawer) MenuDrawer.init();
     }
 
     // 1. Login Page Auto-Captcha
@@ -58,8 +58,8 @@
       AutoCaptcha.init();
     }
 
-    // 2. Session Keep-Alive
-    if (currentSettings.enableSessionKeeper !== false && SessionKeeper) {
+    // 2. Session Keep-Alive (top frame only to avoid duplicate heartbeats)
+    if (isTopFrame && currentSettings.enableSessionKeeper !== false && SessionKeeper) {
       SessionKeeper.init();
     }
 
@@ -68,13 +68,18 @@
       PrivacyMode.init();
     }
 
-    // 4. Search Pages (Ctrl+K)
-    if (currentSettings.enableSpotlight !== false && CommandPalette) {
+    // 3b. Universal Dark Mode
+    if (DarkMode) {
+      DarkMode.init();
+    }
+
+    // 4. Search Pages (Ctrl+K) (top frame only)
+    if (isTopFrame && currentSettings.enableSpotlight !== false && CommandPalette) {
       CommandPalette.init();
     }
 
-    // 5. Quick Dock
-    if (currentSettings.enableQuickDock !== false && QuickDock) {
+    // 5. Quick Dock (top frame only)
+    if (isTopFrame && currentSettings.enableQuickDock !== false && QuickDock) {
       QuickDock.init();
     }
 
@@ -83,6 +88,8 @@
   }
 
   function runPageScanners() {
+    const isTopFrame = window.self === window.top;
+
     // Permanently remove Campus Etiquette button if re-injected by VTOP
     const etiquetteBtn = document.getElementById('campusEtiquetteBtn');
     if (etiquetteBtn) {
@@ -90,11 +97,9 @@
     }
 
     // 0a. Refresh dynamic link indexer and mega-menu close buttons
-    if (Crawler) {
-      Crawler.scan();
-    }
-    if (MenuDrawer) {
-      MenuDrawer.injectCloseButtons();
+    if (isTopFrame) {
+      if (Crawler) Crawler.scan();
+      if (MenuDrawer) MenuDrawer.injectCloseButtons();
     }
 
     // 0b. Auto-Captcha (if login form or registration captcha is in view)
@@ -103,15 +108,22 @@
     }
 
     // 0c. Quick Dock (dynamically mounts after user logs in)
-    if (currentSettings.enableQuickDock !== false && QuickDock) {
-      QuickDock.init();
-    } else if (QuickDock) {
-      QuickDock.destroy();
+    if (isTopFrame) {
+      if (currentSettings.enableQuickDock !== false && QuickDock) {
+        QuickDock.init();
+      } else if (QuickDock) {
+        QuickDock.destroy();
+      }
     }
 
     // 0d. Privacy Mode element re-tagger
     if (PrivacyMode?.isActive) {
       PrivacyMode.tagSensitiveElements();
+    }
+
+    // 0e. Universal Dark Mode dynamic element sanitizer
+    if (DarkMode?.isActive) {
+      DarkMode.sanitizeDynamicElements();
     }
 
     // 6. Course Materials Filter & Downloader
@@ -143,12 +155,29 @@
     }
   }
 
-  function isVtopNode(node) {
+  const EXTENSION_SELECTORS = [
+    '#vtop-zip-panel',
+    '#vtop-quick-dock',
+    '#vtop-custom-course-filter',
+    '#vtop-plus-table-filter-bar',
+    '#vtop-spotlight-modal',
+    '#vtop-da-countdown-banner',
+    '#vtop-busy',
+    '[class*="vtop-plus-"]',
+    '[class*="vtop-dock-"]',
+    '[class*="vtop-palette-"]',
+    '[class*="vtop-attendance-"]',
+    '[class*="vtop-fat-"]',
+    '[class*="vtop-da-"]',
+    '[class*="vtop-filter-"]',
+    '.vtop-th-da-status',
+    '.vtop-td-da-status'
+  ].join(', ');
+
+  function isExtensionNode(node) {
     if (!node || node.nodeType !== 1) return false;
-    const id = node.id || '';
-    const cls = typeof node.className === 'string' ? node.className : '';
-    if (id.startsWith('vtop-') || cls.includes('vtop-')) return true;
-    return Boolean(node.closest?.('[id^="vtop-"], [class*="vtop-"]'));
+    if (node.matches && node.matches(EXTENSION_SELECTORS)) return true;
+    return Boolean(node.closest && node.closest(EXTENSION_SELECTORS));
   }
 
   /**
@@ -158,16 +187,16 @@
     const observer = new MutationObserver((mutations) => {
       // Ignore mutations originating strictly from VTOP++ injected components to break reflow loops
       const isInternal = mutations.every((m) => {
-        if (isVtopNode(m.target)) return true;
+        if (isExtensionNode(m.target)) return true;
         const changedEls = [...m.addedNodes, ...m.removedNodes].filter((n) => n.nodeType === 1);
-        return changedEls.length > 0 && changedEls.every(isVtopNode);
+        return changedEls.length > 0 && changedEls.every(isExtensionNode);
       });
       if (isInternal) return;
 
       if (window.__vtop_plus_scan_t) clearTimeout(window.__vtop_plus_scan_t);
       window.__vtop_plus_scan_t = setTimeout(() => {
         runPageScanners();
-      }, 350);
+      }, 300);
     });
 
     observer.observe(document.body || document.documentElement, {
@@ -177,7 +206,7 @@
   }
 
   /**
-   * Safety watchdog to catch tables loaded via slow AJAX requests
+   * Safety watchdog to catch tables loaded via slow AJAX requests or dynamic tab switches
    */
   let lastKnownPageType = '';
   function setupWatchdog() {
@@ -186,8 +215,28 @@
       if (currentPageType !== lastKnownPageType) {
         lastKnownPageType = currentPageType;
         runPageScanners();
+        return;
       }
-    }, 2500);
+
+      // Check Course Downloader if buttons exist but panel is not mounted/visible
+      const downloadButtons = document.querySelectorAll(
+        'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]'
+      );
+      const panel = document.getElementById('vtop-zip-panel');
+      const isPanelVisible = panel && panel.style.display !== 'none';
+      if (downloadButtons.length > 0 && (!panel || !isPanelVisible)) {
+        if (CourseDownloader) CourseDownloader.init();
+      }
+
+      // Check DA Tracker if on DA view but countdown is not yet mounted
+      if (currentPageType === 'DIGITAL_ASSIGNMENT') {
+        const hasOverviewAugment = Boolean(document.querySelector('.vtop-th-da-status'));
+        const hasBanner = Boolean(document.getElementById('vtop-da-countdown-banner'));
+        if (!hasOverviewAugment && !hasBanner) {
+          if (DaTracker) DaTracker.init();
+        }
+      }
+    }, 2000);
   }
 
   /**
@@ -196,9 +245,27 @@
   function setupMessageListener() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'FORCE_SCAN' || message.action === 'OPEN_PANEL') {
-        CourseDownloader?.openPanel();
-        runPageScanners();
-        sendResponse({ success: true });
+        const scanPromise = CourseDownloader?.scanPageForMaterials
+          ? CourseDownloader.scanPageForMaterials()
+          : Promise.resolve();
+
+        scanPromise
+          .then(() => {
+            CourseDownloader?.openPanel();
+            runPageScanners();
+            const buttons = document.querySelectorAll(
+              'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]'
+            );
+            sendResponse({
+              success: true,
+              fileCount: CourseDownloader?.getFileCount ? CourseDownloader.getFileCount() : 0,
+              activeCourse: CourseDownloader?.getActiveCourseCode ? CourseDownloader.getActiveCourseCode() : 'Course',
+              hasButtons: buttons.length > 0
+            });
+          })
+          .catch((err) => {
+            sendResponse({ success: false, error: err.message });
+          });
         return true;
       }
 
@@ -235,8 +302,18 @@
         return true;
       }
 
+      if (message.action === 'TOGGLE_DARK_MODE') {
+        DarkMode?.toggle();
+        sendResponse({ success: true, active: DarkMode?.isActive });
+        return true;
+      }
+
       if (message.action === 'APPLY_SETTINGS') {
         currentSettings = { ...currentSettings, ...message.settings };
+
+        if (message.settings.enableDarkMode !== undefined && DarkMode) {
+          DarkMode.set(Boolean(message.settings.enableDarkMode));
+        }
 
         if (currentSettings.enableQuickDock !== false) QuickDock?.init();
         else QuickDock?.destroy();

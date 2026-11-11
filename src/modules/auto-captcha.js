@@ -92,8 +92,14 @@
       offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
     }
 
-    offscreenCtx.drawImage(img, 0, 0, VELLORE_WIDTH, VELLORE_HEIGHT);
-    const imgData = offscreenCtx.getImageData(0, 0, VELLORE_WIDTH, VELLORE_HEIGHT);
+    let imgData;
+    try {
+      offscreenCtx.drawImage(img, 0, 0, VELLORE_WIDTH, VELLORE_HEIGHT);
+      imgData = offscreenCtx.getImageData(0, 0, VELLORE_WIDTH, VELLORE_HEIGHT);
+    } catch (err) {
+      console.warn('[VTOP++] Cannot extract captcha pixels (cross-origin or tainted canvas):', err);
+      return '';
+    }
 
     // Compute saturation map into typed array
     const sat = new Uint8Array(VELLORE_WIDTH * VELLORE_HEIGHT);

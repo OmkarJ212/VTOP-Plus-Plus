@@ -1,7 +1,7 @@
 /**
  * VTOP++ - Course Material Downloader Module
  * High-speed, rate-limit-safe batch downloader with teacher grouping,
- * instant STORE ZIP packaging, and resilient DOM table observation.
+ * instant STORE ZIP packaging, multi-page auto-traversal, and resilient DOM table observation.
  * Fully ported & integrated from vtop-downloader-extension.
  */
 
@@ -19,28 +19,83 @@
   const REGEX_SPACES = /\s+/g;
   const REGEX_ILLEGAL_FS = /[\/\\:*?"<>|]/g;
   const REGEX_ONCLICK_FILEID = /downloadCourseMaterialFacultyPdf\s*\(\s*['"]?([a-zA-Z0-9_\-]+)['"]?/i;
+  const REGEX_TOTAL_ENTRIES = /of\s+([\d,]+)\s+entries/i;
 
-  const SELECTOR_DOWNLOAD_BTNS = 'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]';
+  const SELECTOR_DOWNLOAD_BTNS =
+    'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]';
 
-  const allCourseFiles = new Map();
-  let activeCourseKey = null;
+  const allCourseFiles = new Map(); // fileId -> item
+  let activeBaseCourseCode = null;
   let isDownloading = false;
   let cancelRequested = false;
   let isCrawlingPages = false;
   let hasAutoCrawled = false;
 
+  function extractBaseCourseCode(code) {
+    if (!code) return '';
+    return code.replace(/[PEL]$/i, '');
+  }
+
   const CourseDownloader = {
     selectedFaculty: '__ALL__',
+    _watchdogTimer: null,
+    _observer: null,
+
+    getFileCount() {
+      return allCourseFiles.size;
+    },
+
+    getActiveCourseCode() {
+      return activeBaseCourseCode || 'Course';
+    },
 
     resetCourse() {
       allCourseFiles.clear();
       hasAutoCrawled = false;
-      activeCourseKey = null;
+      activeBaseCourseCode = null;
       this.selectedFaculty = '__ALL__';
     },
 
     init() {
+      this.setupObserver();
+      this.startWatchdogTimer();
       this.scanPageForMaterials();
+    },
+
+    setupObserver() {
+      if (this._observer) return;
+      this._observer = new MutationObserver((mutations) => {
+        if (isCrawlingPages || isDownloading) return;
+
+        const isInternal = mutations.every((m) => {
+          return m.target && (m.target.id === 'vtop-zip-panel' || Boolean(m.target.closest && m.target.closest('#vtop-zip-panel')));
+        });
+        if (isInternal) return;
+
+        if (window.__vtop_dl_scan_timeout) clearTimeout(window.__vtop_dl_scan_timeout);
+        window.__vtop_dl_scan_timeout = setTimeout(() => {
+          this.scanPageForMaterials();
+        }, 300);
+      });
+
+      const target = document.body || document.documentElement;
+      if (target) {
+        this._observer.observe(target, { childList: true, subtree: true });
+      }
+    },
+
+    startWatchdogTimer() {
+      if (this._watchdogTimer) clearInterval(this._watchdogTimer);
+      this._watchdogTimer = setInterval(() => {
+        if (isDownloading || isCrawlingPages) return;
+        const downloadButtons = document.querySelectorAll(SELECTOR_DOWNLOAD_BTNS);
+        const panel = document.getElementById('vtop-zip-panel');
+        const isPanelVisible = panel && panel.style.display !== 'none';
+
+        if (downloadButtons.length > 0 && (!panel || !isPanelVisible)) {
+          this.scanPageForMaterials();
+        }
+      }, 2000);
     },
 
     scan() {
@@ -48,6 +103,14 @@
     },
 
     destroy() {
+      if (this._watchdogTimer) {
+        clearInterval(this._watchdogTimer);
+        this._watchdogTimer = null;
+      }
+      if (this._observer) {
+        this._observer.disconnect();
+        this._observer = null;
+      }
       const panel = document.getElementById('vtop-zip-panel');
       if (panel && !isDownloading) {
         panel.style.display = 'none';
@@ -90,8 +153,9 @@
     autoExpandLengthTo100() {
       const lengthSelect = document.querySelector('select[name="materialTable_length"], select[name$="_length"]');
       if (lengthSelect && lengthSelect.value !== '100' && lengthSelect.value !== '-1') {
-        let targetOption = lengthSelect.querySelector('option[value="100"]') ||
-                           lengthSelect.querySelector('option[value="-1"]');
+        let targetOption =
+          lengthSelect.querySelector('option[value="100"]') ||
+          lengthSelect.querySelector('option[value="-1"]');
 
         if (!targetOption) {
           let maxVal = 0;
@@ -115,26 +179,28 @@
       const downloadButtons = cachedButtons || document.querySelectorAll(SELECTOR_DOWNLOAD_BTNS);
       if (!downloadButtons || downloadButtons.length === 0) return;
 
+      // Detect if visible rows belong to a completely new course subject
       for (let i = 0; i < downloadButtons.length; i++) {
         const row = downloadButtons[i].closest('tr');
         if (!row) continue;
         const cells = row.querySelectorAll('td');
         if (cells.length >= 2) {
-          const courseText = cells[1]?.textContent?.trim() || '';
+          const courseText = (cells[1]?.innerText || cells[1]?.textContent || '').trim();
           const courseMatch = courseText.match(REGEX_COURSE_CODE);
           if (courseMatch) {
-            const detectedCourseKey = courseText || courseMatch[1];
-            if (activeCourseKey && activeCourseKey !== detectedCourseKey) {
+            const detectedBaseCode = extractBaseCourseCode(courseMatch[1]);
+            if (activeBaseCourseCode && activeBaseCourseCode !== detectedBaseCode) {
               allCourseFiles.clear();
               hasAutoCrawled = false;
               this.selectedFaculty = '__ALL__';
             }
-            activeCourseKey = detectedCourseKey;
+            activeBaseCourseCode = detectedBaseCode;
             break;
           }
         }
       }
 
+      // Iterate through buttons, skipping already-cached rows
       for (let i = 0; i < downloadButtons.length; i++) {
         const btn = downloadButtons[i];
         let fileId = btn.getAttribute('data-fileid') || btn.getAttribute('data-file-id');
@@ -157,23 +223,25 @@
         let uploadDate = '';
 
         if (cells.length >= 4) {
-          courseText = cells[1]?.textContent?.trim() || '';
+          courseText = (cells[1]?.innerText || cells[1]?.textContent || '').trim();
 
           const matSpan = cells[2]?.querySelector('span');
-          materialText = matSpan ? matSpan.textContent.trim() : (cells[2]?.textContent?.trim() || `Material_${fileId}`);
+          materialText = matSpan
+            ? (matSpan.innerText || matSpan.textContent).trim()
+            : ((cells[2]?.innerText || cells[2]?.textContent)?.trim() || `Material_${fileId}`);
           materialText = materialText.replace(REGEX_WHITESPACE, ' ').trim();
 
           const facCell = cells[3];
           if (facCell) {
             const spans = facCell.querySelectorAll('span');
-            if (spans.length >= 1) teacherText = spans[0].textContent.trim();
-            if (spans.length >= 2) uploadDate = spans[1].textContent.trim();
-            if (!teacherText) teacherText = facCell.textContent.split('\n')[0].trim();
+            if (spans.length >= 1) teacherText = (spans[0].innerText || spans[0].textContent).trim();
+            if (spans.length >= 2) uploadDate = (spans[1].innerText || spans[1].textContent).trim();
+            if (!teacherText) teacherText = (facCell.innerText || facCell.textContent).split('\n')[0].trim();
           }
         }
 
         const courseMatch = courseText.match(REGEX_COURSE_CODE);
-        const courseCode = courseMatch ? courseMatch[1] : (activeCourseKey || 'Course');
+        const courseCode = courseMatch ? courseMatch[1] : (activeBaseCourseCode || 'Course');
         const cleanTeacherName = teacherText.replace(REGEX_CLEAN_TEACHER, '').trim();
 
         allCourseFiles.set(fileId, {
@@ -189,11 +257,16 @@
     },
 
     getTableStateSnapshot() {
-      const activeBtn = document.querySelector('#materialTable_paginate .paginate_button.current, #materialTable_paginate .page-item.active, .paginate_button.current');
-      const activePage = activeBtn ? activeBtn.textContent.trim() : '';
+      const activeBtn = document.querySelector(
+        '#materialTable_paginate .paginate_button.current, #materialTable_paginate .page-item.active, .paginate_button.current'
+      );
+      const activePage = activeBtn ? (activeBtn.innerText || activeBtn.textContent || '').trim() : '';
       const firstRow = document.querySelector('#materialTable tbody tr, table tbody tr');
-      const firstRowText = firstRow ? (firstRow.textContent || '').substring(0, 40) : '';
-      const infoText = document.querySelector('#materialTable_info, .dataTables_info')?.textContent || '';
+      const firstRowText = firstRow ? (firstRow.innerText || firstRow.textContent || '').substring(0, 40) : '';
+      const infoText =
+        document.querySelector('#materialTable_info, .dataTables_info')?.innerText ||
+        document.querySelector('#materialTable_info, .dataTables_info')?.textContent ||
+        '';
       return `${activePage}|${firstRowText}|${infoText}`;
     },
 
@@ -213,11 +286,21 @@
     async checkForMultiPageAndAutoCrawl() {
       if (hasAutoCrawled || isCrawlingPages || isDownloading) return;
 
-      const nextLi = document.getElementById('materialTable_next') ||
-                     document.querySelector('#materialTable_paginate .next, .paginate_button.next');
-      const isNextAvailable = nextLi && !nextLi.classList.contains('disabled') && nextLi.getAttribute('aria-disabled') !== 'true';
+      const nextLi =
+        document.getElementById('materialTable_next') ||
+        document.querySelector('#materialTable_paginate .next, .paginate_button.next');
+      const isNextAvailable =
+        nextLi && !nextLi.classList.contains('disabled') && nextLi.getAttribute('aria-disabled') !== 'true';
 
-      if (isNextAvailable) {
+      const infoElem =
+        document.getElementById('materialTable_info') || document.querySelector('.dataTables_info');
+      let totalEntries = 0;
+      if (infoElem) {
+        const match = (infoElem.innerText || infoElem.textContent || '').match(REGEX_TOTAL_ENTRIES);
+        if (match) totalEntries = parseInt(match[1].replace(/,/g, ''), 10);
+      }
+
+      if (isNextAvailable || totalEntries > allCourseFiles.size) {
         hasAutoCrawled = true;
         await this.crawlAllPages();
       }
@@ -234,8 +317,9 @@
       while (maxPages-- > 0) {
         this.scanVisibleRows();
 
-        const nextLi = document.getElementById('materialTable_next') ||
-                       document.querySelector('#materialTable_paginate .next, .paginate_button.next');
+        const nextLi =
+          document.getElementById('materialTable_next') ||
+          document.querySelector('#materialTable_paginate .next, .paginate_button.next');
         if (!nextLi || nextLi.classList.contains('disabled') || nextLi.getAttribute('aria-disabled') === 'true') {
           break;
         }
@@ -249,13 +333,17 @@
       this.scanVisibleRows();
 
       // Return to page 1
-      const firstBtn = document.getElementById('materialTable_first') ||
-                       document.querySelector('#materialTable_paginate .first a, #materialTable_paginate .paginate_button.first');
+      const firstBtn =
+        document.getElementById('materialTable_first') ||
+        document.querySelector('#materialTable_paginate .first a, #materialTable_paginate .paginate_button.first');
       let targetBtn = firstBtn;
       if (!targetBtn) {
-        const pageLinks = document.querySelectorAll('#materialTable_paginate .paginate_button, #materialTable_paginate .page-link, #materialTable_paginate a');
+        const pageLinks = document.querySelectorAll(
+          '#materialTable_paginate .paginate_button, #materialTable_paginate .page-link, #materialTable_paginate a'
+        );
         for (const btn of pageLinks) {
-          if (btn.textContent && btn.textContent.trim() === '1') {
+          const txt = (btn.innerText || btn.textContent || '').trim();
+          if (txt === '1') {
             targetBtn = btn;
             break;
           }
@@ -270,7 +358,7 @@
 
       isCrawlingPages = false;
       this.updateFacultyDropdown();
-      this.showStatus(`Captured all ${allCourseFiles.size} materials!`, 4000);
+      this.showStatus(`Captured all ${allCourseFiles.size} materials across all pages!`, 4000);
     },
 
     getTeachersMap() {
@@ -296,7 +384,7 @@
           <div class="vtop-panel-header" id="vtop-panel-header">
             <div class="vtop-panel-title">
               <span>📦</span>
-              <span>VTOP++ Downloader</span>
+              <span>VTOP Material Downloader</span>
             </div>
             <div class="vtop-panel-actions">
               <button class="vtop-icon-btn" id="vtop-min-btn" title="Minimize/Maximize">_</button>
@@ -316,9 +404,9 @@
             <div class="vtop-form-group">
               <label class="vtop-form-label" for="vtop-speed-select">Download Pacing (Anti-Rate-Limit):</label>
               <select class="vtop-form-select" id="vtop-speed-select">
-                <option value="fast" selected>⚡ Fast (0.4s - 0.75s, Safe Accelerated)</option>
-                <option value="safe">🛡️ Safe (1.5s - 2.5s jitter, Human-like)</option>
+                <option value="safe" selected>🛡️ Safe (1.5s - 2.5s jitter, Human-like)</option>
                 <option value="stealth">🐢 Stealth (3.0s - 5.0s, Extra Cautious)</option>
+                <option value="fast">⚡ Fast (0.4s - 0.75s, Safe Accelerated)</option>
               </select>
             </div>
 
@@ -380,15 +468,15 @@
         const regInput = document.getElementById('vtop-regno-input');
         regInput.addEventListener('input', () => {
           const val = regInput.value.trim().toUpperCase();
-          if (chrome?.storage?.local) chrome.storage.local.set({ 'vtop_reg_no': val });
+          if (chrome?.storage?.local) chrome.storage.local.set({ vtop_reg_no: val });
         });
 
         const speedSelect = document.getElementById('vtop-speed-select');
         speedSelect.addEventListener('change', () => {
           if (chrome?.storage?.local) {
             chrome.storage.local.set({
-              'vtop_speed_mode': speedSelect.value,
-              'downloadPacing': speedSelect.value
+              vtop_speed_mode: speedSelect.value,
+              downloadPacing: speedSelect.value
             });
           }
         });
@@ -515,7 +603,16 @@
         return;
       }
 
-      const match = (document.body?.textContent || '').match(REGEX_REG_NO);
+      const userImg = document.querySelector('img[src*="/vtop/users/image/?id="]');
+      if (userImg) {
+        const idMatch = userImg.src.match(/id=([a-zA-Z0-9]+)/);
+        if (idMatch && idMatch[1]) {
+          inputElem.value = idMatch[1].toUpperCase();
+          return;
+        }
+      }
+
+      const match = (document.body?.innerText || document.body?.textContent || '').match(REGEX_REG_NO);
       if (match) inputElem.value = match[1].toUpperCase();
     },
 
@@ -611,13 +708,13 @@
       const progressBar = document.getElementById('vtop-progress-bar');
       const progressLabel = document.getElementById('vtop-progress-label');
 
-      const selectedTeacher = facultySelect.value;
-      const regNo = regInput.value.trim().toUpperCase();
-      const speedMode = speedSelect ? speedSelect.value : 'fast';
+      const selectedTeacher = facultySelect ? facultySelect.value : '__ALL__';
+      const regNo = regInput ? regInput.value.trim().toUpperCase() : '';
+      const speedMode = speedSelect ? speedSelect.value : 'safe';
 
       if (!regNo) {
         alert('Please enter your Student Registration Number (e.g. 24BCE0212).');
-        regInput.focus();
+        if (regInput) regInput.focus();
         return;
       }
 
@@ -647,12 +744,12 @@
 
       isDownloading = true;
       cancelRequested = false;
-      startBtn.disabled = true;
-      facultySelect.disabled = true;
-      cancelBtn.style.display = 'inline-flex';
-      progressBox.style.display = 'flex';
-      progressBar.style.width = '0%';
-      progressLabel.textContent = `Starting download of ${filesToDownload.length} files...`;
+      if (startBtn) startBtn.disabled = true;
+      if (facultySelect) facultySelect.disabled = true;
+      if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+      if (progressBox) progressBox.style.display = 'flex';
+      if (progressBar) progressBar.style.width = '0%';
+      if (progressLabel) progressLabel.textContent = `Starting download of ${filesToDownload.length} files...`;
 
       const zip = new JSZip();
       const usedFileNames = new Set();
@@ -660,9 +757,10 @@
       let failedCount = 0;
 
       const courseCode = filesToDownload[0]?.courseCode || 'VTOP';
-      const cleanTeacherName = (selectedTeacher === '__ALL__')
-        ? 'All_Faculty'
-        : (filesToDownload[0]?.cleanTeacher || 'Faculty').replace(REGEX_SPACES, '_');
+      const cleanTeacherName =
+        selectedTeacher === '__ALL__'
+          ? 'All_Faculty'
+          : (filesToDownload[0]?.cleanTeacher || 'Faculty').replace(REGEX_SPACES, '_');
 
       try {
         for (let i = 0; i < filesToDownload.length; i++) {
@@ -672,9 +770,10 @@
           }
 
           const fileInfo = filesToDownload[i];
-          const percent = Math.round(((i) / filesToDownload.length) * 100);
-          progressBar.style.width = `${percent}%`;
-          progressLabel.textContent = `[${i + 1}/${filesToDownload.length}] Downloading: ${fileInfo.materialText}...`;
+          const percent = Math.round((i / filesToDownload.length) * 100);
+          if (progressBar) progressBar.style.width = `${percent}%`;
+          if (progressLabel)
+            progressLabel.textContent = `[${i + 1}/${filesToDownload.length}] Downloading: ${fileInfo.materialText}...`;
 
           try {
             const fileData = await this.fetchSingleMaterial(fileInfo, regNo, csrfToken);
@@ -709,7 +808,10 @@
             console.error(`[VTOP++] Failed file ${fileInfo.fileId}:`, err);
             failedCount++;
 
-            if (err.message && (err.message.includes('session expired') || err.message.includes('429') || err.message.includes('logged out'))) {
+            if (
+              err.message &&
+              (err.message.includes('session expired') || err.message.includes('429') || err.message.includes('logged out'))
+            ) {
               alert(`⚠️ Rate Limit / Session Guard:\n${err.message}`);
               break;
             }
@@ -719,43 +821,46 @@
             const delayMs = this.getDelayMs(speedMode);
             for (let rem = delayMs; rem > 0; rem -= 200) {
               if (cancelRequested) break;
-              progressLabel.textContent = `[${i + 1}/${filesToDownload.length}] Pacing: waiting ${(rem / 1000).toFixed(1)}s (simulating human click)...`;
+              if (progressLabel)
+                progressLabel.textContent = `[${i + 1}/${filesToDownload.length}] Pacing: waiting ${(rem / 1000).toFixed(1)}s (simulating human click)...`;
               await new Promise((r) => setTimeout(r, Math.min(200, rem)));
             }
           }
         }
 
         if (downloadedCount > 0) {
-          progressBar.style.width = '95%';
-          progressLabel.textContent = 'Packaging into .ZIP archive (instant)...';
+          if (progressBar) progressBar.style.width = '95%';
+          if (progressLabel) progressLabel.textContent = 'Packaging into .ZIP archive (instant)...';
 
-          const zipBlob = await zip.generateAsync({
-            type: 'blob',
-            compression: 'STORE'
-          }, (metadata) => {
-            progressBar.style.width = `${Math.round(metadata.percent)}%`;
-          });
+          const zipBlob = await zip.generateAsync(
+            {
+              type: 'blob',
+              compression: 'STORE'
+            },
+            (metadata) => {
+              if (progressBar) progressBar.style.width = `${Math.round(metadata.percent)}%`;
+            }
+          );
 
           const suffix = cancelRequested ? '_Partial' : '';
           const zipFileName = `${courseCode}_${cleanTeacherName}_Materials${suffix}.zip`;
           this.triggerBlobDownload(zipBlob, zipFileName);
 
-          progressBar.style.width = '100%';
-          progressLabel.textContent = `Finished! ${downloadedCount} files zipped. (${failedCount} failed)`;
+          if (progressBar) progressBar.style.width = '100%';
+          if (progressLabel) progressLabel.textContent = `Finished! ${downloadedCount} files zipped. (${failedCount} failed)`;
           this.showStatus(`Saved as ${zipFileName}`, 5000);
         } else {
-          progressLabel.textContent = 'No files downloaded.';
+          if (progressLabel) progressLabel.textContent = 'No files downloaded.';
         }
-
       } catch (globalErr) {
         console.error('[VTOP++] Error during batch download:', globalErr);
         alert('An error occurred while downloading: ' + globalErr.message);
       } finally {
         isDownloading = false;
         cancelRequested = false;
-        startBtn.disabled = false;
-        facultySelect.disabled = false;
-        cancelBtn.style.display = 'none';
+        if (startBtn) startBtn.disabled = false;
+        if (facultySelect) facultySelect.disabled = false;
+        if (cancelBtn) cancelBtn.style.display = 'none';
       }
     },
 
@@ -777,7 +882,7 @@
 
       const customHeaders = {
         'X-Requested-With': 'XMLHttpRequest',
-        'Accept': '*/*'
+        Accept: '*/*'
       };
       if (csrfToken) {
         customHeaders['X-CSRF-TOKEN'] = csrfToken;
@@ -787,13 +892,44 @@
 
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
+          // Attempt 1: Try via Background Service Worker (immune to CSP & redirect CORS)
+          let bgResult = null;
+          try {
+            bgResult = await new Promise((resolve) => {
+              if (!chrome?.runtime?.sendMessage) return resolve(null);
+              chrome.runtime.sendMessage(
+                {
+                  action: 'FETCH_MATERIAL',
+                  url: targetUrl,
+                  body: bodyString,
+                  headers: customHeaders,
+                  timeoutMs: 25000
+                },
+                (response) => {
+                  if (chrome.runtime.lastError) return resolve(null);
+                  resolve(response);
+                }
+              );
+            });
+          } catch (_) {
+            bgResult = null;
+          }
+
           let arrayBuffer = null;
           let contentType = '';
           let contentDisposition = '';
 
-          // Attempt 1: Direct in-page fetch (Zero-copy ArrayBuffer, zero IPC overhead, same-origin)
-          let directFetchOk = false;
-          try {
+          if (bgResult && bgResult.success && bgResult.base64Data) {
+            arrayBuffer = this.base64ToArrayBuffer(bgResult.base64Data);
+            contentType = bgResult.contentType || '';
+            contentDisposition = bgResult.contentDisposition || '';
+          } else if (bgResult && bgResult.error) {
+            if (bgResult.error.includes('429')) {
+              throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
+            }
+            throw new Error(bgResult.error);
+          } else {
+            // Attempt 2: Fallback to direct fetch in page context
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000);
 
@@ -815,43 +951,13 @@
               throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
             }
 
-            if (response.ok) {
-              contentType = response.headers.get('content-type') || '';
-              contentDisposition = response.headers.get('content-disposition') || '';
-              arrayBuffer = await response.arrayBuffer();
-              directFetchOk = Boolean(arrayBuffer && arrayBuffer.byteLength > 0);
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status} ${response.statusText}`);
             }
-          } catch (e) {
-            if (e.message && e.message.includes('429')) throw e;
-            directFetchOk = false;
-          }
 
-          // Attempt 2: Fallback to Background Service Worker if direct fetch failed
-          if (!directFetchOk) {
-            const bgResult = await new Promise((resolve) => {
-              if (!chrome?.runtime?.sendMessage) return resolve(null);
-              chrome.runtime.sendMessage({
-                action: 'FETCH_MATERIAL',
-                url: targetUrl,
-                body: bodyString,
-                headers: customHeaders,
-                timeoutMs: 25000
-              }, (response) => {
-                if (chrome.runtime.lastError) return resolve(null);
-                resolve(response);
-              });
-            });
-
-            if (bgResult && bgResult.success && bgResult.base64Data) {
-              arrayBuffer = this.base64ToArrayBuffer(bgResult.base64Data);
-              contentType = bgResult.contentType || '';
-              contentDisposition = bgResult.contentDisposition || '';
-            } else if (bgResult && bgResult.error) {
-              if (bgResult.error.includes('429')) {
-                throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
-              }
-              throw new Error(bgResult.error);
-            }
+            contentType = response.headers.get('content-type') || '';
+            contentDisposition = response.headers.get('content-disposition') || '';
+            arrayBuffer = await response.arrayBuffer();
           }
 
           if (!arrayBuffer || arrayBuffer.byteLength === 0) {
@@ -860,7 +966,12 @@
 
           if (contentType.includes('text/html') || (!contentDisposition && arrayBuffer.byteLength < 5000)) {
             const textPreview = new TextDecoder().decode(arrayBuffer.slice(0, 1000));
-            if (textPreview.includes('login') || textPreview.includes('Login') || textPreview.includes('session') || textPreview.includes('Session Timeout')) {
+            if (
+              textPreview.includes('login') ||
+              textPreview.includes('Login') ||
+              textPreview.includes('session') ||
+              textPreview.includes('Session Timeout')
+            ) {
               throw new Error('VTOP session expired or logged out. Pausing downloads to protect your account.');
             }
           }
@@ -880,7 +991,13 @@
           };
         } catch (err) {
           lastError = err;
-          if (err.message && (err.message.includes('rate-limited') || err.message.includes('session expired'))) {
+          if (
+            err.message &&
+            (err.message.includes('429') ||
+              err.message.includes('rate-limited') ||
+              err.message.includes('session expired') ||
+              err.message.includes('logged out'))
+          ) {
             throw err;
           }
           if (attempt < 2) {
@@ -902,11 +1019,7 @@
       return 'pdf';
     },
 
-    triggerBlobDownload(blob, fileName) {
-      this.triggerDirectBlobDownload(blob, fileName);
-    },
-
-    triggerDirectBlobDownload(blob, fileName, existingUrl = null) {
+    triggerBlobDownload(blob, fileName, existingUrl = null) {
       const url = existingUrl || URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

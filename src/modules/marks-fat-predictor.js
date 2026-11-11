@@ -20,10 +20,6 @@
     },
 
     checkAndPredict() {
-      // Ensure any legacy top predictor card is removed so the page is clean and tables are at top
-      const existing = document.getElementById('vtop-fat-predictor-card');
-      if (existing) existing.remove();
-
       const courses = this.extractAllCourses();
       if (!courses || courses.length === 0) {
         return;
