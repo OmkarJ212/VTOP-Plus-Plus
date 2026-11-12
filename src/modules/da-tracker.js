@@ -166,10 +166,22 @@
       this.isScanning = false;
     },
 
+    clearCache() {
+      try {
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const key = sessionStorage.key(i);
+          if (key && key.startsWith('vtop_da_status_')) {
+            sessionStorage.removeItem(key);
+          }
+        }
+      } catch (_) {}
+    },
+
     checkAndTrack() {
       // 1. Check for single-course assignment upload view (where student actually views/uploads files)
       const singleTable = this.findSingleCourseDaTable();
       if (singleTable) {
+        this.clearCache();
         this.augmentSingleCourseDaTable(singleTable);
         return;
       }
@@ -597,7 +609,8 @@
         };
       }
 
-      return { type: 'done', text: 'All submissions done' };
+      // If unsubmitted items exist but no date was parsed, warn student instead of falsely claiming all done
+      return { type: 'purple', text: 'Pending assignment' };
     },
 
     applyRowBadge(cell, status) {

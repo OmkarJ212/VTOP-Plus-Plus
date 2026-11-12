@@ -107,7 +107,7 @@
     startObserver() {
       if (this._observer) return;
       this._observer = new MutationObserver((mutations) => {
-        if (!this.isActive) return;
+        if (!this.isActive || this._isSanitizing) return;
 
         // Skip mutations originating purely from VTOP++ injected components
         const hasExternalChanges = mutations.some((m) => {
@@ -148,55 +148,60 @@
      * and black text from freshly injected AJAX chunks without touching captcha or status indicators.
      */
     sanitizeDynamicElements(root = document) {
-      if (!this.isActive) return;
+      if (!this.isActive || this._isSanitizing) return;
+      this._isSanitizing = true;
 
-      // 1. Remove legacy HTML bgcolor attributes across all elements
-      const bgElements = root.querySelectorAll?.('[bgcolor]') || [];
-      for (let i = 0; i < bgElements.length; i++) {
-        const el = bgElements[i];
-        if (this._isProtectedElement(el)) continue;
-        el.removeAttribute('bgcolor');
-      }
-
-      // 1b. Clear WhiteBackground wrappers inline backgrounds
-      const whiteWrappers = root.querySelectorAll?.('.WhiteBackground, [class*="WhiteBackground" i]') || [];
-      for (let i = 0; i < whiteWrappers.length; i++) {
-        whiteWrappers[i].style.backgroundColor = '';
-        whiteWrappers[i].style.background = '';
-      }
-
-      // 1c. Ensure injected course filter bars stay dark
-      if (window.VTOP_PLUS?.CourseFilter?.syncTheme) {
-        window.VTOP_PLUS.CourseFilter.syncTheme(true);
-      }
-
-      // 1d. Clear any hardcoded blue/inline text colors from navbar elements to ensure pure white text
-      const headerElements = root.querySelectorAll?.('#vtop-header [style*="color"], .navbar [style*="color"], #quickLinks [style*="color"], #navbarDropdown [style*="color"]') || [];
-      for (let i = 0; i < headerElements.length; i++) {
-        headerElements[i].style.color = '';
-      }
-
-      // 1e. Clear any hardcoded/inline borders and outlines on navigation items (Academics, Examination, Feedback, etc.)
-      const navBtnElements = root.querySelectorAll?.('.hmenuItem, #top-hmenu-bar .btn, .sidebar .btn, [data-bs-toggle="collapse"].btn, div[id^="MG0"] .btn, .hmenu .btn-outline') || [];
-      for (let i = 0; i < navBtnElements.length; i++) {
-        navBtnElements[i].style.border = 'none';
-        navBtnElements[i].style.outline = 'none';
-        navBtnElements[i].style.boxShadow = 'none';
-      }
-
-      // 2. Clear hardcoded white/near-white inline background styles and near-black text
-      const styledElements = root.querySelectorAll?.('[style*="background"], [style*="color"]') || [];
-      for (let i = 0; i < styledElements.length; i++) {
-        const el = styledElements[i];
-        if (this._isProtectedElement(el)) continue;
-
-        const css = el.style.cssText;
-        if (WHITE_BG_REGEX.test(css)) {
-          el.style.backgroundColor = '';
+      try {
+        // 1. Remove legacy HTML bgcolor attributes across all elements
+        const bgElements = root.querySelectorAll?.('[bgcolor]') || [];
+        for (let i = 0; i < bgElements.length; i++) {
+          const el = bgElements[i];
+          if (this._isProtectedElement(el)) continue;
+          el.removeAttribute('bgcolor');
         }
-        if (DARK_TEXT_REGEX.test(css)) {
-          el.style.color = '';
+
+        // 1b. Clear WhiteBackground wrappers inline backgrounds
+        const whiteWrappers = root.querySelectorAll?.('.WhiteBackground, [class*="WhiteBackground" i]') || [];
+        for (let i = 0; i < whiteWrappers.length; i++) {
+          whiteWrappers[i].style.backgroundColor = '';
+          whiteWrappers[i].style.background = '';
         }
+
+        // 1c. Ensure injected course filter bars stay dark
+        if (window.VTOP_PLUS?.CourseFilter?.syncTheme) {
+          window.VTOP_PLUS.CourseFilter.syncTheme(true);
+        }
+
+        // 1d. Clear any hardcoded blue/inline text colors from navbar elements to ensure pure white text
+        const headerElements = root.querySelectorAll?.('#vtop-header [style*="color"], .navbar [style*="color"], #quickLinks [style*="color"], #navbarDropdown [style*="color"]') || [];
+        for (let i = 0; i < headerElements.length; i++) {
+          headerElements[i].style.color = '';
+        }
+
+        // 1e. Clear any hardcoded/inline borders and outlines on navigation items (Academics, Examination, Feedback, etc.)
+        const navBtnElements = root.querySelectorAll?.('.hmenuItem, #top-hmenu-bar .btn, .sidebar .btn, [data-bs-toggle="collapse"].btn, div[id^="MG0"] .btn, .hmenu .btn-outline') || [];
+        for (let i = 0; i < navBtnElements.length; i++) {
+          navBtnElements[i].style.border = 'none';
+          navBtnElements[i].style.outline = 'none';
+          navBtnElements[i].style.boxShadow = 'none';
+        }
+
+        // 2. Clear hardcoded white/near-white inline background styles and near-black text
+        const styledElements = root.querySelectorAll?.('[style*="background"], [style*="color"]') || [];
+        for (let i = 0; i < styledElements.length; i++) {
+          const el = styledElements[i];
+          if (this._isProtectedElement(el)) continue;
+
+          const css = el.style.cssText;
+          if (WHITE_BG_REGEX.test(css)) {
+            el.style.backgroundColor = '';
+          }
+          if (DARK_TEXT_REGEX.test(css)) {
+            el.style.color = '';
+          }
+        }
+      } finally {
+        this._isSanitizing = false;
       }
     },
 

@@ -860,7 +860,8 @@ fieldset div[class*="col-"]:has(#courseAccordion),
   box-sizing: border-box !important;
 }
 
-.container-fluid:has(#courseAccordion) {
+.card .container-fluid:has(#courseAccordion),
+.box .container-fluid:has(#courseAccordion) {
   background-color: transparent !important;
   padding-left: 0 !important;
   padding-right: 0 !important;

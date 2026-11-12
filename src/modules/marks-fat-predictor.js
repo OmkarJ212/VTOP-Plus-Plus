@@ -245,7 +245,9 @@
 
         const hasScore = scoredText !== '' && !isNaN(parseFloat(scoredText));
         const hasWeightMark = weightMarkText !== '' && !isNaN(parseFloat(weightMarkText));
-        const isGraded = hasScore || hasWeightMark || /\b(present|absent)\b/i.test(status);
+        const isAbsent = /\babsent\b/i.test(status);
+        // Only count component as graded if score/weightage marks exist, or student was marked absent
+        const isGraded = hasScore || hasWeightMark || isAbsent;
 
         if ((weightPct > 0 || maxMark > 0) && isGraded) {
           totalGiven += weightPct;

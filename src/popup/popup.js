@@ -101,6 +101,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           } else {
             showStatus('Downloader widget opened in bottom-right!', 'success');
           }
+        } else if (resp === null || resp === undefined) {
+          showStatus('Make sure you are on a VTOP tab', 'warn');
         } else {
           showStatus('Opened. Make sure you are viewing a course.', 'warn');
         }
@@ -151,10 +153,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function notifyActiveTab(message, callback) {
-    if (!activeTab || !activeTab.id) return;
+    if (!activeTab || !activeTab.id) {
+      if (callback) callback(null);
+      return;
+    }
     chrome.tabs.sendMessage(activeTab.id, message, (response) => {
       if (chrome.runtime.lastError) {
-        // Tab might not have script injected
+        if (callback) callback(null);
+        return;
       }
       if (callback) callback(response);
     });

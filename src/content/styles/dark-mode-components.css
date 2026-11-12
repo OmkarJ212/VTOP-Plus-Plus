@@ -524,15 +524,15 @@ html.vtop-dark-theme [style*="border:1px solid white"] {
 }
 
 /* Card borders across all pages (Time Table, Attendance, Marks, etc.) */
-.card:not(.hmenubox .card) {
+html:not(.vtop-dark-theme) .card:not(.hmenubox .card) {
   border: 1px solid #e2e8f0 !important;
 }
 
-.card-header:not(.hmenubox .card-header) {
+html:not(.vtop-dark-theme) .card-header:not(.hmenubox .card-header) {
   border-bottom: 1px solid #e2e8f0 !important;
 }
 
-.card-header:not(.hmenubox .card-header):not([class*="bg-"]) {
+html:not(.vtop-dark-theme) .card-header:not(.hmenubox .card-header):not([class*="bg-"]) {
   background-color: #f8fafc !important;
 }
 

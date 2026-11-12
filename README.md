@@ -12,9 +12,8 @@ It brings batch course material downloads, live course filtering, attendance bun
 - **Teacher-Grouped & All-Material Downloads:** Collects notes, slides, and syllabus files on Course Pages, including automatic multi-page table traversal.
 - **Instant ZIP Packaging:** Uses local JSZip `STORE` mode compression for fast packaging without freezing the browser tab.
 - **Anti-Rate-Limit Pacing Modes:**
-  - **Fast** *(default)*: `0.4s – 0.75s` jitter.
-  - **Safe**: `1.6s – 2.6s` jitter (human simulation).
-  - **Stealth**: `3.0s – 5.0s` jitter.
+  - **Human** *(default)*: `1.6s – 2.6s` jitter (natural clicking pace).
+  - **Fast**: `0.4s – 0.75s` jitter.
 - **Draggable & Minimizable Panel:** Floating UI with auto-detected registration number, course/faculty sync, and resilient SPA watchdog.
 
 ### 2. Consolidated Course Filter & Live Table Search

@@ -14,7 +14,8 @@
   const REGEX_CLEAN_TEACHER = /[^a-zA-Z0-9_\-\. ]/g;
   const REGEX_WHITESPACE = /[\r\n\t]+/g;
   const REGEX_SAFE_FILENAME = /[^a-zA-Z0-9_\-]/g;
-  const REGEX_CONTENT_DISPOSITION = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i;
+  const REGEX_RFC5987 = /filename\*=(?:UTF-8''|utf-8'')((['"]).*?\2|[^;\n]*)/i;
+  const REGEX_STD_FILENAME = /filename=((['"]).*?\2|[^;\n]*)/i;
   const REGEX_SPACES = /\s+/g;
   const REGEX_ILLEGAL_FS = /[\/\\:*?"<>|]/g;
   const REGEX_ONCLICK_FILEID = /downloadCourseMaterialFacultyPdf\s*\(\s*['"]?([a-zA-Z0-9_\-]+)['"]?/i;
@@ -63,38 +64,16 @@
       this.selectedFaculty = '__ALL__';
     },
 
+    isBusy() {
+      return isCrawlingPages || isDownloading;
+    },
+
     init() {
-      this.setupObserver();
+      if (isCrawlingPages || isDownloading) return;
       this.scanPageForMaterials();
     },
 
-    setupObserver() {
-      if (this._observer) return;
-      this._observer = new MutationObserver((mutations) => {
-        if (isCrawlingPages || isDownloading) return;
-
-        const isInternal = mutations.every((m) => {
-          return m.target && (m.target.id === 'vtop-zip-panel' || Boolean(m.target.closest && m.target.closest('#vtop-zip-panel')));
-        });
-        if (isInternal) return;
-
-        if (window.__vtop_dl_scan_timeout) clearTimeout(window.__vtop_dl_scan_timeout);
-        window.__vtop_dl_scan_timeout = setTimeout(() => {
-          this.scanPageForMaterials();
-        }, 300);
-      });
-
-      const target = document.body || document.documentElement;
-      if (target) {
-        this._observer.observe(target, { childList: true, subtree: true });
-      }
-    },
-
     destroy() {
-      if (this._observer) {
-        this._observer.disconnect();
-        this._observer = null;
-      }
       const panel = document.getElementById('vtop-zip-panel');
       if (panel && !isDownloading) {
         panel.style.display = 'none';
@@ -363,7 +342,7 @@
 
       isCrawlingPages = false;
       this.updateFacultyDropdown();
-      this.showStatus(`Captured all ${allCourseFiles.size} materials across all pages!`, 4000);
+      this.showStatus(`Found ${allCourseFiles.size} materials across all pages.`, 4000);
     },
 
     getTeachersMap() {
@@ -407,17 +386,16 @@
             </div>
 
             <div class="vtop-form-group">
-              <label class="vtop-form-label" for="vtop-speed-select">Download Pacing (Anti-Rate-Limit):</label>
+              <label class="vtop-form-label" for="vtop-speed-select">Download Speed:</label>
               <select class="vtop-form-select" id="vtop-speed-select">
-                <option value="safe" selected>Safe (1.5s - 2.5s jitter, Human-like)</option>
-                <option value="stealth">Stealth (3.0s - 5.0s, Extra Cautious)</option>
-                <option value="fast">Fast (0.4s - 0.75s, Safe Accelerated)</option>
+                <option value="human" selected>Human (1.6s – 2.6s delay)</option>
+                <option value="fast">Fast</option>
               </select>
             </div>
 
             <div class="vtop-meta-info">
               <span id="vtop-file-count">0 files detected</span>
-              <a href="javascript:void(0)" id="vtop-rescan-pages-btn" style="color: #2980b9; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>Scan All Pages</a>
+              <button type="button" id="vtop-rescan-pages-btn" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; color: #2980b9; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>Scan All Pages</button>
             </div>
 
             <div class="vtop-btn-row">
@@ -460,7 +438,10 @@
             this.showStatus('Cancelling after current file...', 3000);
           }
         });
-        document.getElementById('vtop-rescan-pages-btn').addEventListener('click', () => this.crawlAllPages());
+        document.getElementById('vtop-rescan-pages-btn').addEventListener('click', (e) => {
+          e.preventDefault();
+          this.crawlAllPages();
+        });
         const facSel = document.getElementById('vtop-faculty-select');
         facSel.addEventListener('change', () => {
           this.selectedFaculty = facSel.value;
@@ -575,7 +556,8 @@
     loadSavedSettings() {
       if (chrome?.storage?.local) {
         chrome.storage.local.get(['vtop_speed_mode', 'downloadPacing'], (res) => {
-          const speed = res?.downloadPacing || res?.vtop_speed_mode;
+          let speed = res?.downloadPacing || res?.vtop_speed_mode;
+          if (speed === 'safe' || speed === 'stealth') speed = 'human';
           if (speed) {
             const speedSelect = document.getElementById('vtop-speed-select');
             if (speedSelect) speedSelect.value = speed;
@@ -641,11 +623,10 @@
     },
 
     getDelayMs(mode) {
-      if (mode === 'stealth') {
-        return Math.floor(3000 + Math.random() * 2000);
-      } else if (mode === 'fast') {
+      if (mode === 'fast') {
         return Math.floor(400 + Math.random() * 350);
       }
+      // 'human' mode: natural human clicking pace with jitter
       return Math.floor(1600 + Math.random() * 1000);
     },
 
@@ -681,7 +662,8 @@
 
       const selectedTeacher = facultySelect ? facultySelect.value : '__ALL__';
       const regNo = regInput ? regInput.value.trim().toUpperCase() : '';
-      const speedMode = speedSelect ? speedSelect.value : 'safe';
+      let speedMode = speedSelect ? speedSelect.value : 'human';
+      if (speedMode === 'safe' || speedMode === 'stealth') speedMode = 'human';
 
       if (!regNo) {
         alert('Please enter your Student Registration Number (e.g. 24BCE0212).');
@@ -793,7 +775,7 @@
             for (let rem = delayMs; rem > 0; rem -= 200) {
               if (cancelRequested) break;
               if (progressLabel)
-                progressLabel.textContent = `[${i + 1}/${filesToDownload.length}] Pacing: waiting ${(rem / 1000).toFixed(1)}s (simulating human click)...`;
+                progressLabel.textContent = `[${i + 1}/${filesToDownload.length}] Waiting ${(rem / 1000).toFixed(1)}s before next file...`;
               await new Promise((r) => setTimeout(r, Math.min(200, rem)));
             }
           }
@@ -801,7 +783,7 @@
 
         if (downloadedCount > 0) {
           if (progressBar) progressBar.style.width = '95%';
-          if (progressLabel) progressLabel.textContent = 'Packaging into .ZIP archive (instant)...';
+          if (progressLabel) progressLabel.textContent = 'Creating .ZIP archive...';
 
           const zipBlob = await zip.generateAsync(
             {
@@ -945,13 +927,26 @@
             ) {
               throw new Error('VTOP session expired or logged out. Pausing downloads to protect your account.');
             }
+            if (contentType.includes('text/html')) {
+              throw new Error('Received an HTML error response instead of the requested material file.');
+            }
           }
 
           let fileName = null;
           if (contentDisposition) {
-            const match = contentDisposition.match(REGEX_CONTENT_DISPOSITION);
-            if (match && match[1]) {
-              fileName = match[1].replace(/['"]/g, '').trim();
+            const rfcMatch = contentDisposition.match(REGEX_RFC5987);
+            if (rfcMatch && rfcMatch[1]) {
+              const raw = rfcMatch[1].replace(/['"]/g, '').trim();
+              try {
+                fileName = decodeURIComponent(raw);
+              } catch (_) {
+                fileName = raw;
+              }
+            } else {
+              const stdMatch = contentDisposition.match(REGEX_STD_FILENAME);
+              if (stdMatch && stdMatch[1]) {
+                fileName = stdMatch[1].replace(/['"]/g, '').trim();
+              }
             }
           }
 

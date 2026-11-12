@@ -11,6 +11,7 @@
 
   const AttendanceCalculator = {
     targetPercent: 75,
+    _settingsLoaded: false,
 
     init() {
       this.checkAndCalculate();
@@ -24,7 +25,14 @@
         return;
       }
 
+      if (this._settingsLoaded) {
+        this.renderSummaryWidget(table);
+        this.augmentTable(table);
+        return;
+      }
+
       this.loadTargetSettings().then(() => {
+        this._settingsLoaded = true;
         this.renderSummaryWidget(table);
         this.augmentTable(table);
       });
@@ -34,6 +42,10 @@
       if (chrome?.storage?.local) {
         return new Promise((resolve) => {
           chrome.storage.local.get(['attendanceTarget'], (res) => {
+            if (chrome.runtime.lastError) {
+              resolve();
+              return;
+            }
             if (res && res.attendanceTarget !== undefined) {
               const val = parseInt(res.attendanceTarget, 10);
               if (!isNaN(val)) {
@@ -70,6 +82,9 @@
     renderSummaryWidget(table) {
       let card = document.getElementById('vtop-attendance-summary-card');
       if (card) {
+        if (table && table.parentNode && card.nextElementSibling !== table) {
+          table.parentNode.insertBefore(card, table);
+        }
         return;
       }
 
@@ -81,7 +96,7 @@
         <div class="vtop-card-header" style="flex-wrap: wrap; gap: 12px;">
           <div class="vtop-card-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-            <span>VTOP++ Smart Attendance & Bunk Calculator</span>
+            <span>Attendance & Bunk Calculator</span>
           </div>
           <div class="vtop-target-controls" style="display: flex; align-items: center; gap: 8px;">
             <!-- Target Range Slider & Number Box (1-100%) -->
@@ -127,6 +142,7 @@
 
       const slider = document.getElementById('vtop-target-slider');
       const numInput = document.getElementById('vtop-target-num');
+      let debouncedStorageTimer = null;
 
       const updateTarget = (val) => {
         val = Math.max(1, Math.min(100, parseInt(val, 10) || 75));
@@ -137,8 +153,15 @@
         if (debarmentWarning) {
           debarmentWarning.style.display = val < 75 ? 'flex' : 'none';
         }
-        if (chrome?.storage?.local) chrome.storage.local.set({ attendanceTarget: val });
-        this.augmentTable(table);
+        if (debouncedStorageTimer) clearTimeout(debouncedStorageTimer);
+        debouncedStorageTimer = setTimeout(() => {
+          if (chrome?.storage?.local) chrome.storage.local.set({ attendanceTarget: val });
+        }, 300);
+
+        const currentTable = this.findAttendanceTable() || table;
+        if (currentTable) {
+          this.augmentTable(currentTable);
+        }
       };
 
       slider?.addEventListener('input', (e) => updateTarget(e.target.value));
@@ -157,15 +180,13 @@
         const attText = (cells[attendedIdx].textContent || '').trim();
         const totText = (cells[totalIdx].textContent || '').trim();
         if (/^\d+$/.test(attText) && /^\d+$/.test(totText)) {
-          let attended = parseInt(attText, 10) || 0;
+          const attended = parseInt(attText, 10) || 0;
           const total = parseInt(totText, 10) || 0;
           let onDuty = 0;
           if (odIdx !== -1 && cells[odIdx]) {
             onDuty = parseInt((cells[odIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
           }
-          if (onDuty > 0 && attended + onDuty <= total) {
-            attended += onDuty;
-          }
+          // Note: In VTOP, the Attended column already includes On Duty (OD) classes.
           const percentage = total > 0 ? (attended / total) * 100 : 0;
           return { attended, total, present: Math.max(0, attended - onDuty), absent: Math.max(0, total - attended), onDuty, percentage };
         }
@@ -210,15 +231,13 @@
 
       // 3. Fallback: Separate columns with non-pure-digit formatting
       if (attendedIdx !== -1 && totalIdx !== -1 && cells[attendedIdx] && cells[totalIdx]) {
-        let attended = parseInt((cells[attendedIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
+        const attended = parseInt((cells[attendedIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
         const total = parseInt((cells[totalIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
         let onDuty = 0;
         if (odIdx !== -1 && cells[odIdx]) {
           onDuty = parseInt((cells[odIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
         }
-        if (onDuty > 0 && attended + onDuty <= total) {
-          attended += onDuty;
-        }
+        // Note: In VTOP, the Attended column already includes On Duty (OD) classes.
         const percentage = total > 0 ? (attended / total) * 100 : 0;
         return { attended, total, present: Math.max(0, attended - onDuty), absent: Math.max(0, total - attended), onDuty, percentage };
       }

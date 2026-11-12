@@ -147,7 +147,7 @@ async function handleFetchMaterial({ url, body, headers, timeoutMs = 25000 }) {
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
-  const chunkSize = 32768; // 32KB chunks for optimal memory throughput
+  const chunkSize = 8192; // 8KB chunks safely avoid call stack limits on all platforms
   let binary = '';
   for (let i = 0; i < len; i += chunkSize) {
     const chunk = bytes.subarray(i, Math.min(i + chunkSize, len));
