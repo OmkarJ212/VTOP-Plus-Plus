@@ -50,25 +50,6 @@
     },
 
     /**
-     * Save updated settings
-     */
-    async saveSettings(newSettings) {
-      return new Promise((resolve, reject) => {
-        if (!chrome?.storage?.local) {
-          resolve();
-          return;
-        }
-        chrome.storage.local.set(newSettings, () => {
-          if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-          } else {
-            resolve();
-          }
-        });
-      });
-    },
-
-    /**
      * Listen for settings changes across tabs
      */
     onChanged(callback) {

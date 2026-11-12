@@ -47,8 +47,9 @@
     },
 
     findAttendanceTable() {
-      // 1. Direct O(1) selector on Vellore VTOP
-      const direct = document.querySelector('#attendanceDetail, table[id*="attendance" i]');
+      // 1. Direct O(1) selector on Vellore VTOP (#AttendanceDetailDataTable)
+      const direct = document.getElementById('AttendanceDetailDataTable') ||
+                     document.querySelector('#attendanceDetail, table[id*="attendance" i]');
       if (direct) return direct;
 
       // 2. Fast scan across tables
@@ -79,7 +80,7 @@
       card.innerHTML = `
         <div class="vtop-card-header" style="flex-wrap: wrap; gap: 12px;">
           <div class="vtop-card-title">
-            <span>📊</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             <span>VTOP++ Smart Attendance & Bunk Calculator</span>
           </div>
           <div class="vtop-target-controls" style="display: flex; align-items: center; gap: 8px;">
@@ -94,7 +95,7 @@
         </div>
 
         <div id="vtop-target-debarment-warning" class="vtop-debarment-warning" style="display: ${this.targetPercent < 75 ? 'flex' : 'none'};">
-          <span>⚠️</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           <span>Target is below VIT debarment threshold (75%)</span>
         </div>
 
@@ -145,13 +146,32 @@
     },
 
     /**
-     * Resiliently extracts attendance numbers from either a single rich cell or separate columns
+     * Resiliently extracts attendance numbers from separate columns (O(1) fast-path) or a rich status cell
      */
     extractAttendanceData(row, attendedIdx, totalIdx, odIdx = -1) {
       const cells = Array.from(row.querySelectorAll('td'));
       if (cells.length < 3) return null;
 
-      // 1. Primary: Rich multi-line Attendance Status cell
+      // 1. O(1) Fast-path: Separate numeric columns (exact #AttendanceDetailDataTable layout: col 5 & col 6)
+      if (attendedIdx !== -1 && totalIdx !== -1 && cells[attendedIdx] && cells[totalIdx]) {
+        const attText = (cells[attendedIdx].textContent || '').trim();
+        const totText = (cells[totalIdx].textContent || '').trim();
+        if (/^\d+$/.test(attText) && /^\d+$/.test(totText)) {
+          let attended = parseInt(attText, 10) || 0;
+          const total = parseInt(totText, 10) || 0;
+          let onDuty = 0;
+          if (odIdx !== -1 && cells[odIdx]) {
+            onDuty = parseInt((cells[odIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
+          }
+          if (onDuty > 0 && attended + onDuty <= total) {
+            attended += onDuty;
+          }
+          const percentage = total > 0 ? (attended / total) * 100 : 0;
+          return { attended, total, present: Math.max(0, attended - onDuty), absent: Math.max(0, total - attended), onDuty, percentage };
+        }
+      }
+
+      // 2. Fallback: Rich multi-line Attendance Status cell
       for (const cell of cells) {
         const text = cell.textContent || '';
         if (
@@ -188,7 +208,7 @@
         }
       }
 
-      // 2. Fallback: Separate column layout
+      // 3. Fallback: Separate columns with non-pure-digit formatting
       if (attendedIdx !== -1 && totalIdx !== -1 && cells[attendedIdx] && cells[totalIdx]) {
         let attended = parseInt((cells[attendedIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
         const total = parseInt((cells[totalIdx].textContent || '').replace(/[^0-9]/g, ''), 10) || 0;
@@ -210,18 +230,23 @@
       const headerRow = table.querySelector('thead tr, tr.tableHeader, tr:first-child');
       if (!headerRow) return;
 
-      // Identify column indices if separate columns exist
+      // Exact O(1) column indices for #AttendanceDetailDataTable, with header-scan fallback
       const ths = headerRow.querySelectorAll('th, td');
       let attendedIdx = -1;
       let totalIdx = -1;
       let odIdx = -1;
 
-      ths.forEach((th, idx) => {
-        const text = (th.textContent || '').toLowerCase().trim();
-        if (text.includes('attended') && !text.includes('%') && !text.includes('percentage')) attendedIdx = idx;
-        if (text.includes('total') || text.includes('conducted')) totalIdx = idx;
-        if (text.includes('duty') || text === 'od') odIdx = idx;
-      });
+      if (table.id === 'AttendanceDetailDataTable' && ths.length >= 7) {
+        attendedIdx = 5;
+        totalIdx = 6;
+      } else {
+        ths.forEach((th, idx) => {
+          const text = (th.textContent || '').toLowerCase().trim();
+          if (text.includes('attended') && !text.includes('%') && !text.includes('percentage')) attendedIdx = idx;
+          if (text.includes('total') || text.includes('conducted')) totalIdx = idx;
+          if (text.includes('duty') || text === 'od') odIdx = idx;
+        });
+      }
 
       // Add Bunk Meter column header if not present
       if (!headerRow.querySelector('#vtop-th-bunk-meter')) {
@@ -282,13 +307,13 @@
             const missed = data.total - data.attended;
             statusHtml = `
               <span class="vtop-badge vtop-badge-danger" title="Cannot achieve 100% attendance as ${missed} class${missed === 1 ? ' was' : 'es were'} missed">
-                🔴 100% Impossible (already missed ${missed})
+                100% Impossible (already missed ${missed})
               </span>
             `;
           } else {
             statusHtml = `
               <span class="vtop-badge vtop-badge-warn" title="Must attend every remaining class to stay at 100%">
-                🟡 Must attend every class (0 bunks)
+                Must attend every class (0 bunks)
               </span>
             `;
           }
@@ -298,13 +323,13 @@
           if (safeBunks === 0) {
             statusHtml = `
               <span class="vtop-badge ${badgeClass}" title="Current attendance is right at target. Bunking the next class will drop you below ${this.targetPercent}%">
-                🟡 On target (cannot bunk next class)
+                On target (cannot bunk next class)
               </span>
             `;
           } else {
             statusHtml = `
               <span class="vtop-badge ${badgeClass}">
-                🟢 Can bunk <strong>${safeBunks}</strong> class${safeBunks === 1 ? '' : 'es'}
+                Can bunk <strong>${safeBunks}</strong> class${safeBunks === 1 ? '' : 'es'}
               </span>
             `;
           }
@@ -312,7 +337,7 @@
           const needed = Math.max(1, Math.ceil((target * data.total - data.attended) / (1 - target)));
           statusHtml = `
             <span class="vtop-badge vtop-badge-danger">
-              🔴 Attend <strong>${needed}</strong> consecutive class${needed === 1 ? '' : 'es'}
+              Attend <strong>${needed}</strong> consecutive class${needed === 1 ? '' : 'es'}
             </span>
           `;
         }

@@ -35,14 +35,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       activeTab = tab;
       const url = activeTab?.url || '';
+      const isVelloreVtop = /^https?:\/\/vtop\.vit\.ac\.in(\/|$)/i.test(url);
 
-      if (url.includes('vit.ac.in') || url.includes('vtop')) {
+      if (isVelloreVtop) {
         statusBadge.textContent = '● Connected';
         statusBadge.style.background = '#ecfdf5';
         statusBadge.style.color = '#059669';
         statusBadge.style.borderColor = '#a7f3d0';
       } else {
-        statusBadge.textContent = '○ Navigate to VTOP';
+        statusBadge.textContent = '○ Navigate to VIT Vellore VTOP';
         statusBadge.style.background = '#fffbeb';
         statusBadge.style.color = '#b45309';
         statusBadge.style.borderColor = '#fde68a';
@@ -94,9 +95,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       notifyActiveTab({ action: 'FORCE_SCAN' }, (resp) => {
         if (resp && resp.success) {
           if (resp.fileCount > 0) {
-            showStatus(`✅ Found ${resp.fileCount} files (${resp.activeCourse})! Downloader opened.`, 'success');
+            showStatus(`Found ${resp.fileCount} files (${resp.activeCourse})! Downloader opened.`, 'success');
           } else if (resp.hasButtons) {
-            showStatus('✅ Course materials detected! Downloader opened.', 'success');
+            showStatus('Course materials detected! Downloader opened.', 'success');
           } else {
             showStatus('Downloader widget opened in bottom-right!', 'success');
           }
@@ -130,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       btnPrivacy.classList.toggle('active', newState);
       notifyActiveTab({ action: 'TOGGLE_PRIVACY', active: newState });
-      showStatus(`Privacy Mode ${newState ? 'Activated 🔒' : 'Disabled 🔓'}`, 'success');
+      showStatus(`Privacy Mode ${newState ? 'Activated' : 'Disabled'}`, 'success');
     });
   }
 
@@ -145,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       btnDark.classList.toggle('active', newState);
       notifyActiveTab({ action: 'TOGGLE_DARK_MODE', active: newState });
-      showStatus(`Universal Dark Mode ${newState ? 'Enabled 🌙' : 'Disabled ☀️'}`, 'success');
+      showStatus(`Universal Dark Mode ${newState ? 'Enabled' : 'Disabled'}`, 'success');
     });
   }
 

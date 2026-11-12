@@ -166,8 +166,8 @@
   }
 
   function findCaptchaImage() {
-    // 1. Direct ID/class/name match
-    const direct = document.querySelector('img#captchaImg, img#captcha, img[id*="captcha" i], img[src*="captcha" i], img[alt*="captcha" i]');
+    // 1. Direct exact Vellore VTOP selector (#captchaBlock img) + standard fallbacks
+    const direct = document.querySelector('#captchaBlock img, img#captchaImg, img#captcha, img[id*="captcha" i], img[src*="captcha" i], img[alt*="captcha" i]');
     if (direct) return direct;
 
     // 2. Score search across all img tags
@@ -189,8 +189,8 @@
   }
 
   function findCaptchaInput(img) {
-    // 1. Direct selector match
-    const direct = document.querySelector('input[name="captcha" i], input[id="captcha" i], input[placeholder*="captcha" i], input[name*="captcha" i]');
+    // 1. Direct exact Vellore VTOP selector (input#captchaStr) + fallbacks
+    const direct = document.querySelector('input#captchaStr, input[name="captchaStr"], input[name="captcha" i], input[id="captcha" i], input[placeholder*="captcha" i], input[name*="captcha" i]');
     if (direct) return direct;
 
     // 2. Search inputs inside form
@@ -235,7 +235,7 @@
     }
 
     badge.innerHTML = `
-      <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#ecfdf5; color:#10b981; font-size:10px;">⚡</span>
+      <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#ecfdf5; color:#10b981;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
       <span>Auto-Solved: <strong style="letter-spacing:1px; color:#047857;">${solvedText}</strong></span>
       <span style="font-size:10px; color:#6b7280; font-weight:normal;">(VIT Vellore Offline)</span>
     `;
@@ -322,16 +322,15 @@
         }
       }, true);
 
-      // Listen to click on refresh icon/button
+      // Listen to click on refresh icon/button (#button-addon2[onclick="loadCaptcha()"] inside #captchaBlock)
       document.addEventListener('click', (e) => {
-        const btn = e.target.closest('#captchaRefresh, [onclick*="captcha" i], .captcha-refresh, .glyphicon-refresh, .fa-refresh, #captchaBlock button, #captchaBlock a, .captcha-container button, .captcha-container a');
+        const btn = e.target.closest('#captchaBlock #button-addon2, button[onclick*="loadCaptcha"], #captchaBlock button, #captchaRefresh, [onclick*="captcha" i], .captcha-refresh, .glyphicon-refresh, .fa-refresh, #captchaBlock a, .captcha-container button, .captcha-container a');
         if (btn) {
           const img = findCaptchaImage();
           if (img) {
             img.addEventListener('load', () => AutoCaptcha.solve(), { once: true });
           }
-          setTimeout(() => AutoCaptcha.solve(), 300);
-          setTimeout(() => AutoCaptcha.solve(), 800);
+          setTimeout(() => AutoCaptcha.solve(), 250);
         }
       }, true);
     },
@@ -368,9 +367,8 @@
       this.setupObserver();
       this.solve();
 
-      // Quick retry checks for delayed DOM rendering
-      setTimeout(() => this.solve(), 200);
-      setTimeout(() => this.solve(), 600);
+      // Single short safety retry if image was not yet painted at boot
+      setTimeout(() => this.solve(), 150);
     }
   };
 

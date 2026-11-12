@@ -15,7 +15,6 @@
   class CommandPalette {
     constructor() {
       this.isOpen = false;
-      this.isInitialized = false;
       this.modal = null;
       this.input = null;
       this.resultsContainer = null;
@@ -32,7 +31,6 @@
       if (window !== window.top) return; // Don't mount in nested sub-frames
       this.initKeyboardListener();
       this.createDOM();
-      this.isInitialized = true;
     }
 
     destroy() {
@@ -46,7 +44,6 @@
         this.modal.remove();
         this.modal = null;
       }
-      this.isInitialized = false;
     }
 
     initKeyboardListener() {
@@ -264,7 +261,7 @@
       const builtInActions = [
         {
           id: 'vtop-action-dark-mode',
-          title: 'Toggle Dark Mode (🌙/☀️)',
+          title: 'Toggle Dark Mode',
           category: 'VTOP++ Power Tool',
           isAction: true,
           action: () => window.VTOP_PLUS.DarkMode?.toggle(),
@@ -274,7 +271,7 @@
         },
         {
           id: 'vtop-action-privacy-mode',
-          title: 'Toggle Privacy Blur (🔒)',
+          title: 'Toggle Privacy Blur',
           category: 'VTOP++ Power Tool',
           isAction: true,
           action: () => window.VTOP_PLUS.PrivacyMode?.toggle(),
@@ -417,7 +414,7 @@
       }
       const qd = window.VTOP_PLUS?.QuickDock;
       if (qd && typeof qd.requestNavigation === 'function') {
-        qd.requestNavigation({ title: item.title, targetItem: item });
+        qd.requestNavigation({ id: item.id, title: item.title, targetItem: item });
       } else if (window.VTOP_PLUS.Crawler) {
         window.VTOP_PLUS.Crawler.navigate(item);
       } else if (item.element && typeof item.element.click === 'function') {

@@ -34,38 +34,131 @@
     },
 
     /**
-     * Check if currently on a specific VTOP view by page URL, form, or table presence
+     * Check if currently on a specific VTOP view by exact DOM IDs, URL, or table presence
      */
     detectPageType() {
-      const href = window.location.href.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
 
-      if (document.querySelector('#loginForm, #vtopLogin, #authLoginBtn, input[name="username"], input[type="password"]')) {
+      if (
+        path.includes('/login') ||
+        document.querySelector('#vtopLoginForm, input#username, input#captchaStr, #loginForm, #vtopLogin, #authLoginBtn, input[name="username"], input[type="password"]')
+      ) {
         return 'LOGIN';
       }
 
-      if (document.querySelector('button[data-fileid], .download-btn[data-fileid], #materialTable') || href.includes('coursematerial')) {
+      if (
+        document.querySelector('#materialTable, select#courseId, button#downloadmat[data-fileid], button[data-fileid], .download-btn[data-fileid]') ||
+        path.includes('coursematerial')
+      ) {
         return 'COURSE_PAGE';
       }
 
-      if (document.querySelector('#attendanceDetail, table[id*="attendance" i]') || href.includes('attendance')) {
+      if (
+        document.querySelector('#AttendanceDetailDataTable, #StudentCourseDetailDataTable, #attendanceDetail, table[id*="attendance" i]') ||
+        path.includes('attendance')
+      ) {
         return 'ATTENDANCE';
       }
 
-      if (document.querySelector('#studentMarks, #marksView, table[id*="marks" i], .vtop-fat-inline-tfoot') || href.includes('marks')) {
+      if (
+        document.querySelector('#fixedTableContainer table.customTable-level1, #studentMarks, #marksView, table[id*="marks" i], .vtop-fat-inline-tfoot') ||
+        path.includes('marks')
+      ) {
         return 'MARKS';
+      }
+
+      // Check exact DA customTable headers inside #fixedTableContainer before broad selectors
+      const customTables = document.querySelectorAll('#fixedTableContainer table.customTable');
+      for (const tbl of customTables) {
+        const firstRowText = (tbl.querySelector('tr')?.textContent || '').toLowerCase();
+        if (
+          (firstRowText.includes('due date') && firstRowText.includes('document details')) ||
+          (firstRowText.includes('class nbr') && firstRowText.includes('dashboard'))
+        ) {
+          return 'DIGITAL_ASSIGNMENT';
+        }
       }
 
       if (
         document.querySelector(
           '#digitalAssignment, #daUpload, #studDaUpload, form[action*="DigitalAssignment"], button[name="downloadQuestion"], button[name="downloadStudentDA"], button .bi-folder-symlink-fill, [onclick*="myFunction"], [onclick*="processDigitalAssignment"]'
         ) ||
-        href.includes('assignment') ||
-        document.querySelector('.card-header h3, h3, h2, .card-title, .page-head')?.textContent?.toLowerCase().includes('assignment upload')
+        path.includes('assignment')
       ) {
         return 'DIGITAL_ASSIGNMENT';
       }
 
       return 'GENERAL';
+    },
+
+    getBasePath() {
+      return window.location.pathname.split('/')[1] || 'vtop';
+    },
+
+    getAuthId() {
+      const fromDom =
+        document.getElementById('authorizedIDX')?.value ||
+        document.getElementById('authorizedID')?.value ||
+        document.getElementById('authorizedID2')?.value ||
+        document.querySelector('input[name="authorizedID"], input[name*="authId" i], input[name*="regNo" i]')?.value;
+      if (fromDom) return fromDom.trim().toUpperCase();
+
+      const userImg = document.querySelector('img[src*="/users/image/?id="]');
+      if (userImg) {
+        const idMatch = userImg.src.match(/id=([a-zA-Z0-9]+)/);
+        if (idMatch && idMatch[1]) return idMatch[1].toUpperCase();
+      }
+
+      const bodyText = document.body?.innerText || document.body?.textContent || '';
+      const regMatch = bodyText.match(/\b(2[0-9][A-Z]{3}[0-9]{4,5})\b/i);
+      if (regMatch) return regMatch[1].toUpperCase();
+
+      return '';
+    },
+
+    getCsrfToken() {
+      const csrfInput = document.querySelector('input[name="_csrf"], input[id="_csrf"], input[name*="csrf" i], input[id*="csrf" i]');
+      if (csrfInput && csrfInput.value) return csrfInput.value;
+
+      const csrfMeta = document.querySelector('meta[name="_csrf"]');
+      if (csrfMeta && csrfMeta.content) return csrfMeta.content;
+
+      try {
+        const match = document.cookie.match(/(?:^|;\s*)(?:XSRF-TOKEN|_csrf)=([^;]+)/i);
+        if (match && match[1]) return decodeURIComponent(match[1]);
+      } catch (_) {}
+
+      return window._csrf || '';
+    },
+
+    /**
+     * Auto-expands DataTables page length selector to 100 / All if available
+     */
+    expandDataTableLength() {
+      const lengthSelect = document.querySelector('select[name="materialTable_length"], select[name$="_length"]');
+      if (!lengthSelect || lengthSelect.value === '100' || lengthSelect.value === '-1') return false;
+
+      let targetOption =
+        lengthSelect.querySelector('option[value="100"]') ||
+        lengthSelect.querySelector('option[value="-1"]');
+
+      if (!targetOption) {
+        let maxVal = 0;
+        for (const opt of lengthSelect.options) {
+          const val = parseInt(opt.value, 10);
+          if (val > maxVal) {
+            maxVal = val;
+            targetOption = opt;
+          }
+        }
+      }
+
+      if (targetOption && lengthSelect.value !== targetOption.value) {
+        lengthSelect.value = targetOption.value;
+        lengthSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+      }
+      return false;
     }
   };
 

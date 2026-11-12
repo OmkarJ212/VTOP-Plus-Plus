@@ -16,7 +16,6 @@
       id: 'course-page',
       title: 'Course Page',
       category: 'Academics',
-      icon: '📚',
       dataUrl: 'academics/common/StudentCoursePage',
       fallbackDataUrls: [
         'academics/common/CoursePage',
@@ -31,7 +30,6 @@
       id: 'marks-grades',
       title: 'Student Mark View',
       category: 'Examinations',
-      icon: '🎯',
       dataUrl: 'examinations/StudentMarkView',
       fallbackDataUrls: ['examinations/examGradeView/StudentGradeHistory', 'examinations/StudentMarks'],
       patterns: [/student\s*mark/i, /^marks$/i, /mark\s*view/i, /marks\s*&\s*grades/i],
@@ -41,7 +39,6 @@
       id: 'attendance',
       title: 'Class Attendance',
       category: 'Academics',
-      icon: '📊',
       dataUrl: 'academics/common/StudentAttendance',
       fallbackDataUrls: ['academics/common/Attendance', 'academics/common/StudentAttendanceDetail'],
       patterns: [/class\s*attendance/i, /^attendance$/i, /student\s*attendance/i],
@@ -51,7 +48,6 @@
       id: 'timetable',
       title: 'Class Time Table',
       category: 'Academics',
-      icon: '📅',
       dataUrl: 'academics/common/StudentTimeTable',
       fallbackDataUrls: ['academics/common/TimeTable', 'academics/common/StudentTimetable'],
       patterns: [/time\s*table/i, /class\s*time\s*table/i, /student\s*time\s*table/i],
@@ -61,7 +57,6 @@
       id: 'digital-assignments',
       title: 'Digital Assignment Upload',
       category: 'Examinations',
-      icon: '📝',
       dataUrl: 'examinations/StudentDA',
       fallbackDataUrls: ['examinations/StudentDAUpload', 'examinations/DigitalAssignment'],
       patterns: [/digital\s*assignment/i, /assignment\s*upload/i, /^da$/i],
@@ -71,7 +66,6 @@
       id: 'grade-history',
       title: 'Student Grade History',
       category: 'Examinations',
-      icon: '📜',
       dataUrl: 'examinations/examGradeView/StudentGradeHistory',
       fallbackDataUrls: ['examinations/StudentGradeHistory', 'examinations/GradeHistory'],
       patterns: [/grade\s*history/i, /exam\s*grade/i],
@@ -81,7 +75,6 @@
       id: 'exam-schedule',
       title: 'Exam Schedule',
       category: 'Examinations',
-      icon: '⏱️',
       dataUrl: 'examinations/ExamSchedule',
       fallbackDataUrls: ['examinations/StudentExamSchedule'],
       patterns: [/exam\s*schedule/i, /examination\s*schedule/i],
@@ -91,7 +84,6 @@
       id: 'hostel-leave',
       title: 'Hostel Leave Application',
       category: 'Hostels',
-      icon: '🏖️',
       dataUrl: 'hostels/StudentLeave',
       fallbackDataUrls: ['hostels/LeaveApplication', 'hostels/StudentLeaveApply'],
       patterns: [/hostel\s*leave/i, /leave\s*application/i, /^leave$/i],
@@ -101,7 +93,6 @@
       id: 'curriculum',
       title: 'Curriculum & Credit Distribution',
       category: 'Academics',
-      icon: '📋',
       dataUrl: 'academics/common/Curriculum',
       fallbackDataUrls: ['academics/common/StudentCurriculum'],
       patterns: [/curriculum/i, /credits/i],
@@ -111,7 +102,6 @@
       id: 'faculty-advisor',
       title: 'Faculty Advisor & Proctor Details',
       category: 'Academics',
-      icon: '👨‍🏫',
       dataUrl: 'academics/common/FacultyAdvisor',
       fallbackDataUrls: ['academics/common/StudentFacultyAdvisor', 'academics/common/ProctorDetails'],
       patterns: [/faculty\s*advisor/i, /proctor/i],
@@ -121,7 +111,6 @@
       id: 'academic-calendar',
       title: 'Academic Calendar',
       category: 'Academics',
-      icon: '🗓️',
       dataUrl: 'academics/common/AcademicCalendar',
       fallbackDataUrls: ['academics/common/Calendar'],
       patterns: [/academic\s*calendar/i, /calendar/i],
@@ -131,7 +120,6 @@
       id: 'biometric-log',
       title: 'Biometric Log',
       category: 'Hostels',
-      icon: '👆',
       dataUrl: 'hostels/BiometricLog',
       fallbackDataUrls: ['hostels/StudentBiometricLog'],
       patterns: [/biometric/i, /in\s*out\s*log/i],
@@ -193,11 +181,9 @@
       ...rawItem,
       lowerTitle,
       lowerCat,
-      lowerUrl,
       acronym,
       words,
-      synonyms,
-      searchTokens: `${lowerTitle} ${lowerCat} ${acronym} ${synonyms.join(' ')} ${lowerUrl}`
+      synonyms
     };
   }
 
@@ -297,8 +283,7 @@
             category,
             dataUrl,
             element: link,
-            href: href !== '#' && href !== 'javascript:void(0);' ? href : null,
-            icon: category.includes('Exam') ? '📝' : category.includes('Hostel') ? '🏖️' : '📄'
+            href: href !== '#' && href !== 'javascript:void(0);' ? href : null
           });
           itemsMap.set(dedupeKey, newItem);
         }
@@ -332,7 +317,6 @@
           this.quickDockMap.set(id, {
             id: item.id,
             title: item.title,
-            icon: item.icon,
             dataUrl: item.dataUrl,
             targetItem: item,
             isFound: Boolean(item.element || item.dataUrl)

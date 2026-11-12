@@ -5,7 +5,6 @@
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('[VTOP++] Background service worker registered successfully.');
-  setupKeepAliveAlarm();
 });
 
 // Ensure alarm is active on worker spin-up
@@ -35,7 +34,7 @@ if (chrome.alarms) {
  */
 async function pingActiveVtopSessions() {
   try {
-    const tabs = await chrome.tabs.query({ url: ['*://vtop.vit.ac.in/*', '*://vtop2.vit.ac.in/*'] });
+    const tabs = await chrome.tabs.query({ url: ['*://vtop.vit.ac.in/*'] });
     for (const tab of tabs) {
       if (tab.id) {
         chrome.tabs.sendMessage(tab.id, { action: 'HEARTBEAT_PING' }, () => {
@@ -56,11 +55,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then(result => sendResponse(result))
       .catch(err => sendResponse({ success: false, error: err.message || String(err) }));
     return true; // Keep channel open
-  }
-
-  if (message.action === 'GET_VERSION') {
-    sendResponse({ version: chrome.runtime.getManifest().version });
-    return false;
   }
 
   if (message.action === 'LOAD_CAPTCHA_WEIGHTS') {
