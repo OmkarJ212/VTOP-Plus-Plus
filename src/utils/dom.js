@@ -117,18 +117,24 @@
     },
 
     getCsrfToken() {
-      const csrfInput = document.querySelector('input[name="_csrf"], input[id="_csrf"], input[name*="csrf" i], input[id*="csrf" i]');
-      if (csrfInput && csrfInput.value) return csrfInput.value;
+      const csrfInputs = document.querySelectorAll('input[name="_csrf"], input[id="_csrf"], input[name*="csrf" i], input[id*="csrf" i]');
+      for (const input of csrfInputs) {
+        if (input.value && input.value.trim().length > 5) {
+          return input.value.trim();
+        }
+      }
 
-      const csrfMeta = document.querySelector('meta[name="_csrf"]');
-      if (csrfMeta && csrfMeta.content) return csrfMeta.content;
+      const csrfMeta = document.querySelector('meta[name="_csrf"], meta[name*="csrf" i]');
+      if (csrfMeta && csrfMeta.content && csrfMeta.content.trim().length > 5) {
+        return csrfMeta.content.trim();
+      }
 
       try {
-        const match = document.cookie.match(/(?:^|;\s*)(?:XSRF-TOKEN|_csrf)=([^;]+)/i);
+        const match = document.cookie.match(/(?:^|;\s*)(?:XSRF-TOKEN|_csrf|CSRF-TOKEN)=([^;]+)/i);
         if (match && match[1]) return decodeURIComponent(match[1]);
       } catch (_) {}
 
-      return window._csrf || '';
+      return '';
     },
 
     /**

@@ -96,13 +96,13 @@
           }
         }, 450);
 
-        // Hard watchdog: if BlockUI is stuck for > 3.8s, force unblock recovery
+        // Safe watchdog: if BlockUI is genuinely stuck for > 15s, execute auto-unblock recovery
         this.stuckWatchdogTimer = setTimeout(() => {
           if (this.isInFlight) {
-            console.warn('[VTOP++] VTOP loader stalled (>3.8s). Executing auto-unblock recovery.');
+            console.warn('[VTOP++] VTOP server request took >15s. Executing safe unblock recovery.');
             this.recoverFromStall();
           }
-        }, 3800);
+        }, 15000);
       } else {
         clearTimeout(this.stuckWatchdogTimer);
         clearTimeout(this.fallbackSettleTimer);

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "VTOP++",
   "version": "1.0.0",
-  "description": "The Ultimate All-in-One God Extension for VIT Vellore VTOP. Fast Course Material Downloader, Course Filter, Attendance Bunk Calculator, FAT Exam Predictor, DA Tracker, Search Pages (Ctrl+K), and Smart Login Helper.",
+  "description": "Enhances VIT Vellore VTOP with batch course material downloads, faculty filtering, attendance calculator, FAT marks predictor, DA deadlines, quick page search (Ctrl+K), and auto-captcha.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -36,7 +36,7 @@
         "src/modules/dark-mode.js"
       ],
       "run_at": "document_start",
-      "all_frames": true
+      "all_frames": false
     },
     {
       "matches": [
@@ -62,7 +62,7 @@
         "src/content/content.js"
       ],
       "run_at": "document_idle",
-      "all_frames": true
+      "all_frames": false
     }
   ],
   "permissions": [

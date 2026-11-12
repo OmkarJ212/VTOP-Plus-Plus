@@ -18,9 +18,15 @@
     enableQuickDock: true,
     enablePrivacyMode: false,
     enableDarkMode: false,
-    downloadPacing: 'fast', // 'safe', 'fast', 'stealth'
+    enableHideActionPlan: false,
+    downloadPacing: 'human', // 'human', 'fast'
     attendanceTarget: 75 // 75, 80, 85, 90
   };
+
+  function normalizePacing(val) {
+    if (val === 'fast') return 'fast';
+    return 'human';
+  }
 
   const Storage = {
     DEFAULT_SETTINGS,
@@ -43,6 +49,9 @@
             if (raw.vtop_speed_mode && !raw.downloadPacing) {
               raw.downloadPacing = raw.vtop_speed_mode;
             }
+            if (raw.downloadPacing) {
+              raw.downloadPacing = normalizePacing(raw.downloadPacing);
+            }
             resolve({ ...DEFAULT_SETTINGS, ...raw });
           }
         });
@@ -62,6 +71,9 @@
             }
             if (updated.vtop_speed_mode && !updated.downloadPacing) {
               updated.downloadPacing = updated.vtop_speed_mode;
+            }
+            if (updated.downloadPacing) {
+              updated.downloadPacing = normalizePacing(updated.downloadPacing);
             }
             callback(updated);
           }

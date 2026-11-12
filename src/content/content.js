@@ -79,17 +79,21 @@
   }
 
   function runPageScanners() {
+    if (CourseDownloader?.isBusy?.()) return;
+
     // Permanently remove Campus Etiquette button if re-injected by VTOP
     document.getElementById('campusEtiquetteBtn')?.remove();
 
-    // Remove Action Plan - Academic Performance card on the Home page
-    document.querySelectorAll('.card.goldenBorderTop.lightGoldenbackground2').forEach((card) => {
-      const titleText = (card.querySelector('.card-title')?.textContent || '').replace(/\s+/g, ' ').trim();
-      if (/action\s*plan/i.test(titleText) || card.querySelector('#pdfModal')) {
-        const colWrapper = card.closest('.col-12.col-md-8.mb-3');
-        (colWrapper || card).remove();
-      }
-    });
+    // Remove Action Plan card on the Home page only if explicitly enabled by user
+    if (currentSettings.enableHideActionPlan) {
+      document.querySelectorAll('.card.goldenBorderTop.lightGoldenbackground2').forEach((card) => {
+        const titleText = (card.querySelector('.card-title')?.textContent || '').replace(/\s+/g, ' ').trim();
+        if (/action\s*plan/i.test(titleText) || card.querySelector('#pdfModal')) {
+          const colWrapper = card.closest('.col-12.col-md-8.mb-3');
+          (colWrapper || card).remove();
+        }
+      });
+    }
 
     // 0a. Refresh dynamic link indexer and mega-menu close buttons
     if (Crawler) Crawler.scan();
@@ -110,11 +114,6 @@
     // 0d. Privacy Mode element re-tagger
     if (PrivacyMode?.isActive) {
       PrivacyMode.tagSensitiveElements();
-    }
-
-    // 0e. Universal Dark Mode dynamic element sanitizer
-    if (DarkMode?.isActive) {
-      DarkMode.sanitizeDynamicElements();
     }
 
     // 6. Course Materials Filter & Downloader

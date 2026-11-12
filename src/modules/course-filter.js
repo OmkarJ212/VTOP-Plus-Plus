@@ -220,9 +220,20 @@
       return document.querySelector('table[id*="material" i]');
     },
 
+    getOptionsSignature(sel) {
+      if (!sel || !sel.options) return '';
+      const len = sel.options.length;
+      const first = len > 1 ? sel.options[1].value : '';
+      const last = len > 0 ? sel.options[len - 1].value : '';
+      return `${len}:${first}:${last}`;
+    },
+
     ensureCourseDropdownUI() {
       const ui = document.getElementById(UI_ID);
-      if (ui && state.native && state.native.isConnected) return;
+      if (ui && state.native && state.native.isConnected) {
+        const sig = this.getOptionsSignature(state.native);
+        if (state.optSig === sig) return;
+      }
       if (ui) ui.remove();
 
       const sel = this.findCourseDropdown();
@@ -231,6 +242,7 @@
 
     mountCourseDropdownUI(native) {
       state.native = native;
+      state.optSig = this.getOptionsSignature(native);
       const parsed = parseOptions(native);
       state.courses = parsed.data;
       state.sems = Object.keys(parsed.data).sort((a, b) => semWeight(b) - semWeight(a));
@@ -535,7 +547,12 @@
       const searchInput = document.getElementById('vtop-table-filter-search');
       const resetBtn = document.getElementById('vtop-table-filter-reset');
 
+      searchInput?.addEventListener('focus', () => {
+        window.VTOP_PLUS?.DOM?.expandDataTableLength?.();
+      });
+
       searchInput?.addEventListener('input', () => {
+        window.VTOP_PLUS?.DOM?.expandDataTableLength?.();
         state.topicQ = searchInput.value.toLowerCase().trim();
         this.applyFilter();
       });

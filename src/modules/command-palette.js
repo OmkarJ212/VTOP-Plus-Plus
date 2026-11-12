@@ -262,7 +262,7 @@
         {
           id: 'vtop-action-dark-mode',
           title: 'Toggle Dark Mode',
-          category: 'VTOP++ Power Tool',
+          category: 'Quick Action',
           isAction: true,
           action: () => window.VTOP_PLUS.DarkMode?.toggle(),
           acronym: 'dm',
@@ -272,7 +272,7 @@
         {
           id: 'vtop-action-privacy-mode',
           title: 'Toggle Privacy Blur',
-          category: 'VTOP++ Power Tool',
+          category: 'Quick Action',
           isAction: true,
           action: () => window.VTOP_PLUS.PrivacyMode?.toggle(),
           acronym: 'pm',

@@ -64,6 +64,10 @@
 
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ action: 'LOAD_CAPTCHA_WEIGHTS' }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
         if (response?.success && response.data) {
           cachedWeights = response.data;
           window.VTOP_PLUS.CAPTCHA_WEIGHTS.vellore = response.data;
@@ -236,8 +240,7 @@
 
     badge.innerHTML = `
       <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#ecfdf5; color:#10b981;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-      <span>Auto-Solved: <strong style="letter-spacing:1px; color:#047857;">${solvedText}</strong></span>
-      <span style="font-size:10px; color:#6b7280; font-weight:normal;">(VIT Vellore Offline)</span>
+      <span>Captcha filled: <strong style="letter-spacing:1px; color:#047857;">${solvedText}</strong></span>
     `;
 
     // Visual input glow
@@ -285,7 +288,13 @@
 
       // Wait if image is still loading
       if (!img.complete || img.naturalWidth === 0) {
-        img.addEventListener('load', () => AutoCaptcha.solve(), { once: true });
+        if (!img.dataset.vtopLoadWaiting) {
+          img.dataset.vtopLoadWaiting = 'true';
+          img.addEventListener('load', () => {
+            delete img.dataset.vtopLoadWaiting;
+            AutoCaptcha.solve();
+          }, { once: true });
+        }
         return;
       }
 
@@ -336,11 +345,16 @@
     },
 
     applyLoginHelpers() {
-      // 1. Auto-select Student role if present
+      // 1. Auto-select Student role ONLY if no role is currently selected
       const studentRadio = document.querySelector('input[type="radio"][value*="student" i], #userTypeStudent, #student');
       if (studentRadio && !studentRadio.checked) {
-        studentRadio.checked = true;
-        studentRadio.dispatchEvent(new Event('change', { bubbles: true }));
+        const groupName = studentRadio.name;
+        const groupRadios = groupName ? document.querySelectorAll(`input[type="radio"][name="${groupName}"]`) : [];
+        const anyChecked = Array.from(groupRadios).some((r) => r.checked);
+        if (!anyChecked) {
+          studentRadio.checked = true;
+          studentRadio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       }
 
       // 2. Format input
