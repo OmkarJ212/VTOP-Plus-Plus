@@ -34,15 +34,13 @@
 
     async ping() {
       // Only ping if student is actively logged in
-      const authId = document.getElementById('authorizedID')?.value ||
-                     document.getElementById('authorizedIDX')?.value ||
-                     document.querySelector('input[name="authorizedID"]')?.value;
-
-      const isLoginScreen = Boolean(document.querySelector('#loginForm, #vtopLogin, input[name="username"]'));
+      const DOM = window.VTOP_PLUS?.DOM;
+      const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
+      const isLoginScreen = Boolean(document.querySelector('#vtopLoginForm, input#username, #loginForm, #vtopLogin, input[name="username"]'));
       if (!authId || isLoginScreen) return;
 
       try {
-        const basePath = window.location.pathname.split('/')[1] || 'vtop';
+        const basePath = DOM?.getBasePath ? DOM.getBasePath() : 'vtop';
         const pingUrl = `${window.location.origin}/${basePath}/content`;
 
         await fetch(pingUrl, {

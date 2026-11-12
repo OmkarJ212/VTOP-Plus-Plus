@@ -1,8 +1,7 @@
 /**
- * VTOP++ - FAT Grade Predictor & Target Marks Module
- * Specifically calibrated for VTOP's nested marks view (Continuous Assessment Test, Quizzes, DAs).
- * Parses each course's inner marks table, extracts weightage marks, and predicts
- * exact FAT marks needed for S, A, B, and Pass grades with interactive course selection.
+ * VTOP++ - Marks Summary & Lab/Soft-Skill Predictor Module
+ * Shows total weightage scored out of weightage given for all courses,
+ * and predicts remaining weightage needed for S, A, B, and Pass on Lab & Soft Skill courses.
  */
 
 (function () {
@@ -34,43 +33,53 @@
      */
     extractAllCourses() {
       const courses = [];
-      const allTables = Array.from(document.querySelectorAll('table'));
 
-      // Find all inner marks tables (tables that have "Mark Title", "Max. Mark", etc.)
-      // Inspect table headers first rather than scanning full table text
-      const marksTables = allTables.filter((t) => {
-        const header = t.querySelector('thead') || t.querySelector('tr:first-child');
-        const text = (header ? header.textContent : t.textContent || '').toLowerCase();
-        return (
-          text.includes('mark title') &&
-          text.includes('weightage') &&
-          (text.includes('scored mark') || text.includes('weightage mark') || text.includes('status'))
-        );
-      });
+      // 1. O(1) direct selector for Vellore VTOP inner marks tables (#fixedTableContainer table.customTable-level1)
+      let marksTables = Array.from(document.querySelectorAll('#fixedTableContainer table.customTable-level1'));
+
+      // 2. Fallback: scan all tables only if exact class selector yielded none
+      let allTables = null;
+      if (marksTables.length === 0) {
+        allTables = Array.from(document.querySelectorAll('table'));
+        marksTables = allTables.filter((t) => {
+          const header = t.querySelector('thead') || t.querySelector('tr:first-child');
+          const text = (header ? header.textContent : t.textContent || '').toLowerCase();
+          return (
+            text.includes('mark title') &&
+            text.includes('weightage') &&
+            (text.includes('scored mark') || text.includes('weightage mark') || text.includes('status'))
+          );
+        });
+      }
 
       if (marksTables.length > 0) {
         marksTables.forEach((innerTable, idx) => {
           const courseInfo = this.detectCourseHeader(innerTable, idx + 1);
-          const marksData = this.parseInnerMarksTable(innerTable, courseInfo);
+          const marksData = this.parseInnerMarksTable(innerTable);
 
-          if (marksData.components.length > 0) {
-            courses.push({
-              id: `course-${idx}`,
-              tableElement: innerTable,
-              code: courseInfo.code,
-              title: courseInfo.title,
-              type: courseInfo.type,
-              faculty: courseInfo.faculty,
-              slot: courseInfo.slot,
-              components: marksData.components,
-              currentInternals: marksData.currentInternals,
-              maxInternals: marksData.maxInternals,
-              fatWeight: marksData.fatWeight
-            });
+          if (marksData.components.length === 0) {
+            this.clearPrediction(innerTable);
+            return;
           }
+
+          courses.push({
+            id: `course-${idx}`,
+            tableElement: innerTable,
+            code: courseInfo.code,
+            title: courseInfo.title,
+            type: courseInfo.type,
+            faculty: courseInfo.faculty,
+            slot: courseInfo.slot,
+            showPredictions: this.shouldPredictCourse(courseInfo) && marksData.remainingWeight > 0,
+            components: marksData.components,
+            totalGot: marksData.totalGot,
+            totalGiven: marksData.totalGiven,
+            remainingWeight: marksData.remainingWeight
+          });
         });
       } else {
         // Fallback for single flat marks tables
+        if (!allTables) allTables = Array.from(document.querySelectorAll('table'));
         const flatTable = allTables.find((t) => {
           const header = t.querySelector('thead') || t.querySelector('tr:first-child');
           const text = (header ? header.textContent : t.textContent || '').toLowerCase();
@@ -82,7 +91,7 @@
 
         if (flatTable) {
           const courseInfo = { code: 'VTOP Course', title: 'Current Course Marks', type: 'Theory', faculty: '', slot: '' };
-          const marksData = this.parseInnerMarksTable(flatTable, courseInfo);
+          const marksData = this.parseInnerMarksTable(flatTable);
           if (marksData.components.length > 0) {
             courses.push({
               id: 'course-0',
@@ -92,16 +101,29 @@
               type: courseInfo.type,
               faculty: courseInfo.faculty,
               slot: courseInfo.slot,
+              showPredictions: this.shouldPredictCourse(courseInfo) && marksData.remainingWeight > 0,
               components: marksData.components,
-              currentInternals: marksData.currentInternals,
-              maxInternals: marksData.maxInternals,
-              fatWeight: marksData.fatWeight
+              totalGot: marksData.totalGot,
+              totalGiven: marksData.totalGiven,
+              remainingWeight: marksData.remainingWeight
             });
           }
         }
       }
 
       return courses;
+    },
+
+    shouldPredictCourse(courseInfo) {
+      const type = (courseInfo?.type || '').trim();
+      if (/\btheory\s*only\b|\bembedded\s*theory\b/i.test(type)) return false;
+      if (/\b(lab|soft\s*skill)/i.test(type)) return true;
+      return Boolean(courseInfo?.code && courseInfo.code.trim().toUpperCase().endsWith('P') && !type);
+    },
+
+    clearPrediction(table) {
+      const existing = table?.querySelector('.vtop-fat-inline-tfoot');
+      if (existing) existing.remove();
     },
 
     /**
@@ -119,28 +141,30 @@
       let courseRow = null;
 
       if (containingTr) {
-        // Check previous table row in the outer table
         courseRow = containingTr.previousElementSibling;
         if (!courseRow || courseRow.querySelectorAll('td').length < 3) {
-          // Inner table might be directly inside a row with course info
           courseRow = containingTr;
         }
       }
 
       if (courseRow) {
         const cells = Array.from(courseRow.querySelectorAll('td, th'));
-        for (const cell of cells) {
-          const text = (cell.textContent || '').trim();
-          const match = text.match(REGEX_COURSE_CODE);
-          if (match && !code.startsWith(match[1])) {
-            code = match[1];
-          }
-        }
-
-        // Try reading standard VTOP outer table columns:
-        // Sl.No (0) | ClassNbr (1) | Course Code (2) | Course Title (3) | Course Type (4) | Course System (5) | Faculty (6) | Slot (7)
+        // Exact outer table.customTable layout:
+        // Sl.No.(0) | ClassNbr(1) | Course Code(2) | Course Title(3) | Course Type(4) | Course System(5) | Faculty(6) | Slot(7) | Course Mode(8)
         if (cells.length >= 5) {
-          if (!title && cells[3]) title = cells[3].textContent.trim();
+          const codeMatch = (cells[2]?.textContent || '').trim().match(REGEX_COURSE_CODE);
+          if (codeMatch) {
+            code = codeMatch[1];
+          } else {
+            for (const cell of cells) {
+              const m = (cell.textContent || '').trim().match(REGEX_COURSE_CODE);
+              if (m) {
+                code = m[1];
+                break;
+              }
+            }
+          }
+          if (cells[3]) title = cells[3].textContent.trim();
           if (cells[4]) type = cells[4].textContent.trim();
           if (cells[6]) faculty = cells[6].textContent.trim();
           if (cells[7]) slot = cells[7].textContent.trim();
@@ -157,7 +181,9 @@
     /**
      * Parse rows of an inner marks table (CAT-1, CAT-2, Quizzes, DAs)
      */
-    parseInnerMarksTable(table, courseInfo = null) {
+    parseInnerMarksTable(table) {
+      // Exact table.customTable-level1 layout:
+      // Sl.No.(0) | Mark Title(1) | Max. Mark(2) | Weightage %(3) | Status(4) | Scored Mark(5) | Weightage Mark(6) | Remark(7)
       let titleCol = 1;
       let maxCol = 2;
       let weightCol = 3;
@@ -165,27 +191,38 @@
       let scoredCol = 5;
       let weightageMarkCol = 6;
 
-      const headCells = table.querySelectorAll('thead th, thead td, tr:first-child th, tr:first-child td');
-      headCells.forEach((th, idx) => {
-        const text = (th.textContent || '').toLowerCase().trim();
-        if (text.includes('title') || text.includes('component')) titleCol = idx;
-        else if (text.includes('max')) maxCol = idx;
-        else if (text.includes('weightage %') || text === 'weightage') weightCol = idx;
-        else if (text.includes('status')) statusCol = idx;
-        else if (text.includes('scored mark')) scoredCol = idx;
-        else if (text.includes('weightage mark')) weightageMarkCol = idx;
-      });
+      if (!table.classList.contains('customTable-level1')) {
+        const headCells = table.querySelectorAll('thead th, thead td, tr:first-child th, tr:first-child td');
+        headCells.forEach((th, idx) => {
+          const text = (th.textContent || '').toLowerCase().trim();
+          if (text.includes('title') || text.includes('component')) titleCol = idx;
+          else if (text.includes('max')) maxCol = idx;
+          else if (text.includes('weightage %') || text === 'weightage') weightCol = idx;
+          else if (text.includes('status')) statusCol = idx;
+          else if (text.includes('scored mark')) scoredCol = idx;
+          else if (text.includes('weightage mark')) weightageMarkCol = idx;
+        });
+      }
 
       const components = [];
-      let currentInternals = 0;
-      let maxInternals = 0;
+      let totalGot = 0;
+      let totalGiven = 0;
 
-      const rows = table.querySelectorAll('tbody tr').length > 0
-        ? table.querySelectorAll('tbody tr')
+      const directTbodyRows = table.querySelectorAll(':scope > tbody > tr');
+      const rows = directTbodyRows.length > 0
+        ? Array.from(directTbodyRows)
         : Array.from(table.querySelectorAll('tr')).slice(1);
 
       rows.forEach((row) => {
-        const cells = row.querySelectorAll('td');
+        if (
+          row.closest('tfoot, .vtop-fat-inline-tfoot') ||
+          row.classList.contains('vtop-fat-header-row') ||
+          row.classList.contains('vtop-fat-targets-row')
+        ) {
+          return;
+        }
+
+        const cells = row.querySelectorAll(':scope > td');
         if (cells.length < 4) return;
 
         const titleText = (cells[titleCol]?.textContent || '').trim();
@@ -194,7 +231,8 @@
         const maxMark = parseFloat((cells[maxCol]?.textContent || '').replace(/[^0-9.]/g, '')) || 0;
         const weightPct = parseFloat((cells[weightCol]?.textContent || '').replace(/[^0-9.]/g, '')) || 0;
         const status = (cells[statusCol]?.textContent || '').trim();
-        const scored = parseFloat((cells[scoredCol]?.textContent || '').replace(/[^0-9.]/g, '')) || 0;
+        const scoredText = (cells[scoredCol]?.textContent || '').trim();
+        const scored = parseFloat(scoredText.replace(/[^0-9.]/g, '')) || 0;
 
         let weightMark = 0;
         const weightMarkCell = cells[weightageMarkCol];
@@ -205,9 +243,13 @@
           weightMark = (scored / maxMark) * weightPct;
         }
 
-        if (weightPct > 0 || maxMark > 0) {
-          maxInternals += weightPct;
-          currentInternals += weightMark;
+        const hasScore = scoredText !== '' && !isNaN(parseFloat(scoredText));
+        const hasWeightMark = weightMarkText !== '' && !isNaN(parseFloat(weightMarkText));
+        const isGraded = hasScore || hasWeightMark || /\b(present|absent)\b/i.test(status);
+
+        if ((weightPct > 0 || maxMark > 0) && isGraded) {
+          totalGiven += weightPct;
+          totalGot += weightMark;
 
           components.push({
             title: titleText,
@@ -220,44 +262,36 @@
         }
       });
 
-      // Lab/100% CA course: courseInfo.type matches ELA/LO/LAB/PROJECT, or course code ends in P, or maxInternals >= 100
-      // fatWeight = 0 for Lab/100% CA courses; otherwise for Theory courses fatWeight = 40
-      const isLabOrCA = Boolean(
-        (courseInfo?.type && /\b(ELA|LO|LAB|PROJECT)\b/i.test(courseInfo.type)) ||
-        (courseInfo?.code && courseInfo.code.trim().toUpperCase().endsWith('P')) ||
-        maxInternals >= 100
-      );
-      const fatWeight = isLabOrCA ? 0 : 40;
+      const remainingWeight = Math.max(0, 100 - totalGiven);
 
-      return { components, currentInternals, maxInternals, fatWeight };
+      return { components, totalGot, totalGiven, remainingWeight };
     },
 
-    calcRequiredFat(targetTotal, currentInternals, fatWeight) {
-      if (fatWeight <= 0) return 0;
-      const neededWeighted = targetTotal - currentInternals;
-      if (neededWeighted <= 0) return 0; // Already secured
-      const rawOutOf100 = (neededWeighted / fatWeight) * 100;
-      return Math.ceil(rawOutOf100);
+    formatNum(num) {
+      const rounded = Math.round(num * 100) / 100;
+      return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/\.?0+$/, '');
     },
 
-    formatTargetValue(val, fatWeight) {
-      if (fatWeight <= 0) {
-        return '<span class="vtop-fat-badge vtop-fat-badge-na">N/A (100% CA)</span>';
+    formatTargetValue(targetTotal, totalGot, remainingWeight) {
+      if (remainingWeight <= 0) {
+        return '<span class="vtop-fat-val-muted">N/A (Complete)</span>';
       }
-      if (val <= 0) {
-        return '<span class="vtop-fat-badge vtop-fat-badge-secured">Secured 🎉</span>';
+      const needed = Math.max(0, targetTotal - totalGot);
+      if (needed <= 0) {
+        return '<span class="vtop-fat-val-safe">Secured</span>';
       }
-      if (val > 100) {
-        return '<span class="vtop-fat-badge vtop-fat-badge-impossible">Impossible (&gt;100)</span>';
+      const remLabel = this.formatNum(remainingWeight);
+      if (needed > remainingWeight) {
+        return `<span class="vtop-fat-val-muted">Impossible (&gt;${remLabel})</span>`;
       }
-      if (val > 75) {
-        return `<span class="vtop-fat-val-num vtop-fat-val-warn">${val}</span> <span class="vtop-fat-val-den">/ 100</span>`;
-      }
-      return `<span class="vtop-fat-val-num vtop-fat-val-safe">${val}</span> <span class="vtop-fat-val-den">/ 100</span>`;
+      const neededLabel = this.formatNum(needed);
+      const ratio = needed / remainingWeight;
+      const cls = ratio > 0.75 ? 'vtop-fat-val-warn' : 'vtop-fat-val-safe';
+      return `<span class="${cls}">${neededLabel} / ${remLabel}</span>`;
     },
 
     /**
-     * Injects a clean, prominent inline section directly under each course's marks table
+     * Injects native-styled marks summary and prediction rows at the bottom of the course marks table
      */
     augmentCourseTables() {
       this.courses.forEach((c) => {
@@ -270,49 +304,68 @@
           c.tableElement.appendChild(tfoot);
         }
 
-        const sNeeded = this.calcRequiredFat(90, c.currentInternals, c.fatWeight);
-        const aNeeded = this.calcRequiredFat(80, c.currentInternals, c.fatWeight);
-        const bNeeded = this.calcRequiredFat(70, c.currentInternals, c.fatWeight);
-        const passNeeded = this.calcRequiredFat(50, c.currentInternals, c.fatWeight);
-        const passScore = Math.max(40, passNeeded);
+        const firstRowCols = c.tableElement.querySelector('tr')?.querySelectorAll('td, th').length || 0;
+        const gotLabel = this.formatNum(c.totalGot);
+        const givenLabel = this.formatNum(c.totalGiven);
+        const remLabel = this.formatNum(c.remainingWeight);
+        const headerTitle = c.showPredictions ? 'Marks Predictor' : 'Marks Summary';
+        const summaryMeta = c.showPredictions
+          ? `Total: ${gotLabel} / ${givenLabel} · Remaining: ${remLabel}`
+          : `Total: ${gotLabel} / ${givenLabel}`;
 
-        tfoot.innerHTML = `
-          <tr>
-            <td colspan="100%" class="vtop-fat-tfoot-cell">
-              <div class="vtop-fat-summary-wrapper">
-                <div class="vtop-fat-summary-title-row">
-                  <div class="vtop-fat-summary-title">
-                    <span class="vtop-fat-title-icon">🎯</span>
-                    <strong>VTOP++ FAT Target Marks</strong>
-                    ${c.code ? `<span class="vtop-fat-course-tag">${c.code} · ${c.type}</span>` : ''}
+        let targetsHtml = '';
+        if (c.showPredictions) {
+          const sVal = this.formatTargetValue(90, c.totalGot, c.remainingWeight);
+          const aVal = this.formatTargetValue(80, c.totalGot, c.remainingWeight);
+          const bVal = this.formatTargetValue(70, c.totalGot, c.remainingWeight);
+          const passVal = this.formatTargetValue(50, c.totalGot, c.remainingWeight);
+
+          if (firstRowCols === 8) {
+            targetsHtml = `
+              <tr class="tableContent-level1 vtop-fat-targets-row">
+                <td colspan="2"><span class="vtop-fat-grade-label">S (&ge;90):</span> <span class="vtop-fat-target-val">${sVal}</span></td>
+                <td colspan="2"><span class="vtop-fat-grade-label">A (&ge;80):</span> <span class="vtop-fat-target-val">${aVal}</span></td>
+                <td colspan="2"><span class="vtop-fat-grade-label">B (&ge;70):</span> <span class="vtop-fat-target-val">${bVal}</span></td>
+                <td colspan="2"><span class="vtop-fat-grade-label">Pass (&ge;50):</span> <span class="vtop-fat-target-val">${passVal}</span></td>
+              </tr>
+            `;
+          } else {
+            targetsHtml = `
+              <tr class="tableContent-level1 vtop-fat-targets-row">
+                <td colspan="100%" class="vtop-fat-tfoot-cell">
+                  <div class="vtop-fat-grid">
+                    <div class="vtop-fat-grid-cell"><span class="vtop-fat-grade-label">S (&ge;90):</span> <span class="vtop-fat-target-val">${sVal}</span></div>
+                    <div class="vtop-fat-grid-cell"><span class="vtop-fat-grade-label">A (&ge;80):</span> <span class="vtop-fat-target-val">${aVal}</span></div>
+                    <div class="vtop-fat-grid-cell"><span class="vtop-fat-grade-label">B (&ge;70):</span> <span class="vtop-fat-target-val">${bVal}</span></div>
+                    <div class="vtop-fat-grid-cell"><span class="vtop-fat-grade-label">Pass (&ge;50):</span> <span class="vtop-fat-target-val">${passVal}</span></div>
                   </div>
-                  <div class="vtop-fat-internals-badge">
-                    Internals Secured: <strong>${c.currentInternals.toFixed(1)} / ${c.maxInternals}</strong>
-                    <span class="vtop-fat-weightage-tag">(${c.fatWeight}% FAT Weightage)</span>
-                  </div>
+                </td>
+              </tr>
+            `;
+          }
+        }
+
+        if (firstRowCols === 8) {
+          tfoot.innerHTML = `
+            <tr class="tableHeader-level1 vtop-fat-header-row">
+              <td colspan="4" class="vtop-fat-header-left">${headerTitle}</td>
+              <td colspan="4" class="vtop-fat-header-right">${summaryMeta}</td>
+            </tr>
+            ${targetsHtml}
+          `;
+        } else {
+          tfoot.innerHTML = `
+            <tr class="tableHeader-level1 vtop-fat-header-row">
+              <td colspan="100%">
+                <div class="vtop-fat-fallback-header">
+                  <span>${headerTitle}</span>
+                  <span>${summaryMeta}</span>
                 </div>
-                <div class="vtop-fat-grid">
-                  <div class="vtop-fat-target-card">
-                    <span class="vtop-fat-grade-label">S Grade (≥90)</span>
-                    <span class="vtop-fat-target-val">${this.formatTargetValue(sNeeded, c.fatWeight)}</span>
-                  </div>
-                  <div class="vtop-fat-target-card">
-                    <span class="vtop-fat-grade-label">A Grade (≥80)</span>
-                    <span class="vtop-fat-target-val">${this.formatTargetValue(aNeeded, c.fatWeight)}</span>
-                  </div>
-                  <div class="vtop-fat-target-card">
-                    <span class="vtop-fat-grade-label">B Grade (≥70)</span>
-                    <span class="vtop-fat-target-val">${this.formatTargetValue(bNeeded, c.fatWeight)}</span>
-                  </div>
-                  <div class="vtop-fat-target-card">
-                    <span class="vtop-fat-grade-label">Pass (Min 40% in FAT)</span>
-                    <span class="vtop-fat-target-val">${this.formatTargetValue(passScore, c.fatWeight)}</span>
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-        `;
+              </td>
+            </tr>
+            ${targetsHtml}
+          `;
+        }
       });
     }
   };

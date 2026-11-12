@@ -1,81 +1,125 @@
-# 🚀 VTOP++ (The Ultimate All-in-One God Extension)
+# VTOP++
 
-**VTOP++** is an all-in-one productivity and intelligence suite tailored exclusively for Vellore Institute of Technology students on the **VIT Vellore portal (vtop.vit.ac.in)**.
+**VTOP++** (Manifest V3, `v1.0.0`) is an all-in-one productivity, UI modernization, and study utilities Chrome extension built **exclusively for VIT Vellore students** on the **VIT Vellore VTOP portal (`vtop.vit.ac.in`)**. It does not support other VIT campuses (Chennai, Bhopal, or AP).
 
-It merges high-speed material downloads, live course filtering, attendance bunk calculation, FAT grade prediction, digital assignment tracking, login auto-captcha, and keyboard page search navigation into a single, cohesive, modular extension.
-
----
-
-## ✨ Features Breakdown
-
-### 1. 📦 Course Material Downloader (from `vtop-downloader-extension`)
-- **Teacher-Specific Downloads:** Groups notes, slides, and syllabus files by faculty name.
-- **Instant ZIP Packaging:** Uses `STORE` mode compression for near-instantaneous (<100ms) ZIP generation without freezing the browser tab.
-- **Safe Anti-Rate-Limit Pacing:**
-  - **⚡ Fast:** `0.4s – 0.75s` jitter (Safe accelerated mode).
-  - **🛡️ Safe:** `1.5s – 2.5s` jitter (Conservative human simulation).
-  - **🐢 Stealth:** `3.0s – 5.0s` jitter.
-- **Resilient Observer & Watchdog:** Never detaches during SPA navigation.
-
-### 2. 🔍 Live Course Filter (from `vtop-course-filter`)
-- Adds a real-time search bar directly above the course materials table.
-- Filter files instantly by keyword, faculty, or type (Theory vs. Lab).
-
-### 3. 📊 Attendance Bunk Calculator & Debarment Alerts
-- Automatically analyzes the Class Attendance table:
-  - If **≥75%**: Tells you exactly how many classes you can **safely bunk**.
-  - If **<75%**: Tells you how many consecutive classes you **must attend** to escape debarment.
-- Interactive Target Threshold slider (75%, 80%, 85%, 90%).
-- Color-coded badges: 🟢 Safe, 🟡 Warning, 🔴 Debarred Risk.
-
-### 4. 🎯 FAT Grade & Target Marks Predictor
-- Injects into the Marks page:
-  - Extracts continuous assessment marks (CAT-1, CAT-2, DA, Quizzes).
-  - Calculates exactly what raw mark out of 100 you need in the Final Assessment Test (FAT) for **S, A, B, and C grades**.
-
-### 5. 📝 Digital Assignment (DA) Deadline Hub
-- Injects into the Digital Assignment page:
-  - Scans across all courses to show total pending assignments.
-  - Highlights urgent assignments due in `<48 hours` with countdown warnings.
-
-### 6. ⚡ Client-Side Auto-Captcha Solver
-- Binarizes and segments login captchas directly on an offscreen HTML5 canvas.
-- Automatically fills the captcha input upon page load. Zero external server calls.
-
-### 7. ⏱️ 9-Minute Session Keep-Alive
-- Sends background heartbeat pings to prevent VTOP's annoying 15-minute idle session timeout while studying lecture notes.
-
-### 8. 🔍 Search Pages (`Ctrl + K` / `Cmd + K`)
-- Press `Ctrl+K` anywhere on VTOP to open a fast keyboard launcher:
-  - Jump instantly to Attendance, Course Materials, Marks, Leave, or DA without digging through 4-level deep menus.
-
-### 9. 🚀 Floating Quick Dock & Privacy Mode
-- Sleek floating top dock with 1-click shortcuts to top pages.
-- **🔒 Privacy Mode:** One-click toggle that blurs student photos, registration numbers, and CGPA in public spaces (e.g. library, labs, projector).
+It brings batch course material downloads, live course filtering, attendance bunk calculations, marks summaries & Lab/Soft-Skill grade prediction, digital assignment countdown tracking, home class messages, client-side auto-captcha solving, dark mode, privacy blur, navbar quick shortcuts, and `Ctrl+K` keyboard navigation into one modular extension.
 
 ---
 
-## 🛠️ Installation Guide (Testing & Development)
+## Features Breakdown
+
+### 1. Course Material Downloader
+- **Teacher-Grouped & All-Material Downloads:** Collects notes, slides, and syllabus files on Course Pages, including automatic multi-page table traversal.
+- **Instant ZIP Packaging:** Uses local JSZip `STORE` mode compression for fast packaging without freezing the browser tab.
+- **Anti-Rate-Limit Pacing Modes:**
+  - **Fast** *(default)*: `0.4s – 0.75s` jitter.
+  - **Safe**: `1.6s – 2.6s` jitter (human simulation).
+  - **Stealth**: `3.0s – 5.0s` jitter.
+- **Draggable & Minimizable Panel:** Floating UI with auto-detected registration number, course/faculty sync, and resilient SPA watchdog.
+
+### 2. Consolidated Course Filter & Live Table Search
+- **Semester, Subject & Faculty Selectors:** Organizes VTOP's Course Page Consolidated view by Semester (most recent first), Subject, and Faculty with local faculty caching (`vtopFilter.v1`).
+- **Live Topic Filter Bar:** Injects an instant search bar directly above the course materials table to filter rows by topic, module, or keyword.
+
+### 3. Attendance Bunk Calculator & Debarment Alerts
+- Analyzes attendance tables across VTOP:
+  - Shows how many classes you can **safely bunk** when above your target, or how many consecutive classes you **must attend** when below it.
+- **Continuous Target Slider & Input (`1%–100%`):** Persists your target percentage (default `75%`) and shows a warning banner if set below VIT's `75%` debarment threshold.
+- **Summary Card:** Tracks Average Attendance, Safe Subjects (`≥80%`), Warning (`75%–79%`), Debarred Risk (`<75%`), and On-Duty (OD) classes.
+
+### 4. Marks Summary & Lab/Soft-Skill Grade Predictor
+- Appends an inline footer summary to every course marks table showing total weightage scored out of weightage given.
+- For **Lab** and **Soft Skill** courses with remaining weightage, computes the remaining weightage needed for **S (`≥90`)**, **A (`≥80`)**, **B (`≥70`)**, and **Pass (`≥50`)** targets.
+
+### 5. Digital Assignment (DA) Deadline Hub
+- **Single-Course Assignment Upload Page:** Injects a deadline summary banner and inline countdown badges directly into Due Date cells.
+- **Course Overview Page:** Adds a **Next Assignment** column scanning pending/submitted status per course.
+- **Dynamic Color Coding:**
+  - **Purple:** Due today (`0` days left / `<24h`).
+  - **Red:** Due in `≤3` days or overdue.
+  - **Green:** More than `3` days left or already submitted.
+
+### 6. Client-Side Auto-Captcha Solver
+- Segments and classifies login captcha images directly in the browser on an offscreen HTML5 canvas using local neural weights (`models/velloreWeights.json`) — zero external server calls.
+
+### 7. Session Keep-Alive
+- Prevents VTOP idle session timeouts via a **9-minute** background service-worker alarm paired with an **8-minute** client-side heartbeat backup (`HEARTBEAT_PING`).
+
+### 8. Command Palette (`Ctrl + K` / `Cmd + K`)
+- Universal keyboard launcher powered by a dynamic menu crawler with acronym/synonym matching and 1-click native VTOP navigation.
+
+### 9. Navbar Quick Dock, Dark Mode, Privacy Mode & Dashboard Widgets
+- **Navbar-Integrated Quick Dock:** Adds 1-click page shortcut pills, a top linear navigation progress bar, and instant icon toggles directly into the VTOP navbar.
+- **Zero-Leak Dark Mode Engine:** Applied at `document_start` to avoid white flash (FOUC), includes automatic `@media print` reset for clean fee receipts/hall tickets, and pairs with consistent rounded slate scrollbars in both light and dark modes.
+- **Privacy Mode:** One-click toggle that blurs student photos, registration numbers, profile names, and CGPA values on screen (reveals on hover).
+- **Home Class Messages & Dashboard Modernization:** Fetches faculty class messages into a Home dashboard card (with 5-minute cache), styles dashboard Events/Spotlight/sidebar cards, and adds backdrop + close controls to VTOP mega-menu drawers.
+
+---
+
+## Project Structure
+
+```text
+VTOP-Plus-Plus/
+├── manifest.json                         # Manifest V3 extension config & script/CSS order
+├── jszip.min.js                          # Bundled JSZip library
+├── models/
+│   └── velloreWeights.json               # Pre-trained client-side captcha weights
+├── icons/                                # Extension icons (16, 48, 128)
+└── src/
+    ├── background/
+    │   └── background.js                 # Service worker (9m keep-alive alarm, asset/weight fetches)
+    ├── content/
+    │   ├── content.js                    # Master SPA lifecycle orchestrator & storage/popup sync
+    │   └── styles/                       # Modular ordered stylesheets
+    │       ├── privacy-and-navigation.css
+    │       ├── widgets.css
+    │       ├── dark-mode-core.css
+    │       ├── dark-mode-components.css
+    │       ├── dark-mode-widgets.css
+    │       └── dashboard-and-layout.css
+    ├── modules/                          # Self-contained feature modules
+    │   ├── attendance-calculator.js
+    │   ├── auto-captcha.js
+    │   ├── command-palette.js
+    │   ├── course-downloader.js
+    │   ├── course-filter.js
+    │   ├── crawler.js
+    │   ├── da-tracker.js
+    │   ├── dark-mode.js
+    │   ├── home-messages.js
+    │   ├── marks-fat-predictor.js
+    │   ├── menu-drawer.js
+    │   ├── privacy-mode.js
+    │   ├── quick-dock.js
+    │   └── session-keeper.js
+    ├── popup/                            # Extension settings & quick actions popup
+    │   ├── popup.html
+    │   ├── popup.css
+    │   └── popup.js
+    └── utils/
+        ├── dom.js                        # Shared DOM/CSRF/auth/DataTable helpers
+        └── storage.js                    # Default settings & chrome.storage helpers
+```
+
+---
+
+## Installation Guide (Testing & Development)
 
 1. Open **Google Chrome**, **Brave**, or **Microsoft Edge**.
-2. Navigate to: `chrome://extensions`
-3. Enable **Developer mode** (toggle in top-right corner).
-4. Click **Load unpacked** (top-left).
-5. Select the **`VTOP-Plus-Plus`** folder:
-   ```
-   C:\Users\Omkar Joshi\Desktop\VTOP_Extention\VTOP-Plus-Plus
-   ```
-6. The extension **VTOP++** is now installed and active!
+2. Navigate to `chrome://extensions`.
+3. Enable **Developer mode** (toggle in the top-right corner).
+4. Click **Load unpacked** and select the **`VTOP-Plus-Plus`** folder.
+5. **VTOP++** is ready on your next VTOP visit.
 
 ---
 
-## 🔒 Privacy & Safety Guarantee
+## Privacy & Safety
 
-- **100% Client-Side:** Everything runs locally within your browser.
-- **No Password Storage:** The extension never asks for, records, or transmits passwords.
-- **Safe Pacing:** All network interactions respect VTOP rate limits with randomized human jitter.
+- **100% Client-Side:** All scraping, ZIP bundling, captcha solving, and calculations run locally in your browser.
+- **No Credential Storage:** The extension never stores or transmits VTOP passwords.
+- **Rate-Limit Friendly:** Batch material downloads and background DA/message requests run with conservative spacing and randomized jitter.
 
 ---
 
-## ⚖️ License
-MIT License. Built for the students of Vellore Institute of Technology.
+## License
+MIT License. Built exclusively for the students of VIT Vellore.

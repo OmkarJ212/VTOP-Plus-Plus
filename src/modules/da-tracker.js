@@ -89,13 +89,13 @@
     if (isOverdue) {
       badgeType = 'red';
       const absDays = Math.abs(diffDays);
-      badgeText = absDays <= 1 ? 'Overdue (today) ⚠️' : `Overdue (${absDays}d ago) ⚠️`;
+      badgeText = absDays <= 1 ? 'Overdue (today)' : `Overdue (${absDays}d ago)`;
     } else if (isToday) {
       badgeType = 'purple';
-      badgeText = diffHours > 1 ? `Due Today (${diffHours}h left) ⏰` : 'Due Today ⏰';
+      badgeText = diffHours > 1 ? `Due Today (${diffHours}h left)` : 'Due Today';
     } else if (diffDays <= 3) {
       badgeType = 'red';
-      badgeText = `${diffDays} day${diffDays === 1 ? '' : 's'} left ⚠️`;
+      badgeText = `${diffDays} day${diffDays === 1 ? '' : 's'} left`;
     } else {
       badgeType = 'green';
       badgeText = `${diffDays} days left`;
@@ -112,6 +112,41 @@
     };
   }
 
+  function extractDateFromText(text) {
+    if (!text) return null;
+    const match =
+      text.match(/\b(\d{1,2}[-\/\s][A-Za-z]{3,}[-\/\s]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/) ||
+      text.match(/\b(\d{1,2}[-\/\.][0-9]{1,2}[-\/\.]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/);
+    return match ? parseIndianDate(match[1]) : null;
+  }
+
+  function isDaRowSubmitted(row, cells) {
+    const hasStudentDownload = Boolean(
+      row.querySelector(
+        'button[name="downloadStudentDA"], button[id="downloadStudentDA"], a[href*="downloadSTudentDA"], [data-code][id*="StudentDA" i]'
+      )
+    );
+    const cellTexts = Array.from(cells).map((c) => (c.innerText || c.textContent || '').trim());
+    const hasTimestamp = cellTexts.some(
+      (txt) =>
+        /\b\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b|\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/.test(txt) &&
+        (txt.includes('AM') || txt.includes('PM') || txt.includes(':'))
+    );
+    const rowText = (row.innerText || row.textContent || '').toLowerCase();
+    const hasSubmittedText =
+      rowText.includes('uploaded') || rowText.includes('submitted') || rowText.includes('view file');
+    const hasUploadAction = Boolean(
+      row.querySelector(
+        'input[type="file"], #studDaUpload, button[name="digitalAssignmentSubmit"], button[name="editAssignment"]'
+      )
+    );
+
+    if (hasStudentDownload || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
+      return true;
+    }
+    return rowText.includes('not applicable') || rowText.includes('n/a');
+  }
+
   const DaTracker = {
     isScanning: false,
 
@@ -120,37 +155,15 @@
     },
 
     destroy() {
-      const banner = document.getElementById('vtop-da-countdown-banner');
-      if (banner) banner.remove();
-
       document.querySelectorAll('.vtop-th-da-status, .vtop-td-da-status').forEach((el) => el.remove());
       document.querySelectorAll('.vtop-da-cell-augmented').forEach((el) => {
         el.classList.remove('vtop-da-cell-augmented');
-        const badge = el.querySelector('.vtop-da-badge');
-        if (badge) badge.remove();
+        el.querySelectorAll('.vtop-da-cell-badge, .vtop-da-badge').forEach((b) => b.remove());
       });
       document.querySelectorAll('.vtop-da-urgent-row').forEach((el) => {
         el.classList.remove('vtop-da-urgent-row');
       });
       this.isScanning = false;
-    },
-
-    isDaPage() {
-      if (this.findSingleCourseDaTable() || this.findCourseOverviewTable()) return true;
-
-      const href = window.location.href.toLowerCase();
-      if (href.includes('digitalassignment') || href.includes('studentda')) return true;
-
-      const bodyText = (document.body?.innerText || document.body?.textContent || '').toLowerCase();
-      if (bodyText.includes('assignment upload') || bodyText.includes('digital assignment')) {
-        return true;
-      }
-
-      return Boolean(
-        document.querySelector(
-          '#daUpload, #studDaUpload, form[action*="DigitalAssignment"], button[name="downloadQuestion"], button[name="downloadStudentDA"], [onclick*="myFunction"], [onclick*="processDigitalAssignment"], [onclick*="doStudentDA"]'
-        )
-      );
     },
 
     checkAndTrack() {
@@ -173,18 +186,32 @@
     // =========================================================================
 
     findSingleCourseDaTable() {
+      // 1. O(1) scoped check inside #fixedTableContainer > table.customTable
+      const scopedTables = document.querySelectorAll('#fixedTableContainer table.customTable');
+      for (const table of scopedTables) {
+        const headerText = (table.querySelector('tr')?.textContent || '').toLowerCase();
+        if (
+          (headerText.includes('due date') || headerText.includes('deadline') || headerText.includes('last date')) &&
+          (headerText.includes('title') || headerText.includes('document details') || headerText.includes('qp') || headerText.includes('assignment'))
+        ) {
+          return table;
+        }
+      }
+
+      // 2. Fallback: scan all tables using textContent (no layout reflow)
       const overview = this.findCourseOverviewTable();
       const allTables = Array.from(document.querySelectorAll('table'));
 
       for (const table of allTables) {
         if (table === overview) continue;
 
-        const text = (table.innerText || table.textContent || '').toLowerCase();
+        const text = (table.textContent || '').toLowerCase();
         const hasDueDate = text.includes('due date') || text.includes('deadline') || text.includes('last date');
         const hasAssignment =
           text.includes('assignment') ||
           text.includes('case study') ||
           text.includes('download question') ||
+          text.includes('document details') ||
           text.includes('upload') ||
           Boolean(table.querySelector('button[name="downloadQuestion"], input[type="file"], #studDaUpload'));
 
@@ -206,111 +233,51 @@
 
       const headerCells = Array.from(headerRow.querySelectorAll('th, td'));
       let dueDateColIdx = -1;
-      let titleColIdx = -1;
 
       headerCells.forEach((cell, idx) => {
-        const txt = (cell.innerText || cell.textContent || '').toLowerCase();
+        const txt = (cell.textContent || '').toLowerCase();
         if (txt.includes('due date') || txt.includes('deadline') || txt.includes('last date')) {
           dueDateColIdx = idx;
-        }
-        if (txt.includes('title') || txt.includes('assignment') || txt.includes('description')) {
-          titleColIdx = idx;
         }
       });
 
       // Fallback column index if header text not explicitly found
       if (dueDateColIdx === -1) dueDateColIdx = 4;
-      if (titleColIdx === -1) titleColIdx = 1;
 
       const allRows = Array.from(table.querySelectorAll('tr'));
       const dataRows = allRows.filter((r) => {
         if (r.classList.contains('tableHeader') || r.closest('thead') || r === headerRow) return false;
         if (r.querySelector('th')) return false;
         const cells = r.querySelectorAll('td');
-        return cells.length >= 3;
+        if (cells.length < 4) return false;
+        // Skip VTOP's 3-cell sub-header row ("Last Updated On | Upload/Edit | Download") under Document Details
+        const firstText = (cells[0].textContent || '').trim().toLowerCase();
+        if (firstText.includes('last updated') || firstText.includes('sl.no')) return false;
+        return true;
       });
 
       if (dataRows.length === 0) return;
 
-      let closestPending = null;
-      let totalAssignments = 0;
-      let submittedAssignments = 0;
-
       dataRows.forEach((row) => {
         const cells = row.querySelectorAll('td');
         if (cells.length < 3) return;
-        totalAssignments++;
 
-        // Determine assignment title
-        const titleCell = cells[titleColIdx] || cells[1] || cells[0];
-        const title = (titleCell?.innerText || titleCell?.textContent || `Assignment ${totalAssignments}`).trim();
-
-        // Determine submission status
-        const hasStudentDownload = Boolean(
-          row.querySelector(
-            'button[name="downloadStudentDA"], button[id="downloadStudentDA"], a[href*="downloadSTudentDA"], [data-code][id*="StudentDA" i]'
-          )
-        );
-        const cellTexts = Array.from(cells).map((c) => (c.innerText || c.textContent || '').trim());
-        const hasTimestamp = cellTexts.some(
-          (txt) =>
-            /\b\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b|\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/.test(txt) &&
-            (txt.includes('AM') || txt.includes('PM') || txt.includes(':'))
-        );
-        const rowText = (row.innerText || row.textContent || '').toLowerCase();
-        const hasSubmittedText =
-          rowText.includes('uploaded') || rowText.includes('submitted') || rowText.includes('view file');
-        const hasUploadAction = Boolean(
-          row.querySelector(
-            'input[type="file"], #studDaUpload, button[name="digitalAssignmentSubmit"], button[name="editAssignment"]'
-          )
-        );
-
-        let isSubmitted = false;
-        if (hasStudentDownload || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
-          isSubmitted = true;
-        }
-        if (rowText.includes('not applicable') || rowText.includes('n/a')) {
-          isSubmitted = true;
-        }
-
-        // Extract due date from the specific due date cell or row text
+        const isSubmitted = isDaRowSubmitted(row, cells);
         const dueCell = cells[dueDateColIdx] || cells[3] || cells[2];
         const dateSource = (dueCell?.innerText || dueCell?.textContent || row.innerText || row.textContent || '').trim();
-        const dateMatch =
-          dateSource.match(/\b(\d{1,2}[-\/\s][A-Za-z]{3,}[-\/\s]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/) ||
-          dateSource.match(/\b(\d{1,2}[-\/\.][0-9]{1,2}[-\/\.]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/);
-
-        let parsedDate = null;
-        let dateFormatted = '';
-        if (dateMatch) {
-          parsedDate = parseIndianDate(dateMatch[1]);
-          dateFormatted = dateMatch[1];
-        }
+        const parsedDate = extractDateFromText(dateSource);
 
         if (isSubmitted) {
-          submittedAssignments++;
           if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
             dueCell.classList.add('vtop-da-cell-augmented');
             const badge = document.createElement('div');
             badge.className = 'vtop-da-cell-badge';
-            badge.innerHTML = '<span class="vtop-da-badge vtop-da-badge-green">Submitted ✅</span>';
+            badge.innerHTML = '<span class="vtop-da-badge vtop-da-badge-green">Submitted</span>';
             dueCell.appendChild(badge);
           }
         } else if (parsedDate) {
           const rem = getRemainingTime(parsedDate);
           if (rem) {
-            // Check if this is the closest upcoming deadline
-            if (rem.diffMs >= 0) {
-              if (!closestPending || rem.diffMs < closestPending.diffMs) {
-                closestPending = { ...rem, title, dateFormatted, date: parsedDate };
-              }
-            } else if (!closestPending || closestPending.isOverdue) {
-              if (!closestPending || rem.diffMs > closestPending.diffMs) {
-                closestPending = { ...rem, title, dateFormatted, date: parsedDate };
-              }
-            }
-
             // Augment the table cell with an inline countdown badge
             if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
               dueCell.classList.add('vtop-da-cell-augmented');
@@ -326,68 +293,6 @@
           }
         }
       });
-
-      // Render or update the Top Banner above the assignments table
-      this.renderCountdownBanner(table, closestPending, totalAssignments, submittedAssignments);
-    },
-
-    renderCountdownBanner(table, closest, total, submitted) {
-      let banner = document.getElementById('vtop-da-countdown-banner');
-      if (!banner) {
-        banner = document.createElement('div');
-        banner.id = 'vtop-da-countdown-banner';
-        const mountTarget = table.closest('.table-responsive') || table.parentElement || table;
-        mountTarget.parentElement.insertBefore(banner, mountTarget);
-      }
-
-      if (closest) {
-        banner.className = `vtop-da-banner vtop-da-banner-${closest.badgeType}`;
-        banner.innerHTML = `
-          <div class="vtop-da-banner-left">
-            <span class="vtop-da-banner-icon">${closest.isToday ? '⏰' : closest.isOverdue ? '⚠️' : '📅'}</span>
-            <div class="vtop-da-banner-info">
-              <div class="vtop-da-banner-title">
-                Next Deadline: <strong>${closest.title}</strong>
-              </div>
-              <div class="vtop-da-banner-sub">
-                Due on <strong>${closest.dateFormatted || closest.date.toLocaleDateString()}</strong> &bull; ${submitted}/${total} assignments completed
-              </div>
-            </div>
-          </div>
-          <div class="vtop-da-banner-right">
-            <span class="vtop-da-badge vtop-da-badge-${closest.badgeType} vtop-da-badge-lg">${closest.badgeText}</span>
-          </div>
-        `;
-      } else if (total > 0 && submitted >= total) {
-        banner.className = 'vtop-da-banner vtop-da-banner-green';
-        banner.innerHTML = `
-          <div class="vtop-da-banner-left">
-            <span class="vtop-da-banner-icon">🎉</span>
-            <div class="vtop-da-banner-info">
-              <div class="vtop-da-banner-title">
-                <strong>All Digital Assignments Completed!</strong>
-              </div>
-              <div class="vtop-da-banner-sub">
-                Great job! All ${total} assignments for this course have been uploaded and submitted.
-              </div>
-            </div>
-          </div>
-          <div class="vtop-da-banner-right">
-            <span class="vtop-da-badge vtop-da-badge-green vtop-da-badge-lg">All Done ✅</span>
-          </div>
-        `;
-      } else {
-        banner.className = 'vtop-da-banner vtop-da-banner-green';
-        banner.innerHTML = `
-          <div class="vtop-da-banner-left">
-            <span class="vtop-da-banner-icon">📋</span>
-            <div class="vtop-da-banner-info">
-              <div class="vtop-da-banner-title">Digital Assignment Tracker Active</div>
-              <div class="vtop-da-banner-sub">${total} assignments listed for this course</div>
-            </div>
-          </div>
-        `;
-      }
     },
 
     // =========================================================================
@@ -395,13 +300,31 @@
     // =========================================================================
 
     findCourseOverviewTable() {
+      // 1. O(1) scoped check inside #fixedTableContainer > table.customTable
+      const scopedTables = document.querySelectorAll('#fixedTableContainer table.customTable');
+      for (const table of scopedTables) {
+        const firstRow = table.querySelector('tr');
+        const headerText = (firstRow?.textContent || '').toLowerCase();
+        const colCount = firstRow ? firstRow.children.length : 0;
+        if (
+          colCount >= 6 &&
+          (headerText.includes('class nbr') || headerText.includes('class number') || headerText.includes('class no')) &&
+          (headerText.includes('course code') || headerText.includes('course title'))
+        ) {
+          return table;
+        }
+      }
+
+      // 2. Fallback: scan tables using textContent (no layout reflow)
       const allTables = Array.from(document.querySelectorAll('table'));
       for (const table of allTables) {
-        const text = (table.innerText || table.textContent || '').toLowerCase();
+        const firstRow = table.querySelector('tr');
+        const colCount = firstRow ? firstRow.children.length : 0;
+        const text = (firstRow ? firstRow.textContent : table.textContent || '').toLowerCase();
         const hasClassNbr = text.includes('class nbr') || text.includes('class number') || text.includes('class no');
         const hasCourseCode = text.includes('course code') || text.includes('course title');
 
-        if (hasClassNbr && hasCourseCode) {
+        if (colCount >= 6 && hasClassNbr && hasCourseCode) {
           return table;
         }
       }
@@ -418,9 +341,8 @@
 
       if (!headerRow.querySelector('.vtop-th-da-status')) {
         const th = document.createElement(headerRow.querySelector('th') ? 'th' : 'td');
-        th.className = 'vtop-th-da-status fixedContent tableHeader';
+        th.className = 'vtop-th-da-status tableHeader';
         th.textContent = 'Next Assignment';
-        th.style.cssText = 'text-align: center; vertical-align: middle; width: 15%; min-width: 140px;';
         headerRow.appendChild(th);
       }
 
@@ -436,51 +358,13 @@
         let cell = row.querySelector('.vtop-td-da-status');
         if (!cell) {
           cell = document.createElement('td');
-          cell.className = 'vtop-td-da-status fixedContent tableContent';
-          cell.style.cssText = 'text-align: center; vertical-align: middle; padding: 6px 10px;';
+          cell.className = 'vtop-td-da-status tableContent';
           cell.innerHTML = '<span class="vtop-da-badge vtop-da-badge-loading">Checking...</span>';
           row.appendChild(cell);
         }
       });
 
       this.scanCourseDeadlines(dataRows);
-    },
-
-    getAuthId() {
-      const fromDom =
-        document.getElementById('authorizedID')?.value ||
-        document.getElementById('authorizedIDX')?.value ||
-        document.querySelector('input[name="authorizedID"], input[name*="authId" i]')?.value ||
-        document.querySelector('input[name*="regNo" i]')?.value;
-      if (fromDom) return fromDom.trim();
-
-      const userImg = document.querySelector('img[src*="/vtop/users/image/?id="]');
-      if (userImg) {
-        const idMatch = userImg.src.match(/id=([a-zA-Z0-9]+)/);
-        if (idMatch && idMatch[1]) return idMatch[1].toUpperCase();
-      }
-
-      const bodyText = document.body?.innerText || document.body?.textContent || '';
-      const regMatch = bodyText.match(/\b(2[0-9][A-Z]{3}[0-9]{4,5})\b/i);
-      if (regMatch) return regMatch[1].toUpperCase();
-
-      return '';
-    },
-
-    getCsrfToken() {
-      const csrfInput = document.querySelector('input[name="_csrf"], input[id="_csrf"], input[name*="csrf" i]');
-      if (csrfInput && csrfInput.value) return csrfInput.value;
-
-      const csrfMeta = document.querySelector('meta[name="_csrf"]');
-      if (csrfMeta && csrfMeta.content) return csrfMeta.content;
-
-      try {
-        const match = document.cookie.match(/(?:^|;\s*)(?:XSRF-TOKEN|_csrf)=([^;]+)/i);
-        if (match && match[1]) return decodeURIComponent(match[1]);
-      } catch (_) {}
-
-      if (window._csrf) return window._csrf;
-      return '';
     },
 
     async scanCourseDeadlines(dataRows) {
@@ -490,19 +374,20 @@
       if (this.isScanning) return;
       this.isScanning = true;
 
-      const authId = this.getAuthId();
-      const csrf = this.getCsrfToken();
+      const DOM = window.VTOP_PLUS?.DOM;
+      const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
+      const csrf = DOM?.getCsrfToken ? DOM.getCsrfToken() : '';
 
       const processRow = async (row) => {
-        if (!document.body.contains(row)) return;
+        if (!document.body.contains(row)) return false;
 
         const cell = row.querySelector('.vtop-td-da-status');
-        if (!cell) return;
+        if (!cell) return false;
 
-        if (cell.querySelector('.vtop-da-badge:not(.vtop-da-badge-loading)')) return;
+        if (cell.querySelector('.vtop-da-badge:not(.vtop-da-badge-loading)')) return false;
 
         const cells = row.querySelectorAll('td');
-        const classNbrText = (cells[1]?.innerText || cells[1]?.textContent || '').trim();
+        const classNbrText = (cells[1]?.textContent || '').trim();
         const button = row.querySelector('button, a');
         const onclickAttr = button?.getAttribute('onclick') || '';
         const onclickMatch =
@@ -520,11 +405,12 @@
 
         if (!classId) {
           cell.innerHTML = '<span class="vtop-da-badge vtop-da-badge-green">All submissions done</span>';
-          return;
+          return false;
         }
 
         const cacheKey = `vtop_da_status_${classId}`;
         let status = null;
+        let didFetch = false;
         try {
           const cached = sessionStorage.getItem(cacheKey);
           if (cached) {
@@ -536,6 +422,7 @@
         } catch (_) {}
 
         if (!status) {
+          didFetch = true;
           try {
             status = await this.fetchCourseStatus(classId, authId, csrf);
             if (status && status.type !== 'error') {
@@ -554,12 +441,13 @@
         }
 
         this.applyRowBadge(cell, status);
+        return didFetch;
       };
 
       try {
         for (let i = 0; i < pendingRows.length; i++) {
-          await processRow(pendingRows[i]);
-          if (i < pendingRows.length - 1) {
+          const didFetch = await processRow(pendingRows[i]);
+          if (didFetch && i < pendingRows.length - 1) {
             await new Promise((r) => setTimeout(r, Math.floor(300 + Math.random() * 150)));
           }
         }
@@ -569,55 +457,51 @@
     },
 
     async fetchCourseStatus(classId, authId, csrf) {
-      const basePath = window.location.pathname.split('/')[1] || 'vtop';
-      const endpoints = [
-        `${window.location.origin}/${basePath}/examinations/processDigitalAssignment`,
-        `${window.location.origin}/${basePath}/processDigitalAssignment`,
-        `${window.location.origin}/${basePath}/examinations/StudentDAUpload`,
-        `${window.location.origin}/${basePath}/examinations/doStudentDA`
-      ];
+      const basePath = window.VTOP_PLUS?.DOM?.getBasePath ? window.VTOP_PLUS.DOM.getBasePath() : 'vtop';
+      const targetUrl = `${window.location.origin}/${basePath}/examinations/processDigitalAssignment`;
 
       const params = new URLSearchParams();
       if (authId) params.append('authorizedID', authId);
       params.append('classId', classId);
       if (csrf) params.append('_csrf', csrf);
 
-      const semSelect = document.querySelector('select[name*="sem" i], select[id*="sem" i]');
+      const semSelect = document.getElementById('semesterSubId') ||
+                        document.querySelector('select[name*="sem" i], select[id*="sem" i]');
       if (semSelect?.value) {
         params.append(semSelect.name || 'semesterSubId', semSelect.value);
       }
       params.append('x', new Date().toUTCString());
 
-      for (const targetUrl of endpoints) {
-        try {
-          const res = await fetch(targetUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-              'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: params.toString()
-          });
+      try {
+        const res = await fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: params.toString()
+        });
 
-          if (res.status === 429) {
-            console.warn('[VTOP++] VTOP rate limited DA checks (HTTP 429).');
-            return { type: 'error', text: 'Rate limited' };
-          }
-
-          if (!res.ok) continue;
-
-          const html = await res.text();
-          if (html.includes('id="loginForm"') || html.includes('Login - VTOP')) {
-            return { type: 'error', text: 'Auth expired' };
-          }
-
-          const parsed = this.parseCourseHtml(html);
-          if (parsed && parsed.type !== 'error') {
-            return parsed;
-          }
-        } catch (e) {
-          console.warn(`[VTOP++] DA check error for ${targetUrl}:`, e);
+        if (res.status === 429) {
+          console.warn('[VTOP++] VTOP rate limited DA checks (HTTP 429).');
+          return { type: 'error', text: 'Rate limited' };
         }
+
+        if (!res.ok) {
+          return { type: 'error', text: 'Check failed' };
+        }
+
+        const html = await res.text();
+        if (html.includes('id="vtopLoginForm"') || html.includes('id="loginForm"') || html.includes('Login - VTOP')) {
+          return { type: 'error', text: 'Auth expired' };
+        }
+
+        const parsed = this.parseCourseHtml(html);
+        if (parsed && parsed.type !== 'error') {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn(`[VTOP++] DA check error for ${targetUrl}:`, e);
       }
 
       return { type: 'error', text: 'Check failed' };
@@ -627,20 +511,21 @@
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
-      const tables = Array.from(doc.querySelectorAll('table'));
+      const tables = Array.from(doc.querySelectorAll('#fixedTableContainer table.customTable, table'));
       let daTable = tables.find((t) => {
-        const txt = (t.innerText || t.textContent || '').toLowerCase();
+        const headerTxt = (t.querySelector('tr')?.textContent || t.textContent || '').toLowerCase();
         return (
-          txt.includes('due date') ||
-          txt.includes('download question') ||
-          txt.includes('case study') ||
-          txt.includes('assignment') ||
+          headerTxt.includes('due date') ||
+          headerTxt.includes('document details') ||
+          headerTxt.includes('download question') ||
+          headerTxt.includes('case study') ||
+          headerTxt.includes('assignment') ||
           Boolean(t.querySelector('#downloadQuestion, #downloadStudentDA, button[name="downloadQuestion"]'))
         );
       });
 
       if (!daTable && tables.length > 0) {
-        daTable = tables[0];
+        daTable = tables[tables.length - 1];
       }
 
       let allTrs = [];
@@ -654,8 +539,8 @@
         if (r.classList.contains('tableHeader') || r.closest('thead')) return false;
         if (r.querySelector('th')) return false;
         const cells = r.querySelectorAll('td');
-        if (cells.length < 3) return false;
-        const firstText = (cells[0].innerText || cells[0].textContent || '').trim().toLowerCase();
+        if (cells.length < 4) return false;
+        const firstText = (cells[0].textContent || '').trim().toLowerCase();
         if (firstText.includes('sl.no') || firstText.includes('last updated')) return false;
         return true;
       });
@@ -671,51 +556,16 @@
         const cells = row.querySelectorAll('td');
         if (cells.length < 3) return;
 
-        // Check if submitted
-        const hasStudentDownload = Boolean(
-          row.querySelector(
-            'button[name="downloadStudentDA"], button[id="downloadStudentDA"], a[href*="downloadSTudentDA"], [data-code][id*="StudentDA" i]'
-          )
-        );
-        const cellTexts = Array.from(cells).map((c) => (c.innerText || c.textContent || '').trim());
-        const hasTimestamp = cellTexts.some(
-          (txt) =>
-            /\b\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b|\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/.test(txt) &&
-            (txt.includes('AM') || txt.includes('PM') || txt.includes(':'))
-        );
-        const rowText = (row.innerText || row.textContent || '').toLowerCase();
-        const hasSubmittedText =
-          rowText.includes('uploaded') || rowText.includes('submitted') || rowText.includes('view file');
-        const hasUploadAction = Boolean(
-          row.querySelector(
-            'input[type="file"], #studDaUpload, button[name="digitalAssignmentSubmit"], button[name="editAssignment"]'
-          )
-        );
-
-        let isSubmitted = false;
-        if (hasStudentDownload || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
-          isSubmitted = true;
-        }
-        if (rowText.includes('not applicable') || rowText.includes('n/a')) {
-          isSubmitted = true;
-        }
-
-        if (!isSubmitted) {
+        if (!isDaRowSubmitted(row, cells)) {
           hasUnsubmitted = true;
 
           // Search all cells for due date patterns
           let foundDate = null;
           for (let i = 0; i < cells.length; i++) {
-            const cellTxt = (cells[i].innerText || cells[i].textContent || '').trim();
-            const dateMatch =
-              cellTxt.match(/\b(\d{1,2}[-\/\s][A-Za-z]{3,}[-\/\s]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/) ||
-              cellTxt.match(/\b(\d{1,2}[-\/\.][0-9]{1,2}[-\/\.]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp][Mm])?)?)\b/);
-            if (dateMatch) {
-              const dt = parseIndianDate(dateMatch[1]);
-              if (dt) {
-                foundDate = dt;
-                break;
-              }
+            const dt = extractDateFromText((cells[i].innerText || cells[i].textContent || '').trim());
+            if (dt) {
+              foundDate = dt;
+              break;
             }
           }
 

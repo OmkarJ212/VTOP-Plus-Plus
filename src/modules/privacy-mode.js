@@ -13,8 +13,6 @@
 
   const PrivacyMode = {
     isActive: false,
-    _observer: null,
-    _debounceTimer: null,
 
     init() {
       if (chrome?.storage?.local) {
@@ -40,42 +38,9 @@
 
       if (active) {
         this.tagSensitiveElements();
-        this.startObserver();
-      } else {
-        this.stopObserver();
       }
 
-      console.log(`[VTOP++] Privacy Mode ${active ? 'Enabled 🔒' : 'Disabled 🔓'}`);
-    },
-
-    startObserver() {
-      if (this._observer) return;
-      this._observer = new MutationObserver(() => {
-        if (!this.isActive) return;
-        if (this._debounceTimer) clearTimeout(this._debounceTimer);
-        this._debounceTimer = setTimeout(() => {
-          if (this.isActive) this.tagSensitiveElements();
-        }, 120);
-      });
-
-      const root = document.body || document.documentElement;
-      if (root) {
-        this._observer.observe(root, {
-          childList: true,
-          subtree: true
-        });
-      }
-    },
-
-    stopObserver() {
-      if (this._debounceTimer) {
-        clearTimeout(this._debounceTimer);
-        this._debounceTimer = null;
-      }
-      if (this._observer) {
-        this._observer.disconnect();
-        this._observer = null;
-      }
+      console.log(`[VTOP++] Privacy Mode ${active ? 'Enabled' : 'Disabled'}`);
     },
 
     tagSensitiveElements() {

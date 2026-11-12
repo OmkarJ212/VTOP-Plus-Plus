@@ -1,0 +1,745 @@
+/* VTOP++ - Universal Dark Mode Core (Tokens, Root, Navbar, Tables, Containers, Forms) */
+
+/* ==========================================================================
+   7. UNIVERSAL ZERO-LEAK DARK MODE ENGINE (Covers 100% of VTOP pages)
+   ========================================================================== */
+html.vtop-dark-theme,
+body.vtop-dark-theme {
+  --vtop-dark-bg-canvas: #0b0f19;
+  --vtop-dark-bg-surface: #131c2e;
+  --vtop-dark-bg-elevated: #1e293b;
+  --vtop-dark-bg-input: #0f172a;
+  --vtop-dark-border: #293548;
+  --vtop-dark-border-subtle: #1e293b;
+  --vtop-dark-text-main: #f1f5f9;
+  --vtop-dark-text-muted: #94a3b8;
+  --vtop-dark-text-dim: #64748b;
+  --vtop-dark-accent: #38bdf8;
+  --vtop-dark-accent-hover: #0284c7;
+  color-scheme: dark;
+
+  /* Bootstrap 5 Native Design Tokens Override */
+  --bs-body-bg: #0b0f19;
+  --bs-body-color: #f1f5f9;
+  --bs-body-color-rgb: 241, 245, 249;
+  --bs-body-bg-rgb: 11, 15, 25;
+  --bs-primary: #38bdf8;
+  --bs-secondary-color: #94a3b8;
+  --bs-tertiary-color: #64748b;
+  --bs-tertiary-bg: #1e293b;
+  --bs-secondary-bg: #131c2e;
+  --bs-light-rgb: 255, 255, 255;
+  --bs-dark-rgb: 241, 245, 249;
+  --bs-border-color: #293548;
+  --bs-border-color-translucent: rgba(255, 255, 255, 0.12);
+  --bs-card-bg: #131c2e;
+  --bs-card-color: #f1f5f9;
+  --bs-card-border-color: #293548;
+  --bs-card-cap-bg: #0f192b;
+  --bs-card-cap-color: #38bdf8;
+  --bs-accordion-bg: #131c2e;
+  --bs-accordion-color: #f1f5f9;
+  --bs-accordion-border-color: #293548;
+  --bs-accordion-btn-bg: #131c2e;
+  --bs-accordion-btn-color: #f1f5f9;
+  --bs-accordion-active-bg: #1e293b;
+  --bs-accordion-active-color: #38bdf8;
+  --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2338bdf8'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2338bdf8'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+
+  /* Bootstrap 5 Pagination Variables Override */
+  --bs-pagination-bg: #1e293b;
+  --bs-pagination-color: #f1f5f9;
+  --bs-pagination-border-color: #293548;
+  --bs-pagination-hover-bg: #334155;
+  --bs-pagination-hover-color: #38bdf8;
+  --bs-pagination-hover-border-color: #38bdf8;
+  --bs-pagination-focus-bg: #334155;
+  --bs-pagination-focus-color: #38bdf8;
+  --bs-pagination-active-bg: #0284c7;
+  --bs-pagination-active-color: #ffffff;
+  --bs-pagination-active-border-color: #0369a1;
+  --bs-pagination-disabled-bg: #131c2e;
+  --bs-pagination-disabled-color: #64748b;
+  --bs-pagination-disabled-border-color: #1e293b;
+}
+
+/* 7.1 Root & Foundation Structural Canvases */
+html.vtop-dark-theme,
+html.vtop-dark-theme body,
+html.vtop-dark-theme #page_outline,
+html.vtop-dark-theme .content-wrapper,
+html.vtop-dark-theme .wrapper,
+html.vtop-dark-theme main,
+html.vtop-dark-theme .main-sidebar,
+html.vtop-dark-theme .control-sidebar,
+html.vtop-dark-theme .container,
+html.vtop-dark-theme .container-fluid,
+html.vtop-dark-theme #main-container,
+html.vtop-dark-theme .box-body,
+html.vtop-dark-theme .tab-content {
+  background-color: var(--vtop-dark-bg-canvas) !important;
+  color: var(--vtop-dark-text-main) !important;
+}
+
+/* 7.2 Header & Navigation Bars (Pure White Typography & Icon Contrast) */
+html.vtop-dark-theme #vtop-header,
+html.vtop-dark-theme #vtopHeaderBarControl,
+html.vtop-dark-theme .main-header,
+html.vtop-dark-theme .navbar,
+html.vtop-dark-theme .navbar-default,
+html.vtop-dark-theme .navbar-custom-menu,
+html.vtop-dark-theme #top-hmenu-bar,
+html.vtop-dark-theme .hmenu,
+html.vtop-dark-theme .sidebar {
+  background-color: #0d1527 !important;
+  background-image: none !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: #ffffff !important;
+}
+
+/* Keep inner navbar wrappers transparent so .container-fluid (#0b0f19) doesn't create a two-tone seam */
+html.vtop-dark-theme #vtop-header .container-fluid,
+html.vtop-dark-theme #vtop-header #quickLinks,
+html.vtop-dark-theme #top-hmenu-bar .container-fluid {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html.vtop-dark-theme #vtop-header .dropdown-menu {
+  background-color: var(--vtop-dark-bg-elevated) !important;
+  background-image: none !important;
+}
+
+html.vtop-dark-theme #vtop-header .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+html.vtop-dark-theme #vtop-header .navbar-toggler-icon {
+  filter: invert(1) brightness(1.4);
+}
+
+html.vtop-dark-theme #vtop-header .deleteQuickLinkBtn {
+  background-color: rgba(248, 113, 113, 0.16) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+  color: #fca5a5 !important;
+}
+
+html.vtop-dark-theme #vtop-header .deleteQuickLinkBtn:hover {
+  background-color: rgba(248, 113, 113, 0.3) !important;
+  color: #ffffff !important;
+}
+
+html.vtop-dark-theme .navbar a,
+html.vtop-dark-theme .hmenu a,
+html.vtop-dark-theme .sidebar-menu a,
+html.vtop-dark-theme #vtop-header a {
+  color: #ffffff !important;
+}
+
+/* 7.2a Navbar Brand & Campus Title ("VIT Vellore") */
+#vtop-header .navbar-brand,
+#vtop-header .navbar-brand *,
+#vtopHeaderBarControl .navbar-brand,
+#vtopHeaderBarControl .navbar-brand *,
+.main-header .navbar-brand,
+.main-header .navbar-brand *,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand *,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand span,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand small,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand [class*="text-"] {
+  color: #ffffff !important;
+}
+
+/* 7.2b Registration Number & User Profile in Header */
+#navbarDropdown,
+#navbarDropdown *,
+#navbarDropdown .navbar-text,
+#navbarDropdown span,
+.navbar-nav #navbarDropdown,
+.navbar-nav #navbarDropdown *,
+.navbar-custom-menu #navbarDropdown,
+.navbar-custom-menu #navbarDropdown *,
+#vtop-header .navbar-text,
+#vtopHeaderBarControl .navbar-text,
+.main-header .navbar-text,
+.navbar-text.text-light,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-text,
+.navbar-custom-menu .navbar-text {
+  color: #ffffff !important;
+}
+
+/* 7.2c QuickLinks Bar (Home, Printer, Star, Quick Links Dropdown) */
+#quickLinks,
+#quickLinks *,
+#quickLinks a,
+#quickLinks a *,
+#quickLinks i,
+#quickLinks span,
+#quickLinks button,
+#favouriteBtn,
+#favouriteBtn *,
+#favouriteBtn i,
+#favouriteBtn span,
+#printVTOPCoreDocument,
+#printVTOPCoreDocument i,
+#printVTOPCoreDocument * {
+  color: #ffffff !important;
+}
+
+/* QuickLinks Dropdown Button (Clean white text, no outline/border) */
+#quickLinks .dropdown > .btn-outline-primary,
+#quickLinks .dropdown > .btn-outline,
+#quickLinks .dropdown-toggle.btn-outline-primary,
+#vtop-header #quickLinks .dropdown-toggle.btn-outline-primary {
+  color: #ffffff !important;
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  --bs-btn-border-color: transparent !important;
+  --bs-btn-hover-border-color: transparent !important;
+  --bs-btn-active-border-color: transparent !important;
+  --bs-btn-focus-shadow-rgb: 255, 255, 255 !important;
+}
+
+#quickLinks .dropdown > .btn-outline-primary:hover,
+#quickLinks .dropdown > .btn-outline:hover,
+#quickLinks .dropdown-toggle.btn-outline-primary:hover,
+#quickLinks .dropdown-toggle.btn-outline-primary:focus,
+#quickLinks .dropdown-toggle.btn-outline-primary:focus-visible,
+#quickLinks .dropdown-toggle.btn-outline-primary:active,
+#quickLinks .dropdown-toggle.btn-outline-primary.show,
+#vtop-header #quickLinks .dropdown-toggle.btn-outline-primary:hover,
+#vtop-header #quickLinks .dropdown-toggle.btn-outline-primary:focus,
+#vtop-header #quickLinks .dropdown-toggle.btn-outline-primary:active,
+#vtop-header #quickLinks .dropdown-toggle.btn-outline-primary.show {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+#quickLinks .btn-outline-primary .text-light,
+#quickLinks .btn-outline-primary span {
+  color: #ffffff !important;
+}
+
+/* Favourite star button (no outline box) */
+#favouriteBtn,
+#quickLinks #favouriteBtn {
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+#favouriteBtn:hover,
+#quickLinks #favouriteBtn:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+}
+
+/* ==========================================================================
+   7.2e VTOP Navigation Menu Buttons (Academics, Examinations, Feedback, etc.)
+   Standardize zero-outline/borderless button geometry across Light & Dark modes
+   ========================================================================== */
+.hmenuItem,
+.hmenuItem.btn,
+.hmenuItem.btn-outline,
+.btn-outline.hmenuItem,
+.hmenu .btn,
+.hmenu .btn-outline,
+.hmenu a,
+#top-hmenu-bar .btn,
+#top-hmenu-bar .btn-outline,
+#top-hmenu-bar a,
+.hmenubox .btn,
+.hmenubox .btn-outline,
+.sidebar .btn,
+.sidebar .btn-outline,
+.sidebar-menu .btn,
+.sidebar-menu .btn-outline,
+.main-sidebar .btn,
+.main-sidebar .btn-outline,
+nav .hmenuItem,
+nav .btn-outline,
+.navbar-nav .btn-outline,
+div[id^="MG0"] .btn,
+div[id^="MG0"] .btn-outline,
+div[id^="MG0"] a,
+a[data-bs-toggle="collapse"].hmenuItem,
+button[data-bs-toggle="collapse"].hmenuItem,
+a[data-bs-toggle="collapse"].btn-outline,
+button[data-bs-toggle="collapse"].btn-outline,
+a[href^="#MG0"].btn,
+a[href^="#MG0"].btn-outline,
+.systemB5BtnMenu,
+.systemBtnMenu {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  --bs-btn-border-color: transparent !important;
+  --bs-btn-border-width: 0 !important;
+  --bs-btn-focus-box-shadow: none !important;
+  --bs-btn-active-shadow: none !important;
+}
+
+.hmenuItem:hover,
+.hmenuItem.btn:hover,
+.hmenuItem.btn-outline:hover,
+.btn-outline.hmenuItem:hover,
+.hmenu .btn:hover,
+.hmenu .btn-outline:hover,
+#top-hmenu-bar .btn:hover,
+#top-hmenu-bar .btn-outline:hover,
+.sidebar .btn:hover,
+.sidebar-menu .btn:hover,
+.main-sidebar .btn:hover,
+div[id^="MG0"] .btn:hover,
+a[data-bs-toggle="collapse"].hmenuItem:hover,
+a[href^="#MG0"].btn:hover,
+.systemB5BtnMenu:hover,
+.systemBtnMenu:hover {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+html.vtop-dark-theme .hmenuItem:hover,
+html.vtop-dark-theme .hmenuItem.btn:hover,
+html.vtop-dark-theme .hmenuItem.btn-outline:hover,
+html.vtop-dark-theme .btn-outline.hmenuItem:hover,
+html.vtop-dark-theme .hmenu .btn:hover,
+html.vtop-dark-theme .hmenu .btn-outline:hover,
+html.vtop-dark-theme #top-hmenu-bar .btn:hover,
+html.vtop-dark-theme #top-hmenu-bar .btn-outline:hover,
+html.vtop-dark-theme .sidebar .btn:hover,
+html.vtop-dark-theme .sidebar-menu .btn:hover,
+html.vtop-dark-theme .main-sidebar .btn:hover,
+html.vtop-dark-theme div[id^="MG0"] .btn:hover,
+html.vtop-dark-theme a[data-bs-toggle="collapse"].hmenuItem:hover,
+html.vtop-dark-theme a[href^="#MG0"].btn:hover,
+html.vtop-dark-theme .systemB5BtnMenu:hover,
+html.vtop-dark-theme .systemBtnMenu:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.hmenuItem:focus,
+.hmenuItem:active,
+.hmenuItem:focus-visible,
+.hmenuItem[aria-expanded="true"],
+a[href^="#MG0"]:focus,
+a[href^="#MG0"]:active,
+a[href^="#MG0"][aria-expanded="true"] {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: rgba(37, 99, 235, 0.08) !important;
+}
+
+html.vtop-dark-theme .hmenuItem:focus,
+html.vtop-dark-theme .hmenuItem:active,
+html.vtop-dark-theme .hmenuItem:focus-visible,
+html.vtop-dark-theme .hmenuItem[aria-expanded="true"],
+html.vtop-dark-theme a[href^="#MG0"]:focus,
+html.vtop-dark-theme a[href^="#MG0"]:active,
+html.vtop-dark-theme a[href^="#MG0"][aria-expanded="true"] {
+  background-color: rgba(56, 189, 248, 0.12) !important;
+}
+
+/* Ensure typography and icons inside navigation items stay vibrant and visible in dark mode */
+html.vtop-dark-theme .hmenuItem .primaryColor1,
+html.vtop-dark-theme .hmenuItem .primaryColor1 *,
+html.vtop-dark-theme .hmenuItem span,
+html.vtop-dark-theme .hmenuItem i:not(.rotate-caret),
+html.vtop-dark-theme #top-hmenu-bar span,
+html.vtop-dark-theme .sidebar-menu span,
+html.vtop-dark-theme div[id^="MG0"] span {
+  color: #f1f5f9 !important;
+}
+
+html.vtop-dark-theme .hmenuItem:hover .primaryColor1,
+html.vtop-dark-theme .hmenuItem:hover span,
+html.vtop-dark-theme .hmenuItem:hover i:not(.rotate-caret) {
+  color: #ffffff !important;
+}
+
+html:not(.vtop-dark-theme) #top-hmenu-bar .navbar-brand,
+html:not(.vtop-dark-theme) #top-hmenu-bar a.hmenuItem i,
+html:not(.vtop-dark-theme) .hmenuItem .rotate-caret,
+html:not(.vtop-dark-theme) .hmenuItem i.bi-chevron-right,
+html:not(.vtop-dark-theme) i.bi-chevron-right.rotate-caret.text-danger {
+  color: #000000 !important;
+}
+
+html.vtop-dark-theme .hmenuItem .rotate-caret,
+html.vtop-dark-theme .hmenuItem .text-primary,
+html.vtop-dark-theme .hmenuItem i.bi-chevron-right {
+  color: #38bdf8 !important;
+}
+
+/* Submenu dropdown drawer boxes (inside #MG0001, #MG0002, #MG0008, etc.) */
+div[id^="MG0"],
+.hmenubox {
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme div[id^="MG0"],
+html.vtop-dark-theme .hmenubox {
+  background-color: #0f172a !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+div[id^="MG0"] a,
+div[id^="MG0"] button,
+div[id^="MG0"] .menuFontStyle,
+div[id^="MG0"] .quickMainMenu {
+  border: none !important;
+  outline: none !important;
+  background-color: transparent !important;
+}
+
+html.vtop-dark-theme div[id^="MG0"] a,
+html.vtop-dark-theme div[id^="MG0"] button,
+html.vtop-dark-theme div[id^="MG0"] .menuFontStyle,
+html.vtop-dark-theme div[id^="MG0"] .quickMainMenu {
+  color: #e2e8f0 !important;
+}
+
+div[id^="MG0"] a:hover,
+div[id^="MG0"] button:hover {
+  border: none !important;
+  outline: none !important;
+  background-color: rgba(37, 99, 235, 0.08) !important;
+}
+
+html.vtop-dark-theme div[id^="MG0"] a:hover,
+html.vtop-dark-theme div[id^="MG0"] button:hover {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+/* 7.2d Navbar Icons (Bootstrap Icons bi, FontAwesome fa, SVGs — scoped away from .navbar-light / #top-hmenu-bar & light dropdowns) */
+.navbar:not(.navbar-light):not(#top-hmenu-bar) i,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .bi,
+.navbar:not(.navbar-light):not(#top-hmenu-bar) .fa,
+#vtop-header i:not(.dropdown-menu i),
+#vtop-header .bi:not(.dropdown-menu .bi),
+#vtop-header .fa:not(.dropdown-menu .fa),
+#vtopHeaderBarControl i:not(.dropdown-menu i),
+#vtopHeaderBarControl .bi:not(.dropdown-menu .bi),
+#vtopHeaderBarControl .fa:not(.dropdown-menu .fa) {
+  color: #ffffff !important;
+}
+
+.navbar:not(.navbar-light):not(#top-hmenu-bar) svg:not(.vtop-dock-icon),
+#vtop-header svg:not(.vtop-dock-icon):not(.dropdown-menu svg) {
+  color: #ffffff !important;
+  fill: currentColor !important;
+}
+
+html:not(.vtop-dark-theme) #vtop-header .dropdown-menu a:not(.btn) i,
+html:not(.vtop-dark-theme) #vtop-header .dropdown-menu a:not(.btn) .bi,
+html:not(.vtop-dark-theme) #vtop-header .dropdown-menu a:not(.btn) .fa,
+html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) i,
+html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) .bi,
+html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) .fa {
+  color: #1e293b !important;
+}
+
+/* Navbar monochromatic icon images (Inverts dark icons to crisp white, preserves photos and logos) */
+#quickLinks img:not(.img-circle):not(.user-image):not([src*="user" i]):not([src*="logo" i]),
+#vtop-header .navbar-nav img:not(.img-circle):not(.user-image):not([src*="user" i]):not([src*="logo" i]):not([src*="StudentPhoto" i]) {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Student Avatar in Header Dropdown */
+.navbar .img-circle,
+#navbarDropdown img,
+.img_stamp_size {
+  filter: none !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Universal text-light override across entire portal */
+.text-light,
+span.text-light,
+a.text-light,
+i.text-light,
+button.text-light,
+small.text-light,
+html.vtop-dark-theme .text-light,
+body.vtop-dark-theme .text-light {
+  color: #ffffff !important;
+}
+
+html.vtop-dark-theme .dropdown-menu {
+  background-color: var(--vtop-dark-bg-elevated) !important;
+  border: 1px solid var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme .dropdown-menu > li > a {
+  color: #f1f5f9 !important;
+}
+
+html.vtop-dark-theme .dropdown-menu > li > a:hover,
+html.vtop-dark-theme .dropdown-menu > li > a:focus {
+  background-color: #334155 !important;
+  color: #38bdf8 !important;
+}
+
+/* 7.3 Universal Table Blanket (Crushes inline bgcolor and styles across ALL sub-pages) */
+html.vtop-dark-theme table,
+html.vtop-dark-theme table.table,
+html.vtop-dark-theme thead,
+html.vtop-dark-theme tbody,
+html.vtop-dark-theme tfoot,
+html.vtop-dark-theme tr,
+html.vtop-dark-theme th,
+html.vtop-dark-theme td,
+html.vtop-dark-theme [bgcolor] {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  color: var(--vtop-dark-text-main) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+/* Override inline background attributes on cells and rows */
+html.vtop-dark-theme td[style*="background"],
+html.vtop-dark-theme tr[style*="background"],
+html.vtop-dark-theme th[style*="background"],
+html.vtop-dark-theme table[style*="background"],
+html.vtop-dark-theme div[style*="background: #fff"],
+html.vtop-dark-theme div[style*="background-color: #fff"],
+html.vtop-dark-theme div[style*="background: white"],
+html.vtop-dark-theme div[style*="background-color: white"],
+html.vtop-dark-theme div[style*="background: rgb(255"],
+html.vtop-dark-theme div[style*="background-color: rgb(255"] {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  color: var(--vtop-dark-text-main) !important;
+}
+
+/* Headers: Standardized bold typography & bottom rule (Dark overrides colors) */
+th,
+thead th,
+.table > thead > tr > th,
+tr.tableHeader > td,
+tr.tableHeader-level1 > td {
+  font-weight: 700;
+}
+
+table:not(.table-borderless) > thead > tr > th,
+tr.tableHeader > td,
+tr.tableHeader-level1 > td {
+  border-bottom-width: 2px !important;
+}
+
+html.vtop-dark-theme th,
+html.vtop-dark-theme thead tr,
+html.vtop-dark-theme thead th,
+html.vtop-dark-theme .table > thead > tr > th,
+html.vtop-dark-theme tr.tableHeader > td,
+html.vtop-dark-theme tr.tableHeader-level1 > td {
+  background-color: #0b1322 !important;
+  color: #38bdf8 !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+/* Alternating zebra rows for dense data (Attendance, Marks, DA) */
+html.vtop-dark-theme table.table-striped > tbody > tr:nth-of-type(odd) td,
+html.vtop-dark-theme table > tbody > tr:nth-of-type(odd) td {
+  background-color: #0f1728 !important;
+}
+
+/* Interactive row hover */
+html.vtop-dark-theme table.table-hover > tbody > tr:hover td,
+html.vtop-dark-theme table > tbody > tr:hover td {
+  background-color: #1a2538 !important;
+}
+
+/* Table borders */
+html.vtop-dark-theme .table-bordered,
+html.vtop-dark-theme .table-bordered > thead > tr > th,
+html.vtop-dark-theme .table-bordered > tbody > tr > th,
+html.vtop-dark-theme .table-bordered > tfoot > tr > th,
+html.vtop-dark-theme .table-bordered > thead > tr > td,
+html.vtop-dark-theme .table-bordered > tbody > tr > td,
+html.vtop-dark-theme .table-bordered > tfoot > tr > td {
+  border: 1px solid var(--vtop-dark-border) !important;
+}
+
+/* 7.4 Containers (Panels, Boxes, Cards, Wells, Modals) */
+html.vtop-dark-theme .panel,
+html.vtop-dark-theme .panel-default,
+html.vtop-dark-theme .panel-body,
+html.vtop-dark-theme .card,
+html.vtop-dark-theme .card-body,
+html.vtop-dark-theme .box,
+html.vtop-dark-theme .box-body,
+html.vtop-dark-theme .well,
+html.vtop-dark-theme .jumbotron,
+html.vtop-dark-theme .modal-dialog,
+html.vtop-dark-theme .modal-content,
+html.vtop-dark-theme .list-group-item {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  color: var(--vtop-dark-text-main) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .panel-heading,
+html.vtop-dark-theme .panel-footer,
+html.vtop-dark-theme .card-header,
+html.vtop-dark-theme .card-footer,
+html.vtop-dark-theme .box-header,
+html.vtop-dark-theme .box-footer,
+html.vtop-dark-theme .modal-header,
+html.vtop-dark-theme .modal-footer {
+  background-color: #0f192b !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme .card-header strong,
+html.vtop-dark-theme .card-header h1,
+html.vtop-dark-theme .card-header h2,
+html.vtop-dark-theme .card-header h3,
+html.vtop-dark-theme .card-header .h3 {
+  color: var(--vtop-dark-accent) !important;
+}
+
+/* 7.5 Universal Forms, Inputs, Controls */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="range"]),
+select,
+textarea,
+.form-control,
+.form-select {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+}
+
+html.vtop-dark-theme input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="range"]),
+html.vtop-dark-theme select,
+html.vtop-dark-theme textarea,
+html.vtop-dark-theme .form-control,
+html.vtop-dark-theme .form-select {
+  background-color: var(--vtop-dark-bg-input) !important;
+  color: #f8fafc !important;
+  border-color: var(--vtop-dark-border) !important;
+  color-scheme: dark !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+  outline: none !important;
+}
+
+html.vtop-dark-theme input:focus,
+html.vtop-dark-theme select:focus,
+html.vtop-dark-theme textarea:focus,
+html.vtop-dark-theme .form-control:focus,
+html.vtop-dark-theme .form-select:focus {
+  border-color: var(--vtop-dark-accent) !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+}
+
+html.vtop-dark-theme .btn-default {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+html.vtop-dark-theme .btn-default:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+html.vtop-dark-theme .btn-primary {
+  background-color: #0284c7 !important;
+  border-color: #0369a1 !important;
+  color: #ffffff !important;
+}
+
+/* 7.6 BlockUI Loading Overlays (Prevents blinding white flash during AJAX page fetches) */
+html.vtop-dark-theme .blockUI,
+html.vtop-dark-theme .blockOverlay {
+  background-color: #070b13 !important;
+  opacity: 0.82 !important;
+}
+.blockMsg {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+html.vtop-dark-theme .blockMsg {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+/* 7.7 Captcha & OCR Image Protection */
+#captchaBlockImg,
+#captchaImage,
+img[src*="captcha" i],
+canvas#captchaCanvas {
+  border-radius: 4px;
+  padding: 2px;
+}
+html.vtop-dark-theme #captchaBlockImg,
+html.vtop-dark-theme #captchaImage,
+html.vtop-dark-theme img[src*="captcha" i],
+html.vtop-dark-theme canvas#captchaCanvas {
+  filter: none !important;
+  background-color: #ffffff !important;
+}
+
+/* 7.8 Status Badges & Timetable Slot Preservation */
+.badge,
+.label,
+[class*="badge-"],
+[class*="label-"] {
+  font-weight: 700;
+}
+html.vtop-dark-theme .badge,
+html.vtop-dark-theme .label,
+html.vtop-dark-theme [class*="badge-"],
+html.vtop-dark-theme [class*="label-"] {
+  filter: brightness(0.95) saturate(1.1);
+}
+
+/* Saturated colored timetable slots (Theory vs Lab) maintain contrast and legible text */
+html.vtop-dark-theme td[style*="background-color: rgb"]:not([style*="255, 255, 255"]),
+html.vtop-dark-theme td[style*="background: rgb"]:not([style*="255, 255, 255"]) {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* 7.9 Print Reset (Restores clean white & black for fee receipts & hall tickets) */
+@media print {
+  html.vtop-dark-theme,
+  html.vtop-dark-theme body,
+  html.vtop-dark-theme table,
+  html.vtop-dark-theme td,
+  html.vtop-dark-theme th {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+}

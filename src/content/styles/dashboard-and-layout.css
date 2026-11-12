@@ -1,0 +1,946 @@
+/* VTOP++ - Home/Dashboard Cards, Layout Fixes & Global Shadow Reset */
+
+/* 9. Modernized Home Cards (#course-data & #vtop-home-class-messages) */
+#course-data,
+#vtop-home-class-messages {
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+#course-data .card-header,
+#vtop-home-class-messages .card-header {
+  padding: 12px 16px !important;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-top: 3px solid #2563eb !important;
+  background-color: #f8fafc !important;
+}
+
+#course-data .card-header .fontcolor3,
+#vtop-home-class-messages .card-header .fontcolor3 {
+  font-size: 0.9rem !important;
+  letter-spacing: 0.025em;
+}
+
+#course-data .card-header .bg-warning {
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(220, 38, 38, 0.18);
+}
+
+#course-data .courseData.overflow-scroll,
+#vtop-home-class-messages .vtop-msg-body {
+  overflow: auto !important;
+  padding: 0 !important;
+}
+
+#course-data table.table,
+#vtop-home-class-messages table.table {
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+
+#course-data table.table thead th,
+#vtop-home-class-messages table.table thead th {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  white-space: nowrap;
+}
+
+#course-data table.table tbody th,
+#course-data table.table tbody td,
+#vtop-home-class-messages table.table tbody th,
+#vtop-home-class-messages table.table tbody td {
+  padding: 9px 12px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+  transition: background-color 0.15s ease;
+}
+
+#course-data table.table tbody tr:last-child th,
+#course-data table.table tbody tr:last-child td,
+#vtop-home-class-messages table.table tbody tr:last-child th,
+#vtop-home-class-messages table.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#course-data table.table tbody tr:hover th,
+#course-data table.table tbody tr:hover td,
+#vtop-home-class-messages table.table tbody tr:hover th,
+#vtop-home-class-messages table.table tbody tr:hover td {
+  background-color: rgba(15, 23, 42, 0.025) !important;
+}
+
+#course-data table.table tbody th[scope="row"],
+#course-data table.table tbody td:nth-child(4) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Home Class Messages Widget Specific Layout */
+#vtop-home-class-messages .vtop-msg-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+#vtop-home-class-messages .vtop-msg-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+#vtop-home-class-messages .vtop-msg-badge-muted {
+  background-color: rgba(100, 116, 139, 0.12);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.22);
+}
+
+#vtop-home-class-messages .vtop-msg-badge-active {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+#vtop-home-class-messages .vtop-msg-badge-warn {
+  background-color: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+#vtop-home-class-messages .vtop-msg-icon-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 7px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+#vtop-home-class-messages .vtop-msg-icon-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+#vtop-home-class-messages .vtop-msg-icon-btn.vtop-msg-spinning svg {
+  animation: vtopSpin 0.8s linear infinite;
+}
+
+#vtop-home-class-messages .vtop-msg-state,
+#vtop-home-class-messages .vtop-msg-empty {
+  padding: 16px;
+  text-align: center;
+  color: #64748b;
+}
+
+#vtop-home-class-messages .vtop-msg-empty-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+#vtop-home-class-messages .vtop-msg-note {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+#vtop-home-class-messages .vtop-msg-note-footer {
+  padding: 8px 14px;
+  border-top: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+#vtop-home-class-messages .vtop-msg-error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#vtop-home-class-messages .vtop-msg-fallback-btn {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 7px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+#vtop-home-class-messages .vtop-msg-content {
+  padding: 10px 14px;
+}
+
+#vtop-home-class-messages .vtop-msg-content:has(> table.table:only-child) {
+  padding: 0;
+}
+
+#vtop-home-class-messages .expand {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 6px;
+  background-color: #f8fafc;
+}
+
+/* Dark Theme Polish for #course-data & #vtop-home-class-messages */
+html.vtop-dark-theme #course-data,
+html.vtop-dark-theme #vtop-home-class-messages {
+  border: 1px solid var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme #course-data .card-header,
+html.vtop-dark-theme #vtop-home-class-messages .card-header {
+  background-color: #0f192b !important;
+  border-bottom: 1px solid var(--vtop-dark-border) !important;
+  border-top: 3px solid var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme #course-data .card-header .fontcolor3,
+html.vtop-dark-theme #vtop-home-class-messages .card-header .fontcolor3 {
+  color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #course-data .card-header .bg-warning {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(248, 113, 113, 0.25) !important;
+  color: #fca5a5 !important;
+}
+
+html.vtop-dark-theme #course-data table.table thead th,
+html.vtop-dark-theme #vtop-home-class-messages table.table thead th {
+  background-color: #0b1322 !important;
+  color: #38bdf8 !important;
+  border-bottom: 1px solid var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #course-data table.table tbody th,
+html.vtop-dark-theme #course-data table.table tbody td,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody th,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+html.vtop-dark-theme #course-data table.table tbody tr:hover th,
+html.vtop-dark-theme #course-data table.table tbody tr:hover td,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody tr:hover th,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody tr:hover td {
+  background-color: rgba(56, 189, 248, 0.06) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-badge-muted {
+  background-color: rgba(148, 163, 184, 0.14) !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-badge-active {
+  background-color: rgba(56, 189, 248, 0.16) !important;
+  color: #7dd3fc !important;
+  border-color: rgba(56, 189, 248, 0.32) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-badge-warn {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+  color: #fcd34d !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-icon-btn {
+  background-color: #162236 !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: #cbd5e1 !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-icon-btn:hover {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #38bdf8 !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-empty-title {
+  color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-state,
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-note {
+  color: #94a3b8 !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-note-footer {
+  background-color: #0f192b !important;
+  border-top-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-fallback-btn {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .expand {
+  background-color: #0f172a !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #course-data td:nth-child(2) .fw-bold {
+  color: #f8fafc !important;
+}
+
+html.vtop-dark-theme #course-data td:nth-child(2) .text-dark:not(.fw-bold) {
+  color: #cbd5e1 !important;
+}
+
+html.vtop-dark-theme #course-data .text-primary {
+  color: #60a5fa !important;
+}
+
+html.vtop-dark-theme #course-data .text-success {
+  color: #4ade80 !important;
+}
+
+html.vtop-dark-theme #course-data .text-warning {
+  color: #fbbf24 !important;
+}
+
+html.vtop-dark-theme #course-data .text-danger {
+  color: #f87171 !important;
+}
+
+html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
+  color: #fb923c !important;
+}
+
+/* Hide Action Plan - Academic Performance card immediately to prevent paint flash */
+.col-12.col-md-8.mb-3:has(.card.goldenBorderTop.lightGoldenbackground2 #pdfModal),
+.card.goldenBorderTop.lightGoldenbackground2:has(#pdfModal) {
+  display: none !important;
+}
+
+/* 9b. Modernized Dashboard Events, Spotlight & Sidebar Cards (Light Mode Base + Dark Mode Overrides) */
+
+/* Events & Spotlight side-by-side cards */
+.col-12.col-md-6:has(> .card > #events-info-content) > .card {
+  height: 100%;
+  margin-bottom: 0 !important;
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-top: 3px solid #2563eb !important;
+  box-shadow: none !important;
+  background-color: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767.98px) {
+  .col-12.col-md-6:has(> .card > #events-info-content) {
+    margin-bottom: 1rem;
+  }
+}
+
+.card:has(> #events-info-content) > h5.card-title.fontcolor3,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.02em;
+  padding: 12px 16px !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.card:has(> #events-info-content) > h5.card-title.fontcolor3 {
+  border: none !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  border: 1px solid #e2e8f0 !important;
+  border-top: 3px solid #2563eb !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+#events-info-content,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
+  padding: 1rem !important;
+  margin: 0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
+  flex: 1 1 auto;
+  align-content: flex-start;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-top: none !important;
+  border-radius: 0 0 12px 12px !important;
+  box-shadow: none !important;
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+  row-gap: 0.75rem;
+}
+
+#events-info-content > .card,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  background-color: #ffffff !important;
+  overflow: hidden;
+}
+
+#events-info-content > .card {
+  padding: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+#events-info-content > .card:last-child {
+  margin-bottom: 0 !important;
+}
+
+#events-info-content .card-title.fontcolor5 {
+  color: #2563eb !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.6rem !important;
+  padding-bottom: 0.4rem !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#events-info-content .col-2,
+#events-info-content .col-10 {
+  border-bottom: none !important;
+}
+
+#events-info-content .col-2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid #e2e8f0 !important;
+  padding-right: 0.5rem !important;
+}
+
+#events-info-content .col-2 .fontcolor3 {
+  color: #0f172a !important;
+  margin-bottom: 0.1rem !important;
+}
+
+#events-info-content .col-2 .subtitle {
+  color: #64748b !important;
+  font-size: 0.72rem !important;
+}
+
+#events-info-content .col-10 {
+  display: flex;
+  align-items: center;
+}
+
+#events-info-content .col-10 > .card-body {
+  padding: 0.25rem 0.75rem !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  color: #64748b !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col {
+  padding: 0 !important;
+  margin-top: 0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-header {
+  padding: 0.5rem 0.75rem !important;
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-body {
+  padding: 0.25rem 0.5rem !important;
+  background-color: #ffffff !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background .list-group-item {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Dashboard Sidebar Cards (PROCTOR Message, CGPA & Credits, Forthcoming DA, Last Five Feedbacks) */
+div:has(> .card > #last-five-feedbacks) > .card {
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+  background-color: #ffffff !important;
+  overflow: hidden !important;
+}
+
+div:has(> .card > #last-five-feedbacks) > .card:last-child {
+  margin-bottom: 0 !important;
+}
+
+div:has(> .card > #last-five-feedbacks) > .card > .card-header {
+  padding: 12px 16px !important;
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-top: 3px solid #2563eb !important;
+}
+
+div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
+  color: #1e293b !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.02em;
+}
+
+#proctor-message,
+#edu-status {
+  padding: 0.85rem 1rem !important;
+}
+
+/* CGPA & Credit Status: keep distinct tint colors, unify number colors & row polish */
+#edu-status .list-group-item {
+  align-items: center !important;
+  padding: 0.45rem 0 !important;
+  gap: 0.75rem;
+  background-color: transparent !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#edu-status .list-group-item:first-child {
+  padding-top: 0 !important;
+}
+
+#edu-status .list-group-item:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+#edu-status .list-group-item .card-title.fontcolor1 {
+  color: #1e293b !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+}
+
+#edu-status .list-group-item > .fontcolor3 {
+  border-radius: 6px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-variant-numeric: tabular-nums;
+  color: #0f172a !important;
+}
+
+#edu-status .list-group-item > .fontcolor3 span {
+  color: #0f172a !important;
+}
+
+#edu-status table.table {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+
+#edu-status table.table th {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-bottom: none !important;
+  border-right: 1px solid #e2e8f0 !important;
+  padding: 0.45rem 0.65rem !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap;
+}
+
+#edu-status table.table td {
+  padding: 0.45rem 0.65rem !important;
+  font-size: 0.82rem !important;
+  border-bottom: none !important;
+}
+
+#edu-status table.table td.bg-success {
+  background-color: rgba(22, 163, 74, 0.14) !important;
+  color: #166534 !important;
+}
+
+#edu-status table.table td.bg-danger {
+  background-color: rgba(220, 38, 38, 0.14) !important;
+  color: #991b1b !important;
+}
+
+/* Forthcoming Digital Assignments & Last Five Feedbacks flush table cards */
+#digital-assignments,
+#last-five-feedbacks {
+  padding: 0 !important;
+  overflow: auto !important;
+}
+
+#digital-assignments table.table,
+#last-five-feedbacks table.table {
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+
+#digital-assignments table.table thead th,
+#last-five-feedbacks table.table thead th {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 12px !important;
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  white-space: nowrap;
+}
+
+#digital-assignments table.table tbody th,
+#digital-assignments table.table tbody td,
+#last-five-feedbacks table.table tbody th,
+#last-five-feedbacks table.table tbody td {
+  padding: 9px 12px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+#digital-assignments table.table tbody tr:last-child th,
+#digital-assignments table.table tbody tr:last-child td,
+#last-five-feedbacks table.table tbody tr:last-child th,
+#last-five-feedbacks table.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#digital-assignments table.table tbody tr:hover th,
+#digital-assignments table.table tbody tr:hover td,
+#last-five-feedbacks table.table tbody tr:hover th,
+#last-five-feedbacks table.table tbody tr:hover td {
+  background-color: rgba(15, 23, 42, 0.025) !important;
+}
+
+/* Dark Theme Overrides for Events, Spotlight & Sidebar Cards */
+html.vtop-dark-theme .col-12.col-md-6:has(> .card > #events-info-content) > .card {
+  border-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme .card:has(> #events-info-content) > h5.card-title.fontcolor3,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  background-color: #0f192b !important;
+  color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme .card:has(> #events-info-content) > h5.card-title.fontcolor3 {
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  border-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme #events-info-content > .card,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card {
+  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme #events-info-content .card-title.fontcolor5 {
+  color: var(--vtop-dark-accent) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #events-info-content .col-2 {
+  border-right-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #events-info-content .col-2 .fontcolor3 {
+  color: #f8fafc !important;
+}
+
+html.vtop-dark-theme #events-info-content .col-2 .subtitle,
+html.vtop-dark-theme #events-info-content .col-10 > .card-body {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-header {
+  background-color: #0f192b !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-body,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background .list-group-item {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card {
+  border-color: var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card > .card-header {
+  background-color: #0f192b !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
+  color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #edu-status .list-group-item {
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #edu-status .list-group-item .card-title.fontcolor1 {
+  color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #edu-status .list-group-item > .fontcolor3,
+html.vtop-dark-theme #edu-status .list-group-item > .fontcolor3 span {
+  color: #f8fafc !important;
+}
+
+html.vtop-dark-theme #edu-status table.table {
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #edu-status table.table th {
+  background-color: #0b1322 !important;
+  color: #38bdf8 !important;
+  border-right-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #edu-status table.table td.bg-success {
+  background-color: rgba(22, 163, 74, 0.16) !important;
+  color: #86efac !important;
+}
+
+html.vtop-dark-theme #edu-status table.table td.bg-danger {
+  background-color: rgba(220, 38, 38, 0.16) !important;
+  color: #fca5a5 !important;
+}
+
+html.vtop-dark-theme #digital-assignments table.table thead th,
+html.vtop-dark-theme #last-five-feedbacks table.table thead th {
+  background-color: #0b1322 !important;
+  color: #38bdf8 !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #digital-assignments table.table tbody th,
+html.vtop-dark-theme #digital-assignments table.table tbody td,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody th,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody td {
+  border-bottom-color: rgba(148, 163, 184, 0.1) !important;
+}
+
+html.vtop-dark-theme #digital-assignments table.table tbody tr:hover th,
+html.vtop-dark-theme #digital-assignments table.table tbody tr:hover td,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover th,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover td {
+  background-color: rgba(56, 189, 248, 0.06) !important;
+}
+
+html.vtop-dark-theme #last-five-feedbacks table.table td.text-primary {
+  color: #60a5fa !important;
+}
+
+/* Standardize hardcoded #f2dede empty-state alert banner (e.g. Class Messages page) */
+[style*="#f2dede" i],
+[style*="242, 222, 222"] {
+  border-radius: 10px !important;
+  padding: 16px !important;
+}
+
+html.vtop-dark-theme [style*="#f2dede" i],
+html.vtop-dark-theme [style*="242, 222, 222"] {
+  background-color: rgba(239, 68, 68, 0.14) !important;
+  border: 1px solid rgba(248, 113, 113, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+[style*="#f2dede" i] h3,
+[style*="242, 222, 222"] h3 {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+}
+
+html.vtop-dark-theme [style*="#f2dede" i] h3,
+html.vtop-dark-theme [style*="242, 222, 222"] h3 {
+  color: #fca5a5 !important;
+}
+
+.box-info .box-body > h4[style*="green" i] {
+  font-size: 0.92rem !important;
+  margin-bottom: 14px !important;
+}
+
+html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] {
+  color: #4ade80 !important;
+}
+
+html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] span[style*="red" i] {
+  color: #f87171 !important;
+}
+
+/* Fix Bootstrap .card > .card-header.row negative margins spilling header/title outside .card box */
+.card > .card-header.row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card > .card-header.row > .col-auto {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Course Page accordion containment inside outer fieldset / card / box */
+fieldset:has(.col-md-12),
+fieldset:has(#courseAccordion),
+.card:has(#courseAccordion),
+.card-body:has(#courseAccordion),
+.box-body:has(#courseAccordion),
+.panel-body:has(#courseAccordion) {
+  display: flow-root !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+fieldset div[class*="col-"]:has(#courseAccordion),
+.card-body div[class*="col-"]:has(#courseAccordion),
+.box-body div[class*="col-"]:has(#courseAccordion) {
+  float: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.container-fluid:has(#courseAccordion) {
+  background-color: transparent !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#courseAccordion {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Global Shadow Reset across Dashboard and all VTOP pages */
+.shadow,
+.shadow-sm,
+.shadow-lg,
+.card,
+.panel,
+.box,
+.modal-content,
+.dropdown-menu,
+.navbar,
+#vtop-header,
+#top-hmenu-bar,
+div[id^="MG0"],
+.hmenubox,
+.blockMsg,
+.login-box,
+.card-login,
+.vtop-plus-card,
+.vtop-plus-panel,
+.vtop-plus-filter-container,
+.vtop-plus-course-filter-panel,
+.vtop-attendance-card,
+.vtop-palette-dialog,
+.vtop-drawer-close-btn {
+  box-shadow: none !important;
+}
+
+/* Universal Light Mode Scrollbars (matches Dark Mode geometry & slate styling) */
+html:not(.vtop-dark-theme),
+html:not(.vtop-dark-theme) body,
+html:not(.vtop-dark-theme) *,
+html:not(.vtop-dark-theme) .table-responsive,
+html:not(.vtop-dark-theme) .box-body {
+  scrollbar-color: auto !important;
+  scrollbar-width: auto !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-track,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 6px !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-thumb,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 6px !important;
+  border: 2px solid #f1f5f9 !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-thumb:hover,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-corner,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-corner {
+  background: #f1f5f9 !important;
+}

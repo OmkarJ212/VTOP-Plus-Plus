@@ -10,25 +10,7 @@
 
   window.VTOP_PLUS = window.VTOP_PLUS || {};
 
-  // Immediate synchronous FOUC prevention: apply theme class as early as possible
-  try {
-    if (chrome?.storage?.local) {
-      chrome.storage.local.get(['enableDarkMode'], (res) => {
-        if (res?.enableDarkMode) {
-          document.documentElement.classList.add('vtop-dark-theme');
-          if (document.body) {
-            document.body.classList.add('vtop-dark-theme');
-          }
-          if (window.VTOP_PLUS.DarkMode) {
-            window.VTOP_PLUS.DarkMode.isActive = true;
-            window.VTOP_PLUS.DarkMode.syncDockButton();
-          }
-        }
-      });
-    }
-  } catch (e) {
-    // Storage access not yet ready
-  }
+  if (window.VTOP_PLUS.DarkMode) return;
 
   // Ensure body receives theme when DOM is parsed
   document.addEventListener('DOMContentLoaded', () => {
@@ -40,8 +22,6 @@
       window.VTOP_PLUS.DarkMode.syncDockButton();
     }
   }, { once: true });
-
-  if (window.VTOP_PLUS.DarkMode) return;
 
   const WHITE_BG_REGEX = /background(?:-color)?:\s*(?:#fff(?:fff)?|#f8f9fa|#f4f6f9|#f1f5f9|#e9ecef|#fafafa|white|rgb\(\s*(?:24[0-9]|25[0-5])\s*,\s*(?:24[0-9]|25[0-5])\s*,\s*(?:24[0-9]|25[0-5])\s*\))/i;
   const DARK_TEXT_REGEX = /color\s*:\s*(?:#000(?:000)?|#111|#222|#333|#444|#555|#212529|#2c3e50|#34495e|black|rgb\(\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*\))/i;
@@ -106,7 +86,7 @@
         this.stopObserver();
       }
 
-      console.log(`[VTOP++] Universal Dark Mode ${this.isActive ? 'Enabled 🌙' : 'Disabled ☀️'}`);
+      console.log(`[VTOP++] Universal Dark Mode ${this.isActive ? 'Enabled' : 'Disabled'}`);
     },
 
     syncDockButton() {
@@ -114,8 +94,8 @@
       if (!btn) return;
 
       btn.title = this.isActive
-        ? 'Switch to Light Mode (☀️)'
-        : 'Switch to Dark Mode (🌙)';
+        ? 'Switch to Light Mode'
+        : 'Switch to Dark Mode';
       btn.classList.toggle('active', this.isActive);
 
       const qd = window.VTOP_PLUS.QuickDock;
@@ -132,7 +112,7 @@
         // Skip mutations originating purely from VTOP++ injected components
         const hasExternalChanges = mutations.some((m) => {
           const t = m.target;
-          return !t || (!t.closest?.('.vtop-plus-dock, .vtop-plus-panel, .vtop-palette-overlay, .vtop-plus-card') &&
+          return !t || (!t.closest?.('.vtop-plus-dock, .vtop-nav-item, .vtop-dock-pill, .vtop-dock-icon-btn, .vtop-dock-sep, [data-vtop-nav-item], .vtop-plus-panel, .vtop-palette-overlay, .vtop-plus-card') &&
                  !(typeof t.id === 'string' && t.id.startsWith('vtop-')));
         });
         if (!hasExternalChanges) return;
@@ -226,7 +206,7 @@
         el.id === 'captchaBlockImg' ||
         el.id === 'captchaImage' ||
         el.id === 'captchaCanvas' ||
-        el.closest?.('#captchaBlockImg, .vtop-plus-dock, .vtop-downloader-panel, .vtop-palette-overlay')
+        el.closest?.('#captchaBlockImg, .vtop-plus-dock, .vtop-nav-item, .vtop-dock-pill, .vtop-dock-icon-btn, .vtop-dock-sep, [data-vtop-nav-item], .vtop-plus-panel, .vtop-palette-overlay')
       ) {
         return true;
       }
