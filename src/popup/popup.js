@@ -39,14 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (isVelloreVtop) {
         statusBadge.textContent = '● Connected';
-        statusBadge.style.background = '#ecfdf5';
-        statusBadge.style.color = '#059669';
-        statusBadge.style.borderColor = '#a7f3d0';
+        statusBadge.classList.remove('is-warn');
       } else {
         statusBadge.textContent = '○ Navigate to VIT Vellore VTOP';
-        statusBadge.style.background = '#fffbeb';
-        statusBadge.style.color = '#b45309';
-        statusBadge.style.borderColor = '#fde68a';
+        statusBadge.classList.add('is-warn');
       }
     }
   } catch (err) {

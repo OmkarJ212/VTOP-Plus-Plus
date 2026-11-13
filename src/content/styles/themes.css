@@ -1,0 +1,240 @@
+/* VTOP++ - Central Light & Dark Mode Color Tokens */
+
+:root {
+  /* Surfaces & Canvas */
+  --vtop-bg-canvas: #f8fafc;
+  --vtop-bg-surface: #ffffff;
+  --vtop-bg-surface-alt: #f8fafc;
+  --vtop-bg-table-head: #f8fafc;
+  --vtop-bg-table-stripe: #f8fafc;
+  --vtop-bg-elevated: #ffffff;
+  --vtop-bg-elevated-hover: #f1f5f9;
+  --vtop-bg-input: #ffffff;
+  --vtop-bg-hover: rgba(15, 23, 42, 0.025);
+  --vtop-bg-row-hover: #f1f5f9;
+  --vtop-bg-active: #eff6ff;
+  --vtop-tab-hover-bg: rgba(15, 23, 42, 0.04);
+
+  /* Borders & Hairlines */
+  --vtop-border: #e2e8f0;
+  --vtop-border-strong: #cbd5e1;
+  --vtop-border-subtle: rgba(15, 23, 42, 0.06);
+  --vtop-border-muted: #f1f5f9;
+
+  /* Text Roles */
+  --vtop-text-primary: #0f172a;
+  --vtop-text-heading: #1e293b;
+  --vtop-text-secondary: #334155;
+  --vtop-text-body: #475569;
+  --vtop-text-muted: #64748b;
+  --vtop-text-dim: #94a3b8;
+  --vtop-text-inverse: #ffffff;
+
+  /* Brand & Accent */
+  --vtop-navy: #003664;
+  --vtop-brand: #1b4f72;
+  --vtop-brand-blue: #1b75bb;
+  --vtop-accent: #2563eb;
+  --vtop-accent-hover: #1d4ed8;
+  --vtop-accent-sky: #0284c7;
+  --vtop-accent-sky-hover: #0369a1;
+  --vtop-accent-light: #60a5fa;
+  --vtop-accent-soft: rgba(37, 99, 235, 0.12);
+  --vtop-accent-border: rgba(37, 99, 235, 0.25);
+  --vtop-accent-focus: rgba(37, 99, 235, 0.18);
+  --vtop-accent-tint-bg: #e0f2fe;
+  --vtop-accent-tint-bg-soft: #f0f9ff;
+  --vtop-navbar-accent: #38bdf8;
+  --vtop-navbar-active-hover: #7dd3fc;
+  --vtop-navbar-active-bg: rgba(56, 189, 248, 0.14);
+  --vtop-navbar-focus: rgba(56, 189, 248, 0.7);
+  --vtop-navbar-queued-bg: rgba(245, 158, 11, 0.22);
+  --vtop-navbar-queued-fg: #fde68a;
+  --vtop-glass-10: rgba(255, 255, 255, 0.1);
+  --vtop-glass-12: rgba(255, 255, 255, 0.12);
+  --vtop-glass-14: rgba(255, 255, 255, 0.14);
+  --vtop-glass-20: rgba(255, 255, 255, 0.2);
+  --vtop-glass-22: rgba(255, 255, 255, 0.22);
+  --vtop-glass-25: rgba(255, 255, 255, 0.25);
+  --vtop-glass-40: rgba(255, 255, 255, 0.4);
+  --vtop-glass-85: rgba(255, 255, 255, 0.85);
+  --vtop-glass-90: rgba(255, 255, 255, 0.9);
+  --vtop-accent-soft-light: rgba(37, 99, 235, 0.08);
+  --vtop-bg-hover-light: rgba(15, 23, 42, 0.05);
+  --vtop-bg-hover-dark: rgba(255, 255, 255, 0.08);
+  --vtop-shadow-text: rgba(0, 0, 0, 0.7);
+
+  /* Semantic Status */
+  --vtop-success: #15803d;
+  --vtop-success-bright: #27ae60;
+  --vtop-success-hover: #219653;
+  --vtop-success-text: #166534;
+  --vtop-success-bg: rgba(22, 163, 74, 0.12);
+  --vtop-success-bg-soft: #ecfdf5;
+  --vtop-success-border: #a7f3d0;
+  --vtop-success-border-soft: rgba(22, 163, 74, 0.25);
+  --vtop-success-focus: rgba(16, 185, 129, 0.25);
+
+  --vtop-warn: #b45309;
+  --vtop-warn-bright: #f39c12;
+  --vtop-warn-text: #b45309;
+  --vtop-warn-bg: #fffbeb;
+  --vtop-warn-bg-soft: rgba(245, 158, 11, 0.14);
+  --vtop-warn-border: #fde68a;
+
+  --vtop-danger: #b91c1c;
+  --vtop-danger-bright: #e74c3c;
+  --vtop-danger-text: #991b1b;
+  --vtop-danger-bg: rgba(220, 38, 38, 0.14);
+  --vtop-danger-bg-soft: #fef2f2;
+  --vtop-danger-border: rgba(220, 38, 38, 0.2);
+  --vtop-danger-hover: #dc2626;
+
+  --vtop-purple: #7e22ce;
+
+  /* Scrollbars & Overlays */
+  --vtop-scrollbar-track: #f1f5f9;
+  --vtop-scrollbar-thumb: #cbd5e1;
+  --vtop-scrollbar-thumb-hover: #94a3b8;
+  --vtop-overlay-backdrop: rgba(15, 23, 42, 0.45);
+  --vtop-overlay-modal: rgba(15, 23, 42, 0.72);
+  --vtop-muted-bg: rgba(100, 116, 139, 0.12);
+  --vtop-muted-border: rgba(100, 116, 139, 0.22);
+
+  /* Popup Icon Tints */
+  --vtop-icon-dark-bg: #0f172a;
+  --vtop-icon-dark-fg: #38bdf8;
+  --vtop-icon-blue-bg: #e0f2fe;
+  --vtop-icon-blue-fg: #0284c7;
+  --vtop-icon-green-bg: #f0fdf4;
+  --vtop-icon-green-fg: #16a34a;
+  --vtop-icon-indigo-bg: #e0e7ff;
+  --vtop-icon-indigo-fg: #4f46e5;
+  --vtop-icon-amber-bg: #fef3c7;
+  --vtop-icon-amber-fg: #d97706;
+  --vtop-icon-purple-bg: #fae8ff;
+  --vtop-icon-purple-fg: #a855f7;
+  --vtop-icon-red-bg: #fee2e2;
+  --vtop-icon-red-fg: #dc2626;
+  --vtop-icon-yellow-bg: #fef9c3;
+  --vtop-icon-yellow-fg: #ca8a04;
+  --vtop-icon-slate-bg: #f1f5f9;
+  --vtop-icon-slate-fg: #475569;
+  --vtop-icon-teal-bg: #ccfbf1;
+  --vtop-icon-teal-fg: #0d9488;
+}
+
+html.vtop-dark-theme,
+body.vtop-dark-theme,
+.vtop-dark-theme {
+  /* Surfaces & Canvas */
+  --vtop-bg-canvas: #0b0f19;
+  --vtop-bg-surface: #131c2e;
+  --vtop-bg-surface-alt: #0f192b;
+  --vtop-bg-table-head: #0b1322;
+  --vtop-bg-table-stripe: #0f1728;
+  --vtop-bg-elevated: #1e293b;
+  --vtop-bg-elevated-alt: #162236;
+  --vtop-bg-elevated-hover: #334155;
+  --vtop-bg-input: #0f172a;
+  --vtop-bg-hover: rgba(56, 189, 248, 0.06);
+  --vtop-bg-row-hover: #1a2538;
+  --vtop-bg-active: rgba(56, 189, 248, 0.14);
+  --vtop-tab-hover-bg: rgba(56, 189, 248, 0.08);
+  --vtop-bg-navbar-dark: #0d1527;
+  --vtop-bg-blockui: #070b13;
+
+  /* Borders & Hairlines */
+  --vtop-border: #293548;
+  --vtop-border-strong: #475569;
+  --vtop-border-subtle: rgba(148, 163, 184, 0.1);
+  --vtop-border-muted: #1e293b;
+
+  /* Text Roles */
+  --vtop-text-primary: #f1f5f9;
+  --vtop-text-heading: #f8fafc;
+  --vtop-text-secondary: #e2e8f0;
+  --vtop-text-body: #cbd5e1;
+  --vtop-text-muted: #94a3b8;
+  --vtop-text-dim: #64748b;
+  --vtop-text-inverse: #ffffff;
+
+  /* Brand & Accent */
+  --vtop-navy: #38bdf8;
+  --vtop-brand: #0f192b;
+  --vtop-brand-blue: #38bdf8;
+  --vtop-accent: #38bdf8;
+  --vtop-accent-hover: #0284c7;
+  --vtop-accent-sky: #38bdf8;
+  --vtop-accent-sky-hover: #7dd3fc;
+  --vtop-accent-light: #60a5fa;
+  --vtop-accent-soft: rgba(56, 189, 248, 0.16);
+  --vtop-accent-border: rgba(56, 189, 248, 0.32);
+  --vtop-accent-focus: rgba(56, 189, 248, 0.25);
+  --vtop-accent-tint-bg: rgba(2, 132, 199, 0.25);
+  --vtop-accent-tint-bg-soft: rgba(56, 189, 248, 0.12);
+  --vtop-navbar-accent: #38bdf8;
+
+  /* Semantic Status */
+  --vtop-success: #4ade80;
+  --vtop-success-bright: #4ade80;
+  --vtop-success-hover: #22c55e;
+  --vtop-success-text: #86efac;
+  --vtop-success-bg: rgba(22, 163, 74, 0.18);
+  --vtop-success-bg-soft: rgba(22, 163, 74, 0.15);
+  --vtop-success-border: rgba(74, 222, 128, 0.3);
+  --vtop-success-border-soft: rgba(74, 222, 128, 0.3);
+  --vtop-success-focus: rgba(74, 222, 128, 0.25);
+
+  --vtop-warn: #fbbf24;
+  --vtop-warn-bright: #fbbf24;
+  --vtop-warn-orange: #fb923c;
+  --vtop-warn-text: #fcd34d;
+  --vtop-warn-bg: rgba(245, 158, 11, 0.15);
+  --vtop-warn-bg-soft: rgba(245, 158, 11, 0.16);
+  --vtop-warn-border: rgba(245, 158, 11, 0.3);
+
+  --vtop-danger: #f87171;
+  --vtop-danger-bright: #f87171;
+  --vtop-danger-text: #fca5a5;
+  --vtop-danger-bg: rgba(239, 68, 68, 0.16);
+  --vtop-danger-bg-soft: rgba(239, 68, 68, 0.14);
+  --vtop-danger-border: rgba(248, 113, 113, 0.3);
+  --vtop-danger-border-strong: rgba(248, 113, 113, 0.35);
+  --vtop-danger-bg-hover: rgba(248, 113, 113, 0.3);
+  --vtop-danger-hover: #ef4444;
+  --vtop-info-alert-bg: rgba(2, 132, 199, 0.16);
+  --vtop-info-alert-border: rgba(2, 132, 199, 0.45);
+  --vtop-info-alert-text: #7dd3fc;
+  --vtop-danger-alert-bg: rgba(220, 38, 38, 0.16);
+  --vtop-danger-alert-border: rgba(220, 38, 38, 0.45);
+  --vtop-warn-alert-bg: rgba(217, 119, 6, 0.16);
+  --vtop-warn-alert-border: rgba(217, 119, 6, 0.45);
+  --vtop-warn-alert-text: #fde047;
+  --vtop-success-alert-bg: rgba(22, 163, 74, 0.16);
+  --vtop-success-alert-border: rgba(22, 163, 74, 0.45);
+
+  --vtop-purple: #c084fc;
+
+  /* Scrollbars & Overlays */
+  --vtop-scrollbar-track: #0f172a;
+  --vtop-scrollbar-thumb: #334155;
+  --vtop-scrollbar-thumb-hover: #475569;
+  --vtop-overlay-backdrop: rgba(15, 23, 42, 0.65);
+  --vtop-overlay-modal: rgba(0, 0, 0, 0.78);
+  --vtop-muted-bg: rgba(148, 163, 184, 0.14);
+  --vtop-muted-border: rgba(148, 163, 184, 0.25);
+
+  /* Legacy --vtop-dark-* aliases for backwards compatibility */
+  --vtop-dark-bg-canvas: var(--vtop-bg-canvas);
+  --vtop-dark-bg-surface: var(--vtop-bg-surface);
+  --vtop-dark-bg-elevated: var(--vtop-bg-elevated);
+  --vtop-dark-bg-input: var(--vtop-bg-input);
+  --vtop-dark-border: var(--vtop-border);
+  --vtop-dark-border-subtle: var(--vtop-border-muted);
+  --vtop-dark-text-main: var(--vtop-text-primary);
+  --vtop-dark-text-muted: var(--vtop-text-muted);
+  --vtop-dark-text-dim: var(--vtop-text-dim);
+  --vtop-dark-accent: var(--vtop-accent);
+  --vtop-dark-accent-hover: var(--vtop-accent-hover);
+}

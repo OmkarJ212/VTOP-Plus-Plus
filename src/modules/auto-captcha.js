@@ -226,7 +226,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         font-size: 11px;
         font-weight: 600;
-        color: #059669;
+        color: var(--vtop-success);
         margin-top: 6px;
         display: flex;
         align-items: center;
@@ -239,15 +239,15 @@
     }
 
     badge.innerHTML = `
-      <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#ecfdf5; color:#10b981;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-      <span>Captcha filled: <strong style="letter-spacing:1px; color:#047857;">${solvedText}</strong></span>
+      <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--vtop-success-bg-soft); color:var(--vtop-success-bright);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      <span>Captcha filled: <strong style="letter-spacing:1px; color:var(--vtop-success-text);">${solvedText}</strong></span>
     `;
 
     // Visual input glow
     const origBorder = input.style.borderColor;
     const origBoxShadow = input.style.boxShadow;
-    input.style.borderColor = '#10b981';
-    input.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.25)';
+    input.style.borderColor = 'var(--vtop-success-bright)';
+    input.style.boxShadow = '0 0 0 3px var(--vtop-success-focus)';
     setTimeout(() => {
       input.style.borderColor = origBorder;
       input.style.boxShadow = origBoxShadow;

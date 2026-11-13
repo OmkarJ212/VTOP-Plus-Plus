@@ -4,7 +4,7 @@
 #course-data,
 #vtop-home-class-messages {
   border-radius: 0.375rem !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--vtop-border) !important;
   box-shadow: none !important;
   overflow: hidden !important;
 }
@@ -14,9 +14,9 @@
   padding: 12px 16px !important;
   gap: 10px;
   align-items: center;
-  border-bottom: 1px solid #e2e8f0 !important;
-  border-top: 3px solid #2563eb !important;
-  background-color: #f8fafc !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
 }
 
 #course-data .card-header .fontcolor3,
@@ -28,7 +28,7 @@
   border-radius: 8px !important;
   padding: 4px 10px !important;
   font-size: 0.8rem !important;
-  border: 1px solid rgba(220, 38, 38, 0.18);
+  border: 1px solid var(--vtop-danger-border);
 }
 
 #course-data .courseData.overflow-scroll,
@@ -48,7 +48,7 @@
   font-size: 0.75rem !important;
   font-weight: 600 !important;
   padding: 10px 12px !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
   white-space: nowrap;
 }
 
@@ -58,7 +58,7 @@
 #vtop-home-class-messages table.table tbody td {
   padding: 9px 12px !important;
   vertical-align: middle !important;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
   transition: background-color 0.15s ease;
 }
 
@@ -73,7 +73,7 @@
 #course-data table.table tbody tr:hover td,
 #vtop-home-class-messages table.table tbody tr:hover th,
 #vtop-home-class-messages table.table tbody tr:hover td {
-  background-color: rgba(15, 23, 42, 0.025) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 #course-data table.table tbody th[scope="row"],
@@ -100,21 +100,21 @@
 }
 
 #vtop-home-class-messages .vtop-msg-badge-muted {
-  background-color: rgba(100, 116, 139, 0.12);
-  color: #475569;
-  border: 1px solid rgba(100, 116, 139, 0.22);
+  background-color: var(--vtop-muted-bg);
+  color: var(--vtop-text-body);
+  border: 1px solid var(--vtop-muted-border);
 }
 
 #vtop-home-class-messages .vtop-msg-badge-active {
-  background-color: rgba(37, 99, 235, 0.12);
-  color: #1d4ed8;
-  border: 1px solid rgba(37, 99, 235, 0.25);
+  background-color: var(--vtop-accent-soft);
+  color: var(--vtop-accent-hover);
+  border: 1px solid var(--vtop-accent-border);
 }
 
 #vtop-home-class-messages .vtop-msg-badge-warn {
-  background-color: rgba(245, 158, 11, 0.14);
-  color: #b45309;
-  border: 1px solid rgba(245, 158, 11, 0.28);
+  background-color: var(--vtop-warn-bg-soft);
+  color: var(--vtop-warn);
+  border: 1px solid var(--vtop-warn-border);
 }
 
 #vtop-home-class-messages .vtop-msg-icon-btn {
@@ -126,17 +126,17 @@
   height: 28px;
   padding: 0;
   border-radius: 7px;
-  border: 1px solid #cbd5e1;
-  background-color: #ffffff;
-  color: #475569;
+  border: 1px solid var(--vtop-border-strong);
+  background-color: var(--vtop-bg-surface);
+  color: var(--vtop-text-body);
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 #vtop-home-class-messages .vtop-msg-icon-btn:hover {
-  background-color: #f1f5f9;
-  color: #0f172a;
-  border-color: #94a3b8;
+  background-color: var(--vtop-bg-row-hover);
+  color: var(--vtop-text-primary);
+  border-color: var(--vtop-text-dim);
 }
 
 #vtop-home-class-messages .vtop-msg-icon-btn.vtop-msg-spinning svg {
@@ -147,25 +147,25 @@
 #vtop-home-class-messages .vtop-msg-empty {
   padding: 16px;
   text-align: center;
-  color: #64748b;
+  color: var(--vtop-text-muted);
 }
 
 #vtop-home-class-messages .vtop-msg-empty-title {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--vtop-text-secondary);
   margin-bottom: 4px;
 }
 
 #vtop-home-class-messages .vtop-msg-note {
   font-size: 0.76rem;
-  color: #64748b;
+  color: var(--vtop-text-muted);
 }
 
 #vtop-home-class-messages .vtop-msg-note-footer {
   padding: 8px 14px;
-  border-top: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+  border-top: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface-alt);
 }
 
 #vtop-home-class-messages .vtop-msg-error-state {
@@ -177,8 +177,8 @@
 }
 
 #vtop-home-class-messages .vtop-msg-fallback-btn {
-  background-color: #2563eb;
-  color: #ffffff;
+  background-color: var(--vtop-accent);
+  color: var(--vtop-text-inverse);
   border: none;
   border-radius: 7px;
   padding: 4px 12px;
@@ -197,9 +197,9 @@
 #vtop-home-class-messages .expand {
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--vtop-border);
   margin-bottom: 6px;
-  background-color: #f8fafc;
+  background-color: var(--vtop-bg-surface-alt);
 }
 
 /* Dark Theme Polish for #course-data & #vtop-home-class-messages */
@@ -212,26 +212,26 @@ html.vtop-dark-theme #vtop-home-class-messages {
 
 html.vtop-dark-theme #course-data .card-header,
 html.vtop-dark-theme #vtop-home-class-messages .card-header {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   border-bottom: 1px solid var(--vtop-dark-border) !important;
   border-top: 3px solid var(--vtop-dark-accent) !important;
 }
 
 html.vtop-dark-theme #course-data .card-header .fontcolor3,
 html.vtop-dark-theme #vtop-home-class-messages .card-header .fontcolor3 {
-  color: #e2e8f0 !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 html.vtop-dark-theme #course-data .card-header .bg-warning {
-  background-color: rgba(245, 158, 11, 0.12) !important;
-  border: 1px solid rgba(248, 113, 113, 0.25) !important;
-  color: #fca5a5 !important;
+  background-color: var(--vtop-warn-bg-soft) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 html.vtop-dark-theme #course-data table.table thead th,
 html.vtop-dark-theme #vtop-home-class-messages table.table thead th {
-  background-color: #0b1322 !important;
-  color: #38bdf8 !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
   border-bottom: 1px solid var(--vtop-dark-border) !important;
 }
 
@@ -239,96 +239,96 @@ html.vtop-dark-theme #course-data table.table tbody th,
 html.vtop-dark-theme #course-data table.table tbody td,
 html.vtop-dark-theme #vtop-home-class-messages table.table tbody th,
 html.vtop-dark-theme #vtop-home-class-messages table.table tbody td {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
 }
 
 html.vtop-dark-theme #course-data table.table tbody tr:hover th,
 html.vtop-dark-theme #course-data table.table tbody tr:hover td,
 html.vtop-dark-theme #vtop-home-class-messages table.table tbody tr:hover th,
 html.vtop-dark-theme #vtop-home-class-messages table.table tbody tr:hover td {
-  background-color: rgba(56, 189, 248, 0.06) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-badge-muted {
-  background-color: rgba(148, 163, 184, 0.14) !important;
-  color: #cbd5e1 !important;
-  border-color: rgba(148, 163, 184, 0.25) !important;
+  background-color: var(--vtop-muted-bg) !important;
+  color: var(--vtop-text-body) !important;
+  border-color: var(--vtop-muted-border) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-badge-active {
-  background-color: rgba(56, 189, 248, 0.16) !important;
-  color: #7dd3fc !important;
-  border-color: rgba(56, 189, 248, 0.32) !important;
+  background-color: var(--vtop-accent-soft) !important;
+  color: var(--vtop-info-alert-text) !important;
+  border-color: var(--vtop-accent-border) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-badge-warn {
-  background-color: rgba(245, 158, 11, 0.16) !important;
-  color: #fcd34d !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
+  background-color: var(--vtop-warn-bg-soft) !important;
+  color: var(--vtop-warn-text) !important;
+  border-color: var(--vtop-warn-border) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-icon-btn {
-  background-color: #162236 !important;
+  background-color: var(--vtop-bg-elevated-alt) !important;
   border-color: var(--vtop-dark-border) !important;
-  color: #cbd5e1 !important;
+  color: var(--vtop-text-body) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-icon-btn:hover {
-  background-color: #1e293b !important;
-  border-color: #475569 !important;
-  color: #38bdf8 !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-empty-title {
-  color: #e2e8f0 !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-state,
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-note {
-  color: #94a3b8 !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-note-footer {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   border-top-color: var(--vtop-dark-border) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-fallback-btn {
-  background-color: #0284c7 !important;
-  color: #ffffff !important;
+  background-color: var(--vtop-accent-hover) !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 html.vtop-dark-theme #vtop-home-class-messages .expand {
-  background-color: #0f172a !important;
+  background-color: var(--vtop-bg-input) !important;
   border-color: var(--vtop-dark-border) !important;
 }
 
 html.vtop-dark-theme #course-data td:nth-child(2) .fw-bold {
-  color: #f8fafc !important;
+  color: var(--vtop-text-heading) !important;
 }
 
 html.vtop-dark-theme #course-data td:nth-child(2) .text-dark:not(.fw-bold) {
-  color: #cbd5e1 !important;
+  color: var(--vtop-text-body) !important;
 }
 
 html.vtop-dark-theme #course-data .text-primary {
-  color: #60a5fa !important;
+  color: var(--vtop-accent-light) !important;
 }
 
 html.vtop-dark-theme #course-data .text-success {
-  color: #4ade80 !important;
+  color: var(--vtop-success-bright) !important;
 }
 
 html.vtop-dark-theme #course-data .text-warning {
-  color: #fbbf24 !important;
+  color: var(--vtop-warn-bright) !important;
 }
 
 html.vtop-dark-theme #course-data .text-danger {
-  color: #f87171 !important;
+  color: var(--vtop-danger-bright) !important;
 }
 
 html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
-  color: #fb923c !important;
+  color: var(--vtop-warn-orange) !important;
 }
 
 /* Hide Action Plan - Academic Performance card immediately to prevent paint flash */
@@ -344,10 +344,10 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
   height: 100%;
   margin-bottom: 0 !important;
   border-radius: 0.375rem !important;
-  border: 1px solid #e2e8f0 !important;
-  border-top: 3px solid #2563eb !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
   box-shadow: none !important;
-  background-color: #ffffff !important;
+  background-color: var(--vtop-bg-surface) !important;
   overflow: hidden !important;
 }
 
@@ -364,8 +364,8 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 
 .card:has(> #events-info-content) > h5.card-title.fontcolor3,
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
-  background-color: #f8fafc !important;
-  color: #1e293b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
   font-size: 0.95rem !important;
   line-height: 1.5 !important;
   padding: 12px 16px !important;
@@ -375,13 +375,13 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 
 .card:has(> #events-info-content) > h5.card-title.fontcolor3 {
   border: none !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
   border-radius: 0 !important;
 }
 
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
-  border: 1px solid #e2e8f0 !important;
-  border-top: 3px solid #2563eb !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
   border-radius: 0.375rem 0.375rem 0 0 !important;
 }
 
@@ -394,8 +394,8 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
   flex: 1 1 auto;
   align-content: flex-start;
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border: 1px solid var(--vtop-border) !important;
   border-top: none !important;
   border-radius: 0 0 0.375rem 0.375rem !important;
   box-shadow: none !important;
@@ -406,10 +406,10 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 
 #events-info-content > .card,
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card {
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--vtop-border) !important;
   border-radius: 0.375rem !important;
   box-shadow: none !important;
-  background-color: #ffffff !important;
+  background-color: var(--vtop-bg-surface) !important;
   overflow: hidden;
 }
 
@@ -423,11 +423,11 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 }
 
 #events-info-content .card-title.fontcolor5 {
-  color: #2563eb !important;
+  color: var(--vtop-accent) !important;
   font-size: 0.85rem !important;
   margin-bottom: 0.6rem !important;
   padding-bottom: 0.4rem !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
 }
 
 #events-info-content .col-2,
@@ -439,17 +439,17 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-right: 1px solid #e2e8f0 !important;
+  border-right: 1px solid var(--vtop-border) !important;
   padding-right: 0.5rem !important;
 }
 
 #events-info-content .col-2 .fontcolor3 {
-  color: #0f172a !important;
+  color: var(--vtop-text-primary) !important;
   margin-bottom: 0.1rem !important;
 }
 
 #events-info-content .col-2 .subtitle {
-  color: #64748b !important;
+  color: var(--vtop-text-muted) !important;
   font-size: 0.72rem !important;
 }
 
@@ -463,7 +463,7 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
   border: none !important;
   box-shadow: none !important;
   background-color: transparent !important;
-  color: #64748b !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col {
@@ -473,19 +473,19 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-header {
   padding: 0.5rem 0.75rem !important;
-  background-color: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
 }
 
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-body {
   padding: 0.25rem 0.5rem !important;
-  background-color: #ffffff !important;
+  background-color: var(--vtop-bg-surface) !important;
 }
 
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background,
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background .list-group-item {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
 }
 
 /* Dashboard Sidebar Cards (PROCTOR Message, CGPA & Credits, Forthcoming DA, Last Five Feedbacks) */
@@ -493,9 +493,9 @@ div:has(> .card > #last-five-feedbacks) > .card {
   margin-top: 0 !important;
   margin-bottom: 1rem !important;
   border-radius: 0.375rem !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--vtop-border) !important;
   box-shadow: none !important;
-  background-color: #ffffff !important;
+  background-color: var(--vtop-bg-surface) !important;
   overflow: hidden !important;
 }
 
@@ -505,13 +505,13 @@ div:has(> .card > #last-five-feedbacks) > .card:last-child {
 
 div:has(> .card > #last-five-feedbacks) > .card > .card-header {
   padding: 12px 16px !important;
-  background-color: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  border-top: 3px solid #2563eb !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
 }
 
 div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
-  color: #1e293b !important;
+  color: var(--vtop-text-heading) !important;
   font-size: 0.95rem !important;
   line-height: 1.5 !important;
 }
@@ -527,7 +527,7 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
   padding: 0.45rem 0 !important;
   gap: 0.75rem;
   background-color: transparent !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
 }
 
 #edu-status .list-group-item:first-child {
@@ -540,7 +540,7 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
 }
 
 #edu-status .list-group-item .card-title.fontcolor1 {
-  color: #1e293b !important;
+  color: var(--vtop-text-heading) !important;
   font-size: 0.9rem !important;
   font-weight: 600 !important;
 }
@@ -549,17 +549,17 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
   border-radius: 6px !important;
   padding: 0.25rem 0.5rem !important;
   font-variant-numeric: tabular-nums;
-  color: #0f172a !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 #edu-status .list-group-item > .fontcolor3 span {
-  color: #0f172a !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 #edu-status table.table {
   margin-top: 0.75rem !important;
   margin-bottom: 0 !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--vtop-border) !important;
   border-radius: 8px !important;
   overflow: hidden;
   border-collapse: separate !important;
@@ -567,10 +567,10 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
 }
 
 #edu-status table.table th {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
   border-bottom: none !important;
-  border-right: 1px solid #e2e8f0 !important;
+  border-right: 1px solid var(--vtop-border) !important;
   padding: 0.45rem 0.65rem !important;
   font-size: 0.82rem !important;
   white-space: nowrap;
@@ -583,13 +583,13 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
 }
 
 #edu-status table.table td.bg-success {
-  background-color: rgba(22, 163, 74, 0.14) !important;
-  color: #166534 !important;
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
 }
 
 #edu-status table.table td.bg-danger {
-  background-color: rgba(220, 38, 38, 0.14) !important;
-  color: #991b1b !important;
+  background-color: var(--vtop-danger-bg) !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 /* Forthcoming Digital Assignments & Last Five Feedbacks flush table cards */
@@ -610,9 +610,9 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
   font-size: 0.75rem !important;
   font-weight: 600 !important;
   padding: 10px 12px !important;
-  background-color: #f8fafc !important;
-  color: #475569 !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-body) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
   white-space: nowrap;
 }
 
@@ -622,7 +622,7 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
 #last-five-feedbacks table.table tbody td {
   padding: 9px 12px !important;
   vertical-align: middle !important;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
 }
 
 #digital-assignments table.table tbody tr:last-child th,
@@ -636,7 +636,7 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
 #digital-assignments table.table tbody tr:hover td,
 #last-five-feedbacks table.table tbody tr:hover th,
 #last-five-feedbacks table.table tbody tr:hover td {
-  background-color: rgba(15, 23, 42, 0.025) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 /* Dark Theme Overrides for Events, Spotlight & Sidebar Cards */
@@ -649,8 +649,8 @@ html.vtop-dark-theme .col-12.col-md-6:has(> .card > #events-info-content) > .car
 
 html.vtop-dark-theme .card:has(> #events-info-content) > h5.card-title.fontcolor3,
 html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
-  background-color: #0f192b !important;
-  color: #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 html.vtop-dark-theme .card:has(> #events-info-content) > h5.card-title.fontcolor3 {
@@ -684,7 +684,7 @@ html.vtop-dark-theme #events-info-content .col-2 {
 }
 
 html.vtop-dark-theme #events-info-content .col-2 .fontcolor3 {
-  color: #f8fafc !important;
+  color: var(--vtop-text-heading) !important;
 }
 
 html.vtop-dark-theme #events-info-content .col-2 .subtitle,
@@ -693,7 +693,7 @@ html.vtop-dark-theme #events-info-content .col-10 > .card-body {
 }
 
 html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-header {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
 }
 
@@ -711,13 +711,13 @@ html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card {
 }
 
 html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card > .card-header {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
   border-top-color: var(--vtop-dark-accent) !important;
 }
 
 html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
-  color: #e2e8f0 !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 html.vtop-dark-theme #edu-status .list-group-item {
@@ -725,12 +725,12 @@ html.vtop-dark-theme #edu-status .list-group-item {
 }
 
 html.vtop-dark-theme #edu-status .list-group-item .card-title.fontcolor1 {
-  color: #e2e8f0 !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 html.vtop-dark-theme #edu-status .list-group-item > .fontcolor3,
 html.vtop-dark-theme #edu-status .list-group-item > .fontcolor3 span {
-  color: #f8fafc !important;
+  color: var(--vtop-text-heading) !important;
 }
 
 html.vtop-dark-theme #edu-status table.table {
@@ -738,25 +738,25 @@ html.vtop-dark-theme #edu-status table.table {
 }
 
 html.vtop-dark-theme #edu-status table.table th {
-  background-color: #0b1322 !important;
-  color: #38bdf8 !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
   border-right-color: var(--vtop-dark-border) !important;
 }
 
 html.vtop-dark-theme #edu-status table.table td.bg-success {
-  background-color: rgba(22, 163, 74, 0.16) !important;
-  color: #86efac !important;
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
 }
 
 html.vtop-dark-theme #edu-status table.table td.bg-danger {
-  background-color: rgba(220, 38, 38, 0.16) !important;
-  color: #fca5a5 !important;
+  background-color: var(--vtop-danger-bg) !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 html.vtop-dark-theme #digital-assignments table.table thead th,
 html.vtop-dark-theme #last-five-feedbacks table.table thead th {
-  background-color: #0b1322 !important;
-  color: #38bdf8 !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
 }
 
@@ -764,33 +764,33 @@ html.vtop-dark-theme #digital-assignments table.table tbody th,
 html.vtop-dark-theme #digital-assignments table.table tbody td,
 html.vtop-dark-theme #last-five-feedbacks table.table tbody th,
 html.vtop-dark-theme #last-five-feedbacks table.table tbody td {
-  border-bottom-color: rgba(148, 163, 184, 0.1) !important;
+  border-bottom-color: var(--vtop-border-subtle) !important;
 }
 
 html.vtop-dark-theme #digital-assignments table.table tbody tr:hover th,
 html.vtop-dark-theme #digital-assignments table.table tbody tr:hover td,
 html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover th,
 html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover td {
-  background-color: rgba(56, 189, 248, 0.06) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 html.vtop-dark-theme #last-five-feedbacks table.table td.text-primary {
-  color: #60a5fa !important;
+  color: var(--vtop-accent-light) !important;
 }
 
 /* Standardize hardcoded #f2dede empty-state alert banner (e.g. Class Messages page) */
 [style*="#f2dede" i],
 [style*="242, 222, 222"] {
   border-radius: 10px !important;
-  border: 1px solid rgba(220, 38, 38, 0.2) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
   padding: 16px !important;
 }
 
 html.vtop-dark-theme [style*="#f2dede" i],
 html.vtop-dark-theme [style*="242, 222, 222"] {
-  background-color: rgba(239, 68, 68, 0.14) !important;
-  border-color: rgba(248, 113, 113, 0.3) !important;
-  color: #fca5a5 !important;
+  background-color: var(--vtop-danger-bg-soft) !important;
+  border-color: var(--vtop-danger-border) !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 [style*="#f2dede" i] h3,
@@ -802,7 +802,7 @@ html.vtop-dark-theme [style*="242, 222, 222"] {
 
 html.vtop-dark-theme [style*="#f2dede" i] h3,
 html.vtop-dark-theme [style*="242, 222, 222"] h3 {
-  color: #fca5a5 !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 .box-info .box-body > h4[style*="green" i] {
@@ -811,11 +811,11 @@ html.vtop-dark-theme [style*="242, 222, 222"] h3 {
 }
 
 html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] {
-  color: #4ade80 !important;
+  color: var(--vtop-success-bright) !important;
 }
 
 html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] span[style*="red" i] {
-  color: #f87171 !important;
+  color: var(--vtop-danger-bright) !important;
 }
 
 /* Fix Bootstrap .card > .card-header.row negative margins spilling header/title outside .card box */
@@ -969,25 +969,25 @@ html:not(.vtop-dark-theme) *::-webkit-scrollbar {
 
 html:not(.vtop-dark-theme)::-webkit-scrollbar-track,
 html:not(.vtop-dark-theme) *::-webkit-scrollbar-track {
-  background: #f1f5f9 !important;
+  background: var(--vtop-scrollbar-track) !important;
   border-radius: 6px !important;
 }
 
 html:not(.vtop-dark-theme)::-webkit-scrollbar-thumb,
 html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb {
-  background: #cbd5e1 !important;
+  background: var(--vtop-scrollbar-thumb) !important;
   border-radius: 6px !important;
-  border: 2px solid #f1f5f9 !important;
+  border: 2px solid var(--vtop-scrollbar-track) !important;
 }
 
 html:not(.vtop-dark-theme)::-webkit-scrollbar-thumb:hover,
 html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8 !important;
+  background: var(--vtop-scrollbar-thumb-hover) !important;
 }
 
 html:not(.vtop-dark-theme)::-webkit-scrollbar-corner,
 html:not(.vtop-dark-theme) *::-webkit-scrollbar-corner {
-  background: #f1f5f9 !important;
+  background: var(--vtop-scrollbar-track) !important;
 }
 
 /* My Curriculum Page (#studentWiseCurriculum) */
@@ -997,20 +997,20 @@ html:not(.vtop-dark-theme) *::-webkit-scrollbar-corner {
 
 .card:has(#studentWiseCurriculum) > .card-header {
   padding: 12px 16px !important;
-  border-top: 3px solid #2563eb !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  background-color: #f8fafc !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
 }
 
 .card:has(#studentWiseCurriculum) > .card-header h3 {
   margin: 0 !important;
   font-size: 1.05rem !important;
   font-weight: 600 !important;
-  color: #1e293b !important;
+  color: var(--vtop-text-heading) !important;
 }
 
 html.vtop-dark-theme .card:has(#studentWiseCurriculum) > .card-header {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
   border-top-color: var(--vtop-dark-accent) !important;
 }
@@ -1022,7 +1022,7 @@ html.vtop-dark-theme .card:has(#studentWiseCurriculum) > .card-header h3 {
 #studentWiseCurriculum .fs-5 {
   font-size: 0.95rem !important;
   line-height: 1.6;
-  color: #1e293b;
+  color: var(--vtop-text-heading);
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .fs-5 {
@@ -1037,7 +1037,7 @@ html.vtop-dark-theme #studentWiseCurriculum .fs-5 {
   border-radius: 0.375rem !important;
   overflow: hidden !important;
   margin-bottom: 0 !important;
-  background-color: #ffffff !important;
+  background-color: var(--vtop-bg-surface) !important;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
@@ -1046,7 +1046,7 @@ html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card {
 }
 
 #studentWiseCurriculum .card.categoty-card:hover {
-  border-color: #94a3b8 !important;
+  border-color: var(--vtop-text-dim) !important;
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card:hover {
@@ -1076,28 +1076,28 @@ html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card:hover {
   font-size: 0.8rem !important;
   font-weight: 600 !important;
   font-variant-numeric: tabular-nums;
-  border-right: 1px solid #e2e8f0 !important;
+  border-right: 1px solid var(--vtop-border) !important;
 }
 
 #studentWiseCurriculum .card.categoty-card .symbol-label.bg-info {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 #studentWiseCurriculum .card.categoty-card .symbol-label.bg-info small.text-muted {
-  color: #64748b !important;
+  color: var(--vtop-text-muted) !important;
   font-weight: 500;
 }
 
 #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success {
-  background-color: rgba(22, 163, 74, 0.12) !important;
-  color: #166534 !important;
-  border-right-color: rgba(22, 163, 74, 0.25) !important;
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
+  border-right-color: var(--vtop-success-border-soft) !important;
 }
 
 #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small,
 #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small.text-white {
-  color: #15803d !important;
+  color: var(--vtop-success) !important;
   font-weight: 500;
 }
 
@@ -1106,30 +1106,30 @@ html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label {
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-info {
-  background-color: #0f192b !important;
-  color: #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-info small.text-muted {
-  color: #94a3b8 !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success {
-  background-color: rgba(22, 163, 74, 0.18) !important;
-  color: #86efac !important;
-  border-right-color: rgba(74, 222, 128, 0.3) !important;
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
+  border-right-color: var(--vtop-success-border-soft) !important;
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small,
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small.text-white {
-  color: #86efac !important;
+  color: var(--vtop-success-text) !important;
 }
 
 #studentWiseCurriculum .card.categoty-card .col-6 {
   padding: 10px 12px !important;
   font-size: 0.875rem !important;
   font-weight: 500;
-  color: #1e293b;
+  color: var(--vtop-text-heading);
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .col-6 {
@@ -1148,7 +1148,7 @@ html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .col-6 {
   background: transparent !important;
   border: none !important;
   padding: 4px !important;
-  color: #64748b !important;
+  color: var(--vtop-text-muted) !important;
   box-shadow: none !important;
   display: inline-flex;
   align-items: center;
@@ -1161,15 +1161,15 @@ html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .col-6 {
 }
 
 html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .icon-button {
-  color: #94a3b8 !important;
+  color: var(--vtop-text-dim) !important;
 }
 
 #curriculumCategoryView table.table thead th {
   font-size: 0.78rem !important;
   font-weight: 600 !important;
-  background-color: #f8fafc !important;
-  color: #475569 !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-body) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
 }
 
 #curriculumCategoryView table.table tbody td {
@@ -1178,7 +1178,7 @@ html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .icon-button {
 }
 
 html.vtop-dark-theme #curriculumCategoryView table.table thead th {
-  background-color: #0b1322 !important;
+  background-color: var(--vtop-bg-table-head) !important;
   color: var(--vtop-dark-accent) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
 }
@@ -1193,12 +1193,12 @@ html.vtop-dark-theme #curriculumCategoryView .basket-option label {
 
 #curriculumCategoryView .card.card-tabs > .card-header {
   padding: 0 !important;
-  background-color: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView .card.card-tabs > .card-header {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
 }
 
@@ -1215,20 +1215,20 @@ html.vtop-dark-theme #curriculumCategoryView .card.card-tabs > .card-header {
   padding: 8px 14px !important;
   font-size: 0.85rem !important;
   font-weight: 500 !important;
-  color: #64748b !important;
+  color: var(--vtop-text-muted) !important;
   background-color: transparent !important;
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
 #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link:hover {
-  color: #0f172a !important;
-  background-color: rgba(15, 23, 42, 0.04) !important;
+  color: var(--vtop-text-primary) !important;
+  background-color: var(--vtop-tab-hover-bg) !important;
 }
 
 #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link.active {
-  color: #0f172a !important;
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
+  color: var(--vtop-text-primary) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link {
@@ -1236,8 +1236,8 @@ html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link
 }
 
 html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link:hover {
-  color: #f8fafc !important;
-  background-color: rgba(56, 189, 248, 0.08) !important;
+  color: var(--vtop-text-heading) !important;
+  background-color: var(--vtop-tab-hover-bg) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link.active {
@@ -1251,7 +1251,7 @@ html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link
 }
 
 html.vtop-dark-theme #curriculumCategoryView .text-success {
-  color: #4ade80 !important;
+  color: var(--vtop-success-bright) !important;
 }
 
 #curriculumCategoryView .dataTables_wrapper > .row:first-child {
@@ -1265,7 +1265,7 @@ html.vtop-dark-theme #curriculumCategoryView .text-success {
   align-items: center;
   gap: 6px;
   font-size: 0.82rem;
-  color: #475569;
+  color: var(--vtop-text-body);
   margin: 0;
 }
 
@@ -1276,7 +1276,7 @@ html.vtop-dark-theme #curriculumCategoryView .dataTables_filter label {
 
 #curriculumCategoryView thead.bg-gradient-light {
   background-image: none !important;
-  background-color: #f8fafc !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView .table-responsive,
@@ -1286,12 +1286,12 @@ html.vtop-dark-theme #curriculumCategoryView table.table {
 }
 
 html.vtop-dark-theme #curriculumCategoryView thead.bg-gradient-light {
-  background-color: #0b1322 !important;
+  background-color: var(--vtop-bg-table-head) !important;
 }
 
 #curriculumCategoryView table.table tbody td {
   padding: 9px 12px !important;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:nth-of-type(even) td {
@@ -1299,15 +1299,15 @@ html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:nth-of-type(ev
 }
 
 html.vtop-dark-theme #curriculumCategoryView table.table tbody td {
-  border-bottom-color: rgba(148, 163, 184, 0.1) !important;
+  border-bottom-color: var(--vtop-border-subtle) !important;
 }
 
 #curriculumCategoryView table.table tbody tr:hover td {
-  background-color: rgba(15, 23, 42, 0.025) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:hover td {
-  background-color: rgba(56, 189, 248, 0.06) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 #curriculumCategoryView td:has(button[name="courseSyllabusDwnld"]) {
@@ -1320,7 +1320,7 @@ html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:hover td {
   border: none !important;
   padding: 2px 4px !important;
   margin-left: 8px;
-  color: #2563eb !important;
+  color: var(--vtop-accent) !important;
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
@@ -1329,7 +1329,7 @@ html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:hover td {
 }
 
 #curriculumCategoryView button[name="courseSyllabusDwnld"]:hover {
-  color: #1d4ed8 !important;
+  color: var(--vtop-accent-hover) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"] {
@@ -1337,23 +1337,23 @@ html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"] 
 }
 
 html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"]:hover {
-  color: #7dd3fc !important;
+  color: var(--vtop-info-alert-text) !important;
 }
 
 /* Bootstrap Toasts (e.g. #quickLinkMsg) */
 .toast {
-  background-color: #ffffff !important;
-  color: #1e293b !important;
-  border: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-heading) !important;
+  border: 1px solid var(--vtop-border) !important;
   border-radius: 0.375rem !important;
   box-shadow: none !important;
   overflow: hidden;
 }
 
 .toast .toast-header {
-  background-color: #f8fafc !important;
-  color: #1e293b !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
   padding: 8px 12px !important;
   font-size: 0.85rem;
 }
@@ -1388,7 +1388,7 @@ html.vtop-dark-theme .toast {
 }
 
 html.vtop-dark-theme .toast .toast-header {
-  background-color: #0f192b !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
   color: var(--vtop-dark-text-main) !important;
   border-bottom-color: var(--vtop-dark-border) !important;
 }
@@ -1412,13 +1412,13 @@ html.vtop-dark-theme .toast .toast-body {
 }
 
 html.vtop-dark-theme .toast .toast-body .text-success {
-  color: #4ade80 !important;
+  color: var(--vtop-success-bright) !important;
 }
 
 html.vtop-dark-theme .toast .toast-body .text-danger {
-  color: #f87171 !important;
+  color: var(--vtop-danger-bright) !important;
 }
 
 html.vtop-dark-theme .toast .toast-body .text-warning {
-  color: #fbbf24 !important;
+  color: var(--vtop-warn-bright) !important;
 }
