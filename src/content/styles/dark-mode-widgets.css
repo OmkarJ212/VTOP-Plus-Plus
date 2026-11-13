@@ -26,22 +26,22 @@ html.vtop-dark-theme #vtop-table-filter-search::placeholder {
 
 html.vtop-dark-theme .vtop-filter-input:focus,
 html.vtop-dark-theme #vtop-table-filter-search:focus {
-  border-color: var(--vtop-dark-accent) !important;
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+  border-color: var(--vtop-accent) !important;
+  box-shadow: 0 0 0 2px var(--vtop-accent-focus) !important;
 }
 
 html.vtop-dark-theme .vtop-filter-btn,
 html.vtop-dark-theme #vtop-table-filter-reset {
-  background-color: var(--vtop-dark-bg-elevated) !important;
-  border-color: var(--vtop-dark-border) !important;
-  color: var(--vtop-dark-text-main) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .vtop-filter-btn:hover,
 html.vtop-dark-theme #vtop-table-filter-reset:hover {
-  background-color: #334155 !important;
-  color: #ffffff !important;
-  border-color: var(--vtop-dark-accent) !important;
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+  border-color: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme .vtop-filter-icon {
@@ -110,38 +110,38 @@ html.vtop-dark-theme .vtop-fat-target-val {
 }
 
 html.vtop-dark-theme .vtop-fat-val-safe {
-  color: #4ade80 !important;
+  color: var(--vtop-success-bright) !important;
 }
 
 html.vtop-dark-theme .vtop-fat-val-warn {
-  color: #fbbf24 !important;
+  color: var(--vtop-warn-bright) !important;
 }
 
 html.vtop-dark-theme .vtop-fat-val-muted {
-  color: var(--vtop-dark-text-muted) !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 /* 4. Floating Materials Downloader Panel */
 html.vtop-dark-theme .vtop-plus-panel {
-  background: var(--vtop-dark-bg-surface) !important;
-  border-color: var(--vtop-dark-border) !important;
-  color: var(--vtop-dark-text-main) !important;
+  background: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
   box-shadow: none !important;
 }
 
 html.vtop-dark-theme #vtop-zip-panel,
 html.vtop-dark-theme .vtop-panel-body {
-  background: #0f172a !important;
-  background-color: #0f172a !important;
+  background: var(--vtop-bg-input) !important;
+  background-color: var(--vtop-bg-input) !important;
 }
 
 html.vtop-dark-theme .vtop-panel-header {
-  background: #0f192b !important;
-  border-bottom: 1px solid var(--vtop-dark-border) !important;
+  background: var(--vtop-brand) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
 }
 
 html.vtop-dark-theme .vtop-panel-title {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 html.vtop-dark-theme .vtop-form-label {
@@ -165,109 +165,109 @@ html.vtop-dark-theme .vtop-progress-bar-bg {
 }
 
 html.vtop-dark-theme .vtop-status-msg {
-  background: rgba(39, 174, 96, 0.15) !important;
-  color: #4ade80 !important;
+  background: var(--vtop-success-bg-soft) !important;
+  color: var(--vtop-success-bright) !important;
 }
 
 /* 5. Command Palette Modal (Ctrl+K) */
 html.vtop-dark-theme .vtop-palette-dialog {
-  background: var(--vtop-dark-bg-surface) !important;
-  border-color: var(--vtop-dark-border) !important;
+  background: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
   box-shadow: none !important;
 }
 
 html.vtop-dark-theme .vtop-palette-header {
-  border-bottom-color: var(--vtop-dark-border) !important;
+  border-bottom-color: var(--vtop-border) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-input {
-  color: #f1f5f9 !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-input::placeholder {
-  color: #64748b !important;
+  color: var(--vtop-text-dim) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-esc {
-  background: var(--vtop-dark-bg-elevated) !important;
-  border-color: var(--vtop-dark-border) !important;
-  color: var(--vtop-dark-text-muted) !important;
+  background: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-list::-webkit-scrollbar-thumb {
-  background: #334155 !important;
+  background: var(--vtop-scrollbar-thumb) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-item:hover,
 html.vtop-dark-theme .vtop-palette-item.selected {
-  background: var(--vtop-dark-bg-elevated) !important;
-  border-left-color: var(--vtop-dark-accent) !important;
+  background: var(--vtop-bg-elevated) !important;
+  border-left-color: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-item-title {
-  color: #f1f5f9 !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-item-sub {
-  color: #94a3b8 !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 html.vtop-dark-theme .vtop-match {
-  background: rgba(56, 189, 248, 0.25) !important;
-  color: #38bdf8 !important;
+  background: var(--vtop-accent-focus) !important;
+  color: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-footer {
-  background: #0f172a !important;
-  border-top-color: var(--vtop-dark-border) !important;
-  color: #94a3b8 !important;
+  background: var(--vtop-bg-input) !important;
+  border-top-color: var(--vtop-border) !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-hint kbd {
-  background: var(--vtop-dark-bg-elevated) !important;
-  border-color: var(--vtop-dark-border) !important;
-  color: #f1f5f9 !important;
+  background: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-item-action {
-  background: rgba(2, 132, 199, 0.25) !important;
-  color: #38bdf8 !important;
+  background: var(--vtop-accent-tint-bg) !important;
+  color: var(--vtop-accent) !important;
 }
 
 /* 6. Attendance & Urgent Banner Overrides */
 html.vtop-dark-theme .vtop-debarment-warning {
-  background: rgba(245, 158, 11, 0.15) !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
-  color: #fbbf24 !important;
+  background: var(--vtop-warn-bg) !important;
+  border-color: var(--vtop-warn-border) !important;
+  color: var(--vtop-warn-bright) !important;
 }
 
 html.vtop-dark-theme .vtop-da-urgent-row > td:first-child {
-  border-left-color: #f87171 !important;
+  border-left-color: var(--vtop-danger-bright) !important;
 }
 
 html.vtop-dark-theme .vtop-da-badge-purple {
-  color: #c084fc !important;
+  color: var(--vtop-purple) !important;
 }
 html.vtop-dark-theme .vtop-da-badge-red {
-  color: #f87171 !important;
+  color: var(--vtop-danger-bright) !important;
 }
 html.vtop-dark-theme .vtop-da-badge-green {
-  color: #86efac !important;
+  color: var(--vtop-success-text) !important;
 }
 html.vtop-dark-theme .vtop-da-badge-loading {
-  color: var(--vtop-dark-text-muted) !important;
+  color: var(--vtop-text-muted) !important;
 }
 html.vtop-dark-theme .vtop-badge-safe {
-  color: #86efac !important;
+  color: var(--vtop-success-text) !important;
 }
 html.vtop-dark-theme .vtop-badge-warn {
-  color: #fbbf24 !important;
+  color: var(--vtop-warn-bright) !important;
 }
 html.vtop-dark-theme .vtop-badge-danger {
-  color: #f87171 !important;
+  color: var(--vtop-danger-bright) !important;
 }
 html.vtop-dark-theme .vtop-bunk-meta {
-  color: var(--vtop-dark-text-muted) !important;
+  color: var(--vtop-text-muted) !important;
 }
 
 /* 8. Universal Dark Mode Scrollbars & Range Sliders */
@@ -289,29 +289,29 @@ html.vtop-dark-theme *::-webkit-scrollbar {
 
 html.vtop-dark-theme::-webkit-scrollbar-track,
 html.vtop-dark-theme *::-webkit-scrollbar-track {
-  background: #0f172a !important;
+  background: var(--vtop-scrollbar-track) !important;
   border-radius: 6px !important;
 }
 
 html.vtop-dark-theme::-webkit-scrollbar-thumb,
 html.vtop-dark-theme *::-webkit-scrollbar-thumb {
-  background: #334155 !important;
+  background: var(--vtop-scrollbar-thumb) !important;
   border-radius: 6px !important;
-  border: 2px solid #0f172a !important;
+  border: 2px solid var(--vtop-scrollbar-track) !important;
 }
 
 html.vtop-dark-theme::-webkit-scrollbar-thumb:hover,
 html.vtop-dark-theme *::-webkit-scrollbar-thumb:hover {
-  background: #475569 !important;
+  background: var(--vtop-scrollbar-thumb-hover) !important;
 }
 
 html.vtop-dark-theme::-webkit-scrollbar-corner,
 html.vtop-dark-theme *::-webkit-scrollbar-corner {
-  background: #0f172a !important;
+  background: var(--vtop-scrollbar-track) !important;
 }
 
 html.vtop-dark-theme input[type="range"] {
-  accent-color: #38bdf8 !important;
+  accent-color: var(--vtop-accent) !important;
   color-scheme: dark !important;
   background: transparent !important;
   border: none !important;

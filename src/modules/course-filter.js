@@ -271,24 +271,16 @@
         sib.style.display = 'none';
       }
 
-      const isDark = document.documentElement.classList.contains('vtop-dark-theme');
-      const boxBg = isDark ? '#131c2e' : '#ffffff';
-      const boxBorder = isDark ? '#293548' : '#cbd5e1';
-      const selBg = isDark ? '#0f172a' : '#fff';
-      const selBorder = isDark ? '#293548' : '#cbd5e1';
-      const textColor = isDark ? '#f8fafc' : '#0f172a';
-      const lblColor = isDark ? '#94a3b8' : '#334155';
-
       const box = document.createElement('div');
       box.id = UI_ID;
       box.className = 'vtop-plus-course-filter-panel';
       box.style.cssText =
         'display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding:16px;' +
-        `background:${boxBg};border:1px solid ${boxBorder};border-radius:0.375rem;margin:12px 0 16px;width:100%;` +
+        'background:var(--vtop-bg-surface);border:1px solid var(--vtop-border-strong);border-radius:0.375rem;margin:12px 0 16px;width:100%;' +
         'box-sizing:border-box;box-shadow:none;font-family:inherit;';
 
-      const selCss = `width:100%;height:38px;padding:6px 12px;border:1px solid ${selBorder};border-radius:6px;background:${selBg};font-size:13px;color:${textColor};`;
-      const lblCss = `font-weight:700;font-size:12px;color:${lblColor};margin-bottom:6px;display:block;`;
+      const selCss = 'width:100%;height:38px;padding:6px 12px;border:1px solid var(--vtop-border-strong);border-radius:6px;background:var(--vtop-bg-input);font-size:13px;color:var(--vtop-text-primary);';
+      const lblCss = 'font-weight:700;font-size:12px;color:var(--vtop-text-secondary);margin-bottom:6px;display:block;';
 
       box.innerHTML = `
         <div style="display:flex;flex-direction:column;justify-content:flex-end;">
@@ -310,7 +302,7 @@
           </select>
         </div>
         <div id="vtop-busy" style="display:none;grid-column:1/-1;height:3px;border-radius:2px;
-          background:linear-gradient(90deg,transparent,#27ae60,transparent);background-size:40% 100%;
+          background:linear-gradient(90deg,transparent,var(--vtop-success-bright),transparent);background-size:40% 100%;
           background-repeat:no-repeat;animation:vtopSlide 1s linear infinite;"></div>
         <style>@keyframes vtopSlide{0%{background-position:-40% 0}100%{background-position:140% 0}}</style>
       `;
@@ -517,28 +509,15 @@
       container.id = TABLE_BAR_ID;
       container.className = 'vtop-plus-filter-container';
 
-      const isDark = document.documentElement.classList.contains('vtop-dark-theme') ||
-                     document.body?.classList.contains('vtop-dark-theme') ||
-                     window.VTOP_PLUS?.DarkMode?.isActive;
-
-      const barBg = isDark ? '#131c2e' : '#ffffff';
-      const barBorder = isDark ? '#293548' : '#e2e8f0';
-      const inBg = isDark ? '#0f172a' : '#ffffff';
-      const inBorder = isDark ? '#293548' : '#cbd5e1';
-      const inColor = isDark ? '#f1f5f9' : '#0f172a';
-      const btnBg = isDark ? '#1e293b' : '#f1f5f9';
-      const btnBorder = isDark ? '#293548' : '#cbd5e1';
-      const btnColor = isDark ? '#f1f5f9' : '#475569';
-
-      container.style.cssText = `display:block;width:100%;box-sizing:border-box;background:${barBg} !important;background-color:${barBg} !important;border:1px solid ${barBorder} !important;border-radius:10px;padding:12px 16px;margin-bottom:12px;box-shadow:none !important;`;
+      container.style.cssText = 'display:block;width:100%;box-sizing:border-box;background:var(--vtop-bg-surface) !important;background-color:var(--vtop-bg-surface) !important;border:1px solid var(--vtop-border) !important;border-radius:10px;padding:12px 16px;margin-bottom:12px;box-shadow:none !important;';
 
       container.innerHTML = `
         <div class="vtop-filter-row" style="display:flex;align-items:center;gap:12px;width:100%;">
           <div class="vtop-filter-group" style="flex:1;display:flex;align-items:center;gap:8px;">
-            <span class="vtop-filter-icon" style="display:inline-flex;align-items:center;color:${isDark ? '#94a3b8' : '#64748b'};"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Quick filter by topic, module, keyword..." style="width:100%;padding:8px 12px;border:1px solid ${inBorder} !important;border-radius:6px;font-size:13px;outline:none;background:${inBg} !important;background-color:${inBg} !important;color:${inColor} !important;box-sizing:border-box;" />
+            <span class="vtop-filter-icon" style="display:inline-flex;align-items:center;color:var(--vtop-text-muted);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Quick filter by topic, module, keyword..." style="width:100%;padding:8px 12px;border:1px solid var(--vtop-border-strong) !important;border-radius:6px;font-size:13px;outline:none;background:var(--vtop-bg-input) !important;background-color:var(--vtop-bg-input) !important;color:var(--vtop-text-primary) !important;box-sizing:border-box;" />
           </div>
-          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters" style="background:${btnBg} !important;background-color:${btnBg} !important;border:1px solid ${btnBorder} !important;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:${btnColor} !important;white-space:nowrap;">Clear</button>
+          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters" style="background:var(--vtop-bg-row-hover) !important;background-color:var(--vtop-bg-row-hover) !important;border:1px solid var(--vtop-border-strong) !important;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--vtop-text-body) !important;white-space:nowrap;">Clear</button>
         </div>
       `;
 
@@ -668,44 +647,8 @@
       }
     },
 
-    syncTheme(isDark) {
-      const container = document.getElementById(TABLE_BAR_ID);
-      if (container) {
-        const barBg = isDark ? '#131c2e' : '#ffffff';
-        const barBorder = isDark ? '#293548' : '#e2e8f0';
-        container.style.backgroundColor = barBg;
-        container.style.background = barBg;
-        container.style.borderColor = barBorder;
-
-        const searchInput = document.getElementById('vtop-table-filter-search');
-        if (searchInput) {
-          const inBg = isDark ? '#0f172a' : '#ffffff';
-          const inBorder = isDark ? '#293548' : '#cbd5e1';
-          const inColor = isDark ? '#f1f5f9' : '#0f172a';
-          searchInput.style.backgroundColor = inBg;
-          searchInput.style.background = inBg;
-          searchInput.style.borderColor = inBorder;
-          searchInput.style.color = inColor;
-        }
-
-        const resetBtn = document.getElementById('vtop-table-filter-reset');
-        if (resetBtn) {
-          const btnBg = isDark ? '#1e293b' : '#f1f5f9';
-          const btnBorder = isDark ? '#293548' : '#cbd5e1';
-          const btnColor = isDark ? '#f1f5f9' : '#475569';
-          resetBtn.style.backgroundColor = btnBg;
-          resetBtn.style.background = btnBg;
-          resetBtn.style.borderColor = btnBorder;
-          resetBtn.style.color = btnColor;
-        }
-      }
-
-      const topFilter = document.getElementById(UI_ID);
-      if (topFilter) {
-        topFilter.style.backgroundColor = isDark ? '#131c2e' : '#ffffff';
-        topFilter.style.background = isDark ? '#131c2e' : '#ffffff';
-        topFilter.style.borderColor = isDark ? '#293548' : '#cbd5e1';
-      }
+    syncTheme() {
+      // Theme colors are driven by CSS custom properties in themes.css.
     }
   };
 

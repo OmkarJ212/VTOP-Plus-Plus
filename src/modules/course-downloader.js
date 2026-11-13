@@ -382,7 +382,7 @@
 
             <div class="vtop-form-group">
               <label class="vtop-form-label" for="vtop-regno-input">Student Registration No:</label>
-              <input class="vtop-form-input" type="text" id="vtop-regno-input" placeholder="e.g. 24BCE0212" />
+              <input class="vtop-form-input" type="text" id="vtop-regno-input" placeholder="e.g. 24BCE0000" />
             </div>
 
             <div class="vtop-form-group">
@@ -395,7 +395,7 @@
 
             <div class="vtop-meta-info">
               <span id="vtop-file-count">0 files detected</span>
-              <button type="button" id="vtop-rescan-pages-btn" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; color: #2980b9; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>Scan All Pages</button>
+              <button type="button" id="vtop-rescan-pages-btn" style="background: none; border: none; padding: 0; font: inherit; cursor: pointer; color: var(--vtop-accent-sky); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>Scan All Pages</button>
             </div>
 
             <div class="vtop-btn-row">
@@ -666,7 +666,7 @@
       if (speedMode === 'safe' || speedMode === 'stealth') speedMode = 'human';
 
       if (!regNo) {
-        alert('Please enter your Student Registration Number (e.g. 24BCE0212).');
+        alert('Please enter your Student Registration Number (e.g. 24BCE0000).');
         if (regInput) regInput.focus();
         return;
       }

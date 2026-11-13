@@ -25,6 +25,7 @@
         "*://vtop.vit.ac.in/*"
       ],
       "css": [
+        "src/content/styles/themes.css",
         "src/content/styles/privacy-and-navigation.css",
         "src/content/styles/widgets.css",
         "src/content/styles/dark-mode-core.css",
@@ -78,6 +79,7 @@
     {
       "resources": [
         "models/velloreWeights.json",
+        "src/content/styles/themes.css",
         "src/content/styles/privacy-and-navigation.css",
         "src/content/styles/widgets.css",
         "src/content/styles/dark-mode-core.css",

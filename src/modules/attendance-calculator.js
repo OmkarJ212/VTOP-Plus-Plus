@@ -102,11 +102,11 @@
           </div>
           <div class="vtop-target-controls" style="display: flex; align-items: center; gap: 8px;">
             <!-- Target Range Slider & Number Box (1-100%) -->
-            <label for="vtop-target-slider" style="font-weight: 600; font-size: 13px; color: #334155;">Target:</label>
+            <label for="vtop-target-slider" style="font-weight: 600; font-size: 13px; color: var(--vtop-text-secondary);">Target:</label>
             <input type="range" id="vtop-target-slider" min="1" max="100" step="1" value="${this.targetPercent}" style="width: 120px; cursor: pointer;" />
             <div style="display: flex; align-items: center; gap: 2px;">
-              <input type="number" id="vtop-target-num" min="1" max="100" value="${this.targetPercent}" class="vtop-target-input" style="width: 52px; padding: 4px 6px; font-size: 13px; font-weight: 600; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-variant-numeric: tabular-nums;" />
-              <span style="font-weight: 600; color: #475569; font-size: 13px;">%</span>
+              <input type="number" id="vtop-target-num" min="1" max="100" value="${this.targetPercent}" class="vtop-target-input" style="width: 52px; padding: 4px 6px; font-size: 13px; font-weight: 600; border: 1px solid var(--vtop-border-strong); border-radius: 6px; text-align: center; font-variant-numeric: tabular-nums;" />
+              <span style="font-weight: 600; color: var(--vtop-text-body); font-size: 13px;">%</span>
             </div>
           </div>
         </div>
@@ -122,19 +122,19 @@
             <span class="vtop-stat-lbl">Average Attendance</span>
           </div>
           <div class="vtop-stat-box">
-            <span class="vtop-stat-num" id="vtop-stat-safe" style="color: #27ae60;">0</span>
+            <span class="vtop-stat-num" id="vtop-stat-safe" style="color: var(--vtop-success-bright);">0</span>
             <span class="vtop-stat-lbl">Safe Subjects (≥80%)</span>
           </div>
           <div class="vtop-stat-box">
-            <span class="vtop-stat-num" id="vtop-stat-warn" style="color: #f39c12;">0</span>
+            <span class="vtop-stat-num" id="vtop-stat-warn" style="color: var(--vtop-warn-bright);">0</span>
             <span class="vtop-stat-lbl">Warning (75%–79%)</span>
           </div>
           <div class="vtop-stat-box">
-            <span class="vtop-stat-num" id="vtop-stat-danger" style="color: #e74c3c;">0</span>
+            <span class="vtop-stat-num" id="vtop-stat-danger" style="color: var(--vtop-danger-bright);">0</span>
             <span class="vtop-stat-lbl">Debarred Risk (&lt;75%)</span>
           </div>
           <div class="vtop-stat-box" id="vtop-box-od" style="display: none;">
-            <span class="vtop-stat-num" id="vtop-stat-od" style="color: #0284c7;">0</span>
+            <span class="vtop-stat-num" id="vtop-stat-od" style="color: var(--vtop-accent-sky);">0</span>
             <span class="vtop-stat-lbl">On Duty Classes</span>
           </div>
         </div>
@@ -321,7 +321,7 @@
             bunkCell = document.createElement('td');
             bunkCell.className = 'vtop-td-bunk fixedContent tableContent';
             bunkCell.style.cssText = 'text-align: center; vertical-align: middle; padding: 8px 10px;';
-            bunkCell.innerHTML = '<span style="color:#94a3b8;font-size:12px;">--</span>';
+            bunkCell.innerHTML = '<span style="color:var(--vtop-text-dim);font-size:12px;">--</span>';
             row.appendChild(bunkCell);
           }
           return;
@@ -405,7 +405,7 @@
         // Clarify On Duty in cell if present
         if (data.onDuty > 0) {
           statusHtml += `
-            <div style="font-size: 11px; color: #0284c7; font-weight: 600; margin-top: 4px;">
+            <div style="font-size: 11px; color: var(--vtop-accent-sky); font-weight: 600; margin-top: 4px;">
               Includes ${data.onDuty} On Duty
             </div>
           `;
@@ -443,9 +443,9 @@
       if (overallElem && totalConductedSum > 0) {
         const overallPct = ((totalAttendedSum / totalConductedSum) * 100).toFixed(1);
         overallElem.textContent = `${overallPct}%`;
-        if (overallPct >= 80) overallElem.style.color = '#27ae60';
-        else if (overallPct >= 75) overallElem.style.color = '#f39c12';
-        else overallElem.style.color = '#e74c3c';
+        if (overallPct >= 80) overallElem.style.color = 'var(--vtop-success-bright)';
+        else if (overallPct >= 75) overallElem.style.color = 'var(--vtop-warn-bright)';
+        else overallElem.style.color = 'var(--vtop-danger-bright)';
       }
 
       if (safeElem) safeElem.textContent = safeCount;

@@ -61,7 +61,7 @@
   transform: translateZ(0);
 }
 .vtop-top-progress.vtop-progress-active {
-  background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+  background: linear-gradient(90deg, transparent, var(--vtop-navbar-accent), transparent);
   background-size: 200% 100%;
   animation: vtopProgressAnim 1.2s linear infinite;
 }
@@ -128,7 +128,7 @@ a[href*="campusEtiquette" i] {
   border: none;
   border-radius: 6px;
   box-shadow: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--vtop-glass-90);
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 500;
@@ -144,18 +144,18 @@ a[href*="campusEtiquette" i] {
 }
 
 .vtop-nav-item.vtop-dock-pill:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: var(--vtop-glass-12);
+  color: var(--vtop-text-inverse);
 }
 
 .vtop-nav-item.vtop-dock-pill:active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: var(--vtop-glass-20);
+  color: var(--vtop-text-inverse);
 }
 
 .vtop-nav-item.vtop-dock-pill:focus-visible,
 .vtop-nav-item.vtop-dock-icon-btn:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.7);
+  outline: 2px solid var(--vtop-navbar-focus);
   outline-offset: 1px;
 }
 
@@ -179,21 +179,21 @@ a[href*="campusEtiquette" i] {
 }
 
 .vtop-kbd-shortcut {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--vtop-glass-10);
+  border: 1px solid var(--vtop-glass-20);
   border-radius: 4px;
   padding: 2px 5px;
   font-size: 9.5px;
   font-weight: 600;
   line-height: 1;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--vtop-glass-85);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
 }
 
 .vtop-nav-item.vtop-dock-sep {
   width: 1px;
   height: 18px;
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--vtop-glass-22);
   margin: 0 4px;
   flex-shrink: 0;
   align-self: center;
@@ -212,7 +212,7 @@ a[href*="campusEtiquette" i] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--vtop-glass-90);
   cursor: pointer;
   outline: none;
   flex-shrink: 0;
@@ -221,25 +221,25 @@ a[href*="campusEtiquette" i] {
 }
 
 .vtop-nav-item.vtop-dock-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: var(--vtop-glass-12);
+  color: var(--vtop-text-inverse);
 }
 
 .vtop-nav-item.vtop-dock-icon-btn:active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: var(--vtop-glass-20);
+  color: var(--vtop-text-inverse);
 }
 
 #vtop-dock-dark-btn.active,
 html.vtop-privacy-active #vtop-dock-priv-btn {
-  color: #38bdf8;
+  color: var(--vtop-navbar-accent);
   background: transparent;
 }
 
 #vtop-dock-dark-btn.active:hover,
 html.vtop-privacy-active #vtop-dock-priv-btn:hover {
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.14);
+  color: var(--vtop-navbar-active-hover);
+  background: var(--vtop-navbar-active-bg);
 }
 
 .vtop-pill-spinner {
@@ -257,8 +257,8 @@ html.vtop-privacy-active #vtop-dock-priv-btn:hover {
 }
 
 .vtop-pill-loading {
-  background: rgba(255, 255, 255, 0.14) !important;
-  color: #ffffff !important;
+  background: var(--vtop-glass-14) !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 .vtop-pill-loading .vtop-pill-spinner {
@@ -270,8 +270,8 @@ html.vtop-privacy-active #vtop-dock-priv-btn:hover {
 }
 
 .vtop-pill-queued {
-  background: rgba(245, 158, 11, 0.22) !important;
-  color: #fde68a !important;
+  background: var(--vtop-navbar-queued-bg) !important;
+  color: var(--vtop-navbar-queued-fg) !important;
 }
 
 @media (max-width: 1380px) {
@@ -330,7 +330,7 @@ html.vtop-privacy-active #vtop-dock-priv-btn:hover {
 .vtop-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--vtop-overlay-backdrop);
   z-index: 1020;
   opacity: 0;
   pointer-events: none;
@@ -348,9 +348,9 @@ html.vtop-privacy-active #vtop-dock-priv-btn:hover {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #64748b;
+  border: 1px solid var(--vtop-border-strong);
+  background: var(--vtop-bg-surface);
+  color: var(--vtop-text-muted);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -362,7 +362,7 @@ html.vtop-privacy-active #vtop-dock-priv-btn:hover {
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .vtop-drawer-close-btn:hover {
-  background: #ef4444;
-  color: #ffffff;
-  border-color: #dc2626;
+  background: var(--vtop-danger-bright);
+  color: var(--vtop-text-inverse);
+  border-color: var(--vtop-danger-hover);
 }

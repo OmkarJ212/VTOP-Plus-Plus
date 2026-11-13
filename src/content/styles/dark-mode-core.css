@@ -5,63 +5,52 @@
    ========================================================================== */
 html.vtop-dark-theme,
 body.vtop-dark-theme {
-  --vtop-dark-bg-canvas: #0b0f19;
-  --vtop-dark-bg-surface: #131c2e;
-  --vtop-dark-bg-elevated: #1e293b;
-  --vtop-dark-bg-input: #0f172a;
-  --vtop-dark-border: #293548;
-  --vtop-dark-border-subtle: #1e293b;
-  --vtop-dark-text-main: #f1f5f9;
-  --vtop-dark-text-muted: #94a3b8;
-  --vtop-dark-text-dim: #64748b;
-  --vtop-dark-accent: #38bdf8;
-  --vtop-dark-accent-hover: #0284c7;
   color-scheme: dark;
 
   /* Bootstrap 5 Native Design Tokens Override */
-  --bs-body-bg: #0b0f19;
-  --bs-body-color: #f1f5f9;
+  --bs-body-bg: var(--vtop-bg-canvas);
+  --bs-body-color: var(--vtop-text-primary);
   --bs-body-color-rgb: 241, 245, 249;
   --bs-body-bg-rgb: 11, 15, 25;
-  --bs-primary: #38bdf8;
-  --bs-secondary-color: #94a3b8;
-  --bs-tertiary-color: #64748b;
-  --bs-tertiary-bg: #1e293b;
-  --bs-secondary-bg: #131c2e;
+  --bs-primary: var(--vtop-accent);
+  --bs-secondary-color: var(--vtop-text-muted);
+  --bs-tertiary-color: var(--vtop-text-dim);
+  --bs-tertiary-bg: var(--vtop-bg-elevated);
+  --bs-secondary-bg: var(--vtop-bg-surface);
   --bs-light-rgb: 255, 255, 255;
   --bs-dark-rgb: 241, 245, 249;
-  --bs-border-color: #293548;
-  --bs-border-color-translucent: rgba(255, 255, 255, 0.12);
-  --bs-card-bg: #131c2e;
-  --bs-card-color: #f1f5f9;
-  --bs-card-border-color: #293548;
-  --bs-card-cap-bg: #0f192b;
-  --bs-card-cap-color: #38bdf8;
-  --bs-accordion-bg: #131c2e;
-  --bs-accordion-color: #f1f5f9;
-  --bs-accordion-border-color: #293548;
-  --bs-accordion-btn-bg: #131c2e;
-  --bs-accordion-btn-color: #f1f5f9;
-  --bs-accordion-active-bg: #1e293b;
-  --bs-accordion-active-color: #38bdf8;
+  --bs-border-color: var(--vtop-border);
+  --bs-border-color-translucent: var(--vtop-glass-12);
+  --bs-card-bg: var(--vtop-bg-surface);
+  --bs-card-color: var(--vtop-text-primary);
+  --bs-card-border-color: var(--vtop-border);
+  --bs-card-cap-bg: var(--vtop-bg-surface-alt);
+  --bs-card-cap-color: var(--vtop-accent);
+  --bs-accordion-bg: var(--vtop-bg-surface);
+  --bs-accordion-color: var(--vtop-text-primary);
+  --bs-accordion-border-color: var(--vtop-border);
+  --bs-accordion-btn-bg: var(--vtop-bg-surface);
+  --bs-accordion-btn-color: var(--vtop-text-primary);
+  --bs-accordion-active-bg: var(--vtop-bg-elevated);
+  --bs-accordion-active-color: var(--vtop-accent);
   --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2338bdf8'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
   --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2338bdf8'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
 
   /* Bootstrap 5 Pagination Variables Override */
-  --bs-pagination-bg: #1e293b;
-  --bs-pagination-color: #f1f5f9;
-  --bs-pagination-border-color: #293548;
-  --bs-pagination-hover-bg: #334155;
-  --bs-pagination-hover-color: #38bdf8;
-  --bs-pagination-hover-border-color: #38bdf8;
-  --bs-pagination-focus-bg: #334155;
-  --bs-pagination-focus-color: #38bdf8;
-  --bs-pagination-active-bg: #0284c7;
-  --bs-pagination-active-color: #ffffff;
-  --bs-pagination-active-border-color: #0369a1;
-  --bs-pagination-disabled-bg: #131c2e;
-  --bs-pagination-disabled-color: #64748b;
-  --bs-pagination-disabled-border-color: #1e293b;
+  --bs-pagination-bg: var(--vtop-bg-elevated);
+  --bs-pagination-color: var(--vtop-text-primary);
+  --bs-pagination-border-color: var(--vtop-border);
+  --bs-pagination-hover-bg: var(--vtop-bg-elevated-hover);
+  --bs-pagination-hover-color: var(--vtop-accent);
+  --bs-pagination-hover-border-color: var(--vtop-accent);
+  --bs-pagination-focus-bg: var(--vtop-bg-elevated-hover);
+  --bs-pagination-focus-color: var(--vtop-accent);
+  --bs-pagination-active-bg: var(--vtop-accent-hover);
+  --bs-pagination-active-color: var(--vtop-text-inverse);
+  --bs-pagination-active-border-color: var(--vtop-accent-sky-hover);
+  --bs-pagination-disabled-bg: var(--vtop-bg-surface);
+  --bs-pagination-disabled-color: var(--vtop-text-dim);
+  --bs-pagination-disabled-border-color: var(--vtop-border-muted);
 }
 
 /* 7.1 Root & Foundation Structural Canvases */
@@ -92,10 +81,10 @@ html.vtop-dark-theme .navbar-custom-menu,
 html.vtop-dark-theme #top-hmenu-bar,
 html.vtop-dark-theme .hmenu,
 html.vtop-dark-theme .sidebar {
-  background-color: #0d1527 !important;
+  background-color: var(--vtop-bg-navbar-dark) !important;
   background-image: none !important;
-  border-color: var(--vtop-dark-border) !important;
-  color: #ffffff !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* Keep inner navbar wrappers transparent so .container-fluid (#0b0f19) doesn't create a two-tone seam */
@@ -112,7 +101,7 @@ html.vtop-dark-theme #vtop-header .dropdown-menu {
 }
 
 html.vtop-dark-theme #vtop-header .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.25) !important;
+  border-color: var(--vtop-glass-25) !important;
 }
 
 html.vtop-dark-theme #vtop-header .navbar-toggler-icon {
@@ -120,21 +109,21 @@ html.vtop-dark-theme #vtop-header .navbar-toggler-icon {
 }
 
 html.vtop-dark-theme #vtop-header .deleteQuickLinkBtn {
-  background-color: rgba(248, 113, 113, 0.16) !important;
-  border-color: rgba(248, 113, 113, 0.35) !important;
-  color: #fca5a5 !important;
+  background-color: var(--vtop-danger-bg) !important;
+  border-color: var(--vtop-danger-border-strong) !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 html.vtop-dark-theme #vtop-header .deleteQuickLinkBtn:hover {
-  background-color: rgba(248, 113, 113, 0.3) !important;
-  color: #ffffff !important;
+  background-color: var(--vtop-danger-bg-hover) !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 html.vtop-dark-theme .navbar a,
 html.vtop-dark-theme .hmenu a,
 html.vtop-dark-theme .sidebar-menu a,
 html.vtop-dark-theme #vtop-header a {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* 7.2a Navbar Brand & Campus Title ("VIT Vellore") */
@@ -149,7 +138,7 @@ html.vtop-dark-theme #vtop-header a {
 .navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand span,
 .navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand small,
 .navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-brand [class*="text-"] {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* 7.2b Registration Number & User Profile in Header */
@@ -167,7 +156,7 @@ html.vtop-dark-theme #vtop-header a {
 .navbar-text.text-light,
 .navbar:not(.navbar-light):not(#top-hmenu-bar) .navbar-text,
 .navbar-custom-menu .navbar-text {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* 7.2c QuickLinks Bar (Home, Printer, Star, Quick Links Dropdown) */
@@ -185,7 +174,7 @@ html.vtop-dark-theme #vtop-header a {
 #printVTOPCoreDocument,
 #printVTOPCoreDocument i,
 #printVTOPCoreDocument * {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* QuickLinks Dropdown Button (Clean white text, no outline/border) */
@@ -193,7 +182,7 @@ html.vtop-dark-theme #vtop-header a {
 #quickLinks .dropdown > .btn-outline,
 #quickLinks .dropdown-toggle.btn-outline-primary,
 #vtop-header #quickLinks .dropdown-toggle.btn-outline-primary {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
   border: none !important;
   border-color: transparent !important;
   outline: none !important;
@@ -216,17 +205,17 @@ html.vtop-dark-theme #vtop-header a {
 #vtop-header #quickLinks .dropdown-toggle.btn-outline-primary:focus,
 #vtop-header #quickLinks .dropdown-toggle.btn-outline-primary:active,
 #vtop-header #quickLinks .dropdown-toggle.btn-outline-primary.show {
-  background-color: rgba(255, 255, 255, 0.12) !important;
+  background-color: var(--vtop-glass-12) !important;
   border: none !important;
   border-color: transparent !important;
   outline: none !important;
   box-shadow: none !important;
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 #quickLinks .btn-outline-primary .text-light,
 #quickLinks .btn-outline-primary span {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* Favourite star button (no outline box) */
@@ -240,7 +229,7 @@ html.vtop-dark-theme #vtop-header a {
 }
 #favouriteBtn:hover,
 #quickLinks #favouriteBtn:hover {
-  background-color: rgba(255, 255, 255, 0.12) !important;
+  background-color: var(--vtop-glass-12) !important;
   border: none !important;
 }
 
@@ -315,7 +304,7 @@ a[href^="#MG0"].btn:hover,
   border-color: transparent !important;
   outline: none !important;
   box-shadow: none !important;
-  background-color: rgba(15, 23, 42, 0.05) !important;
+  background-color: var(--vtop-bg-hover-light) !important;
 }
 
 html.vtop-dark-theme .hmenuItem:hover,
@@ -334,7 +323,7 @@ html.vtop-dark-theme a[data-bs-toggle="collapse"].hmenuItem:hover,
 html.vtop-dark-theme a[href^="#MG0"].btn:hover,
 html.vtop-dark-theme .systemB5BtnMenu:hover,
 html.vtop-dark-theme .systemBtnMenu:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: var(--vtop-bg-hover-dark) !important;
 }
 
 .hmenuItem:focus,
@@ -349,7 +338,7 @@ a[href^="#MG0"][aria-expanded="true"] {
   border-color: transparent !important;
   outline: none !important;
   box-shadow: none !important;
-  background-color: rgba(37, 99, 235, 0.08) !important;
+  background-color: var(--vtop-accent-soft-light) !important;
 }
 
 html.vtop-dark-theme .hmenuItem:focus,
@@ -359,7 +348,7 @@ html.vtop-dark-theme .hmenuItem[aria-expanded="true"],
 html.vtop-dark-theme a[href^="#MG0"]:focus,
 html.vtop-dark-theme a[href^="#MG0"]:active,
 html.vtop-dark-theme a[href^="#MG0"][aria-expanded="true"] {
-  background-color: rgba(56, 189, 248, 0.12) !important;
+  background-color: var(--vtop-bg-hover) !important;
 }
 
 /* Ensure typography and icons inside navigation items stay vibrant and visible in dark mode */
@@ -370,13 +359,13 @@ html.vtop-dark-theme .hmenuItem i:not(.rotate-caret),
 html.vtop-dark-theme #top-hmenu-bar span,
 html.vtop-dark-theme .sidebar-menu span,
 html.vtop-dark-theme div[id^="MG0"] span {
-  color: #f1f5f9 !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .hmenuItem:hover .primaryColor1,
 html.vtop-dark-theme .hmenuItem:hover span,
 html.vtop-dark-theme .hmenuItem:hover i:not(.rotate-caret) {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 html:not(.vtop-dark-theme) #top-hmenu-bar .navbar-brand,
@@ -384,26 +373,26 @@ html:not(.vtop-dark-theme) #top-hmenu-bar a.hmenuItem i,
 html:not(.vtop-dark-theme) .hmenuItem .rotate-caret,
 html:not(.vtop-dark-theme) .hmenuItem i.bi-chevron-right,
 html:not(.vtop-dark-theme) i.bi-chevron-right.rotate-caret.text-danger {
-  color: #000000 !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .hmenuItem .rotate-caret,
 html.vtop-dark-theme .hmenuItem .text-primary,
 html.vtop-dark-theme .hmenuItem i.bi-chevron-right {
-  color: #38bdf8 !important;
+  color: var(--vtop-accent) !important;
 }
 
 /* Submenu dropdown drawer boxes (inside #MG0001, #MG0002, #MG0008, etc.) */
 div[id^="MG0"],
 .hmenubox {
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--vtop-border) !important;
   box-shadow: none !important;
 }
 
 html.vtop-dark-theme div[id^="MG0"],
 html.vtop-dark-theme .hmenubox {
-  background-color: #0f172a !important;
-  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-border) !important;
 }
 
 div[id^="MG0"] a,
@@ -419,20 +408,20 @@ html.vtop-dark-theme div[id^="MG0"] a,
 html.vtop-dark-theme div[id^="MG0"] button,
 html.vtop-dark-theme div[id^="MG0"] .menuFontStyle,
 html.vtop-dark-theme div[id^="MG0"] .quickMainMenu {
-  color: #e2e8f0 !important;
+  color: var(--vtop-text-secondary) !important;
 }
 
 div[id^="MG0"] a:hover,
 div[id^="MG0"] button:hover {
   border: none !important;
   outline: none !important;
-  background-color: rgba(37, 99, 235, 0.08) !important;
+  background-color: var(--vtop-accent-soft-light) !important;
 }
 
 html.vtop-dark-theme div[id^="MG0"] a:hover,
 html.vtop-dark-theme div[id^="MG0"] button:hover {
-  background-color: rgba(56, 189, 248, 0.15) !important;
-  color: #38bdf8 !important;
+  background-color: var(--vtop-accent-soft) !important;
+  color: var(--vtop-accent) !important;
 }
 
 /* 7.2d Navbar Icons (Bootstrap Icons bi, FontAwesome fa, SVGs — scoped away from .navbar-light / #top-hmenu-bar & light dropdowns) */
@@ -445,12 +434,12 @@ html.vtop-dark-theme div[id^="MG0"] button:hover {
 #vtopHeaderBarControl i:not(.dropdown-menu i),
 #vtopHeaderBarControl .bi:not(.dropdown-menu .bi),
 #vtopHeaderBarControl .fa:not(.dropdown-menu .fa) {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 .navbar:not(.navbar-light):not(#top-hmenu-bar) svg:not(.vtop-dock-icon),
 #vtop-header svg:not(.vtop-dock-icon):not(.dropdown-menu svg) {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
   fill: currentColor !important;
 }
 
@@ -460,7 +449,7 @@ html:not(.vtop-dark-theme) #vtop-header .dropdown-menu a:not(.btn) .fa,
 html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) i,
 html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) .bi,
 html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) .fa {
-  color: #1e293b !important;
+  color: var(--vtop-text-heading) !important;
 }
 
 /* Navbar monochromatic icon images (Inverts dark icons to crisp white, preserves photos and logos) */
@@ -474,7 +463,7 @@ html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) .fa 
 #navbarDropdown img,
 .img_stamp_size {
   filter: none !important;
-  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  border: 2px solid var(--vtop-glass-40) !important;
 }
 
 /* Universal text-light override across entire portal */
@@ -486,23 +475,23 @@ button.text-light,
 small.text-light,
 html.vtop-dark-theme .text-light,
 body.vtop-dark-theme .text-light {
-  color: #ffffff !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 html.vtop-dark-theme .dropdown-menu {
-  background-color: var(--vtop-dark-bg-elevated) !important;
-  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
   box-shadow: none !important;
 }
 
 html.vtop-dark-theme .dropdown-menu > li > a {
-  color: #f1f5f9 !important;
+  color: var(--vtop-text-primary) !important;
 }
 
 html.vtop-dark-theme .dropdown-menu > li > a:hover,
 html.vtop-dark-theme .dropdown-menu > li > a:focus {
-  background-color: #334155 !important;
-  color: #38bdf8 !important;
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-accent) !important;
 }
 
 /* 7.3 Universal Table Blanket (Crushes inline bgcolor and styles across ALL sub-pages) */
@@ -556,21 +545,21 @@ html.vtop-dark-theme thead th,
 html.vtop-dark-theme .table > thead > tr > th,
 html.vtop-dark-theme tr.tableHeader > td,
 html.vtop-dark-theme tr.tableHeader-level1 > td {
-  background-color: #0b1322 !important;
-  color: #38bdf8 !important;
-  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) !important;
 }
 
 /* Alternating zebra rows for dense data (Attendance, Marks, DA) */
 html.vtop-dark-theme table.table-striped > tbody > tr:nth-of-type(odd) td,
 html.vtop-dark-theme table > tbody > tr:nth-of-type(odd) td {
-  background-color: #0f1728 !important;
+  background-color: var(--vtop-bg-table-stripe) !important;
 }
 
 /* Interactive row hover */
 html.vtop-dark-theme table.table-hover > tbody > tr:hover td,
 html.vtop-dark-theme table > tbody > tr:hover td {
-  background-color: #1a2538 !important;
+  background-color: var(--vtop-bg-row-hover) !important;
 }
 
 /* Table borders */
@@ -610,9 +599,9 @@ html.vtop-dark-theme .box-header,
 html.vtop-dark-theme .box-footer,
 html.vtop-dark-theme .modal-header,
 html.vtop-dark-theme .modal-footer {
-  background-color: #0f192b !important;
-  border-color: var(--vtop-dark-border) !important;
-  color: var(--vtop-dark-accent) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme .card-header strong,
@@ -629,7 +618,7 @@ select,
 textarea,
 .form-control,
 .form-select {
-  border: 1px solid #cbd5e1 !important;
+  border: 1px solid var(--vtop-border-strong) !important;
   border-radius: 6px !important;
 }
 
@@ -638,9 +627,9 @@ html.vtop-dark-theme select,
 html.vtop-dark-theme textarea,
 html.vtop-dark-theme .form-control,
 html.vtop-dark-theme .form-select {
-  background-color: var(--vtop-dark-bg-input) !important;
-  color: #f8fafc !important;
-  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-bg-input) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
   color-scheme: dark !important;
 }
 
@@ -649,8 +638,8 @@ select:focus,
 textarea:focus,
 .form-control:focus,
 .form-select:focus {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+  border-color: var(--vtop-accent) !important;
+  box-shadow: 0 0 0 2px var(--vtop-accent-focus) !important;
   outline: none !important;
 }
 
@@ -659,40 +648,40 @@ html.vtop-dark-theme select:focus,
 html.vtop-dark-theme textarea:focus,
 html.vtop-dark-theme .form-control:focus,
 html.vtop-dark-theme .form-select:focus {
-  border-color: var(--vtop-dark-accent) !important;
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+  border-color: var(--vtop-accent) !important;
+  box-shadow: 0 0 0 2px var(--vtop-accent-focus) !important;
 }
 
 html.vtop-dark-theme .btn-default {
-  background-color: #1e293b !important;
-  color: #f1f5f9 !important;
-  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: var(--vtop-border) !important;
 }
 html.vtop-dark-theme .btn-default:hover {
-  background-color: #334155 !important;
-  color: #ffffff !important;
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-text-inverse) !important;
 }
 html.vtop-dark-theme .btn-primary {
-  background-color: #0284c7 !important;
-  border-color: #0369a1 !important;
-  color: #ffffff !important;
+  background-color: var(--vtop-accent-hover) !important;
+  border-color: var(--vtop-accent-sky-hover) !important;
+  color: var(--vtop-text-inverse) !important;
 }
 
 /* 7.6 BlockUI Loading Overlays (Prevents blinding white flash during AJAX page fetches) */
 html.vtop-dark-theme .blockUI,
 html.vtop-dark-theme .blockOverlay {
-  background-color: #070b13 !important;
+  background-color: var(--vtop-bg-blockui) !important;
   opacity: 0.82 !important;
 }
 .blockMsg {
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--vtop-border) !important;
   border-radius: 10px !important;
   box-shadow: none !important;
 }
 html.vtop-dark-theme .blockMsg {
-  background-color: #1e293b !important;
-  color: #f1f5f9 !important;
-  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: var(--vtop-border) !important;
 }
 
 /* 7.7 Captcha & OCR Image Protection */
@@ -708,7 +697,7 @@ html.vtop-dark-theme #captchaImage,
 html.vtop-dark-theme img[src*="captcha" i],
 html.vtop-dark-theme canvas#captchaCanvas {
   filter: none !important;
-  background-color: #ffffff !important;
+  background-color: var(--vtop-text-inverse) !important;
 }
 
 /* 7.8 Status Badges & Timetable Slot Preservation */
@@ -728,8 +717,8 @@ html.vtop-dark-theme [class*="label-"] {
 /* Saturated colored timetable slots (Theory vs Lab) maintain contrast and legible text */
 html.vtop-dark-theme td[style*="background-color: rgb"]:not([style*="255, 255, 255"]),
 html.vtop-dark-theme td[style*="background: rgb"]:not([style*="255, 255, 255"]) {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  color: var(--vtop-text-inverse) !important;
+  text-shadow: 0 1px 2px var(--vtop-shadow-text);
 }
 
 /* 7.9 Print Reset (Restores clean white & black for fee receipts & hall tickets) */
@@ -739,7 +728,7 @@ html.vtop-dark-theme td[style*="background: rgb"]:not([style*="255, 255, 255"]) 
   html.vtop-dark-theme table,
   html.vtop-dark-theme td,
   html.vtop-dark-theme th {
-    background-color: #ffffff !important;
-    color: #000000 !important;
+    background-color: white !important;
+    color: black !important;
   }
 }
