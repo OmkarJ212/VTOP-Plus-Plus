@@ -32,9 +32,9 @@
       }
 
       // Listen for background worker alarm pings
-      if (!this._onMessage) {
+      if (!this._onMessage && chrome?.runtime?.onMessage) {
         this._onMessage = (message) => {
-          if (message.action === 'HEARTBEAT_PING') {
+          if (message && message.action === 'HEARTBEAT_PING') {
             this.ping();
           }
         };
@@ -66,22 +66,24 @@
         const basePath = DOM?.getBasePath ? DOM.getBasePath() : 'vtop';
         const pingUrl = `${window.location.origin}/${basePath}/content`;
 
-        const res = await fetch(pingUrl, {
+        let res = await fetch(pingUrl, {
           method: 'GET',
           credentials: 'include',
           cache: 'no-store'
         }).catch(() => null);
 
         if (!res || !res.ok) {
-          await fetch(`${window.location.origin}/${basePath}/`, {
+          res = await fetch(`${window.location.origin}/${basePath}/`, {
             method: 'GET',
             credentials: 'include',
             cache: 'no-store'
           }).catch(() => null);
         }
 
-        this.lastPingTime = new Date().toLocaleTimeString();
-        console.debug(`[VTOP++] Session heartbeat sent at ${this.lastPingTime}`);
+        if (res && res.ok && !(res.url || '').includes('/vtop/login')) {
+          this.lastPingTime = new Date().toLocaleTimeString();
+          console.debug(`[VTOP++] Session heartbeat sent at ${this.lastPingTime}`);
+        }
       } catch (err) {
         // network offline or page navigating
       }
@@ -93,7 +95,9 @@
         this.timer = null;
       }
       if (this._onMessage) {
-        chrome.runtime.onMessage.removeListener(this._onMessage);
+        if (chrome?.runtime?.onMessage) {
+          chrome.runtime.onMessage.removeListener(this._onMessage);
+        }
         this._onMessage = null;
       }
       if (this._listenersAttached) {

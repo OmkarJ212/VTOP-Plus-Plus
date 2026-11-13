@@ -50,6 +50,8 @@ async function pingActiveVtopSessions() {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!message || typeof message.action !== 'string') return;
+
   if (message.action === 'FETCH_MATERIAL') {
     handleFetchMaterial(message)
       .then(result => sendResponse(result))
@@ -59,17 +61,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.action === 'LOAD_CAPTCHA_WEIGHTS') {
     fetch(chrome.runtime.getURL('models/velloreWeights.json'))
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(data => sendResponse({ success: true, data }))
       .catch(err => sendResponse({ success: false, error: err.message }));
     return true; // Keep channel open
   }
 });
 
+function isAllowedMaterialUrl(rawUrl) {
+  if (typeof rawUrl !== 'string' || !rawUrl) return false;
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.hostname === 'vtop.vit.ac.in') {
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    }
+    if (parsed.protocol === 'https:' && parsed.hostname.endsWith('.amazonaws.com')) {
+      return true;
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+}
+
 /**
  * Fetch course material with extension privileges
  */
 async function handleFetchMaterial({ url, body, headers, timeoutMs = 25000 }) {
+  if (!isAllowedMaterialUrl(url)) {
+    return { success: false, error: 'Disallowed URL' };
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -87,8 +112,6 @@ async function handleFetchMaterial({ url, body, headers, timeoutMs = 25000 }) {
       redirect: 'follow',
       signal: controller.signal
     });
-
-    clearTimeout(timeoutId);
 
     const status = response.status;
     const ok = response.ok;
@@ -133,11 +156,12 @@ async function handleFetchMaterial({ url, body, headers, timeoutMs = 25000 }) {
       base64Data
     };
   } catch (err) {
-    clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
       return { success: false, error: `Request timed out after ${Math.round(timeoutMs / 1000)}s` };
     }
     return { success: false, error: err.message || String(err) };
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

@@ -217,32 +217,7 @@
     return null;
   }
 
-  function renderSolvedBadge(input, solvedText) {
-    let badge = document.getElementById('vtop-captcha-badge');
-    if (!badge) {
-      badge = document.createElement('div');
-      badge.id = 'vtop-captcha-badge';
-      badge.style.cssText = `
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--vtop-success);
-        margin-top: 6px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.3s ease;
-      `;
-      if (input.parentNode) {
-        input.parentNode.appendChild(badge);
-      }
-    }
-
-    badge.innerHTML = `
-      <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--vtop-success-bg-soft); color:var(--vtop-success-bright);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-      <span>Captcha filled: <strong style="letter-spacing:1px; color:var(--vtop-success-text);">${solvedText}</strong></span>
-    `;
-
+  function renderSolvedBadge(input) {
     // Visual input glow
     const origBorder = input.style.borderColor;
     const origBoxShadow = input.style.boxShadow;
@@ -265,6 +240,15 @@
   const AutoCaptcha = {
     async solve() {
       if (isSolving) return;
+
+      // Fast exit on logged-in pages without a login form or captcha field
+      if (
+        !document.querySelector(
+          '#captchaBlock, input#captchaStr, input[name*="captcha" i], input[id*="captcha" i], input[placeholder*="captcha" i], #vtopLoginForm, #loginForm, input[type="password"]'
+        )
+      ) {
+        return;
+      }
 
       const img = findCaptchaImage();
       const input = findCaptchaInput(img);
@@ -293,6 +277,9 @@
           img.addEventListener('load', () => {
             delete img.dataset.vtopLoadWaiting;
             AutoCaptcha.solve();
+          }, { once: true });
+          img.addEventListener('error', () => {
+            delete img.dataset.vtopLoadWaiting;
           }, { once: true });
         }
         return;
@@ -335,6 +322,7 @@
       document.addEventListener('click', (e) => {
         const btn = e.target.closest('#captchaBlock #button-addon2, button[onclick*="loadCaptcha"], #captchaBlock button, #captchaRefresh, [onclick*="captcha" i], .captcha-refresh, .glyphicon-refresh, .fa-refresh, #captchaBlock a, .captcha-container button, .captcha-container a');
         if (btn) {
+          lastSolvedSrc = null;
           const img = findCaptchaImage();
           if (img) {
             img.addEventListener('load', () => AutoCaptcha.solve(), { once: true });

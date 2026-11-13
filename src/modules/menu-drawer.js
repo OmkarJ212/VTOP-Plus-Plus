@@ -9,11 +9,16 @@
 
   window.VTOP_PLUS = window.VTOP_PLUS || {};
 
+  const OPEN_DRAWER_SELECTOR = '.hmenubox.collapse.show, .collapse.show.hmenuitem, div[id^="MG0"].collapse.show';
+
   class MenuDrawerController {
     constructor() {
       this.isInitialized = false;
       this.backdrop = null;
       this.menuObserver = null;
+      this.observedHmenuBar = null;
+      this._onDocClick = null;
+      this._onKeyDown = null;
     }
 
     init() {
@@ -24,6 +29,27 @@
       this.attachMenuObserver();
       this.injectCloseButtons();
       this.isInitialized = true;
+    }
+
+    destroy() {
+      if (this.menuObserver) {
+        this.menuObserver.disconnect();
+        this.menuObserver = null;
+      }
+      this.observedHmenuBar = null;
+      if (this._onDocClick) {
+        document.removeEventListener('click', this._onDocClick);
+        this._onDocClick = null;
+      }
+      if (this._onKeyDown) {
+        window.removeEventListener('keydown', this._onKeyDown);
+        this._onKeyDown = null;
+      }
+      if (this.backdrop && this.backdrop.parentNode) {
+        this.backdrop.parentNode.removeChild(this.backdrop);
+      }
+      this.backdrop = null;
+      this.isInitialized = false;
     }
 
     /**
@@ -45,12 +71,17 @@
      * Watches #top-hmenu-bar for drawer open/close to toggle backdrop
      */
     attachMenuObserver() {
-      if (this.menuObserver) return;
       const hmenuBar = document.getElementById('top-hmenu-bar');
       if (!hmenuBar) return;
+      if (this.menuObserver && this.observedHmenuBar === hmenuBar && this.observedHmenuBar.isConnected) return;
 
+      if (this.menuObserver) {
+        this.menuObserver.disconnect();
+      }
+
+      this.observedHmenuBar = hmenuBar;
       this.menuObserver = new MutationObserver(() => {
-        const hasOpenDrawer = Boolean(document.querySelector('.hmenubox.collapse.show, .collapse.show.hmenuitem'));
+        const hasOpenDrawer = Boolean(document.querySelector(OPEN_DRAWER_SELECTOR));
         if (this.backdrop) {
           this.backdrop.classList.toggle('vtop-backdrop-visible', hasOpenDrawer);
         }
@@ -68,31 +99,37 @@
      */
     setupGlobalListeners() {
       // 1. Click outside handler
-      document.addEventListener('click', (e) => {
-        const openDrawer = document.querySelector('.hmenubox.collapse.show, .collapse.show.hmenuitem');
-        if (!openDrawer) return;
+      if (!this._onDocClick) {
+        this._onDocClick = (e) => {
+          const openDrawer = document.querySelector(OPEN_DRAWER_SELECTOR);
+          if (!openDrawer) return;
 
-        // If click was inside the drawer, or on a navbar menu toggle button, do nothing
-        const clickedInsideDrawer = openDrawer.contains(e.target);
-        const clickedToggleButton = Boolean(
-          e.target.closest('#top-hmenu-bar .hmenuItem, a[data-bs-toggle="collapse"], a[href^="#MG"], [data-toggle="collapse"]')
-        );
+          // If click was inside the drawer, or on a navbar menu toggle button, do nothing
+          const clickedInsideDrawer = openDrawer.contains(e.target);
+          const clickedToggleButton = Boolean(
+            e.target.closest('#top-hmenu-bar .hmenuItem, a[data-bs-toggle="collapse"], a[href^="#MG"], [data-toggle="collapse"]')
+          );
 
-        if (!clickedInsideDrawer && !clickedToggleButton) {
-          this.closeDrawer(openDrawer);
-        }
-      });
-
-      // 2. Escape key handler
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          const openDrawer = document.querySelector('.hmenubox.collapse.show, .collapse.show.hmenuitem');
-          if (openDrawer) {
-            e.preventDefault();
+          if (!clickedInsideDrawer && !clickedToggleButton) {
             this.closeDrawer(openDrawer);
           }
-        }
-      });
+        };
+        document.addEventListener('click', this._onDocClick);
+      }
+
+      // 2. Escape key handler
+      if (!this._onKeyDown) {
+        this._onKeyDown = (e) => {
+          if (e.key === 'Escape') {
+            const openDrawer = document.querySelector(OPEN_DRAWER_SELECTOR);
+            if (openDrawer) {
+              e.preventDefault();
+              this.closeDrawer(openDrawer);
+            }
+          }
+        };
+        window.addEventListener('keydown', this._onKeyDown);
+      }
     }
 
     /**
@@ -145,7 +182,7 @@
      * Closes all open drawers
      */
     closeAllDrawers() {
-      const openDrawers = document.querySelectorAll('.hmenubox.collapse.show, .collapse.show.hmenuitem');
+      const openDrawers = document.querySelectorAll(OPEN_DRAWER_SELECTOR);
       openDrawers.forEach((d) => this.closeDrawer(d));
     }
   }

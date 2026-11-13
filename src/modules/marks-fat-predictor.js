@@ -264,9 +264,11 @@
         }
       });
 
-      const remainingWeight = Math.max(0, 100 - totalGiven);
+      const roundedGot = Math.round(totalGot * 1e4) / 1e4;
+      const roundedGiven = Math.round(totalGiven * 1e4) / 1e4;
+      const remainingWeight = Math.max(0, Math.round((100 - roundedGiven) * 1e4) / 1e4);
 
-      return { components, totalGot, totalGiven, remainingWeight };
+      return { components, totalGot: roundedGot, totalGiven: roundedGiven, remainingWeight };
     },
 
     formatNum(num) {
@@ -275,15 +277,15 @@
     },
 
     formatTargetValue(targetTotal, totalGot, remainingWeight) {
-      if (remainingWeight <= 0) {
+      if (remainingWeight <= 1e-6) {
         return '<span class="vtop-fat-val-muted">N/A (Complete)</span>';
       }
       const needed = Math.max(0, targetTotal - totalGot);
-      if (needed <= 0) {
+      if (needed <= 1e-6) {
         return '<span class="vtop-fat-val-safe">Secured</span>';
       }
       const remLabel = this.formatNum(remainingWeight);
-      if (needed > remainingWeight) {
+      if (needed > remainingWeight + 1e-6) {
         return `<span class="vtop-fat-val-muted">Impossible (&gt;${remLabel})</span>`;
       }
       const neededLabel = this.formatNum(needed);
@@ -347,16 +349,16 @@
           }
         }
 
-        if (firstRowCols === 8) {
-          tfoot.innerHTML = `
+        const nextHtml =
+          firstRowCols === 8
+            ? `
             <tr class="tableHeader-level1 vtop-fat-header-row">
               <td colspan="4" class="vtop-fat-header-left">${headerTitle}</td>
               <td colspan="4" class="vtop-fat-header-right">${summaryMeta}</td>
             </tr>
             ${targetsHtml}
-          `;
-        } else {
-          tfoot.innerHTML = `
+          `
+            : `
             <tr class="tableHeader-level1 vtop-fat-header-row">
               <td colspan="100%">
                 <div class="vtop-fat-fallback-header">
@@ -367,6 +369,8 @@
             </tr>
             ${targetsHtml}
           `;
+        if (tfoot.innerHTML !== nextHtml) {
+          tfoot.innerHTML = nextHtml;
         }
       });
     }

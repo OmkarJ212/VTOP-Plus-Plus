@@ -28,6 +28,9 @@
     return 'human';
   }
 
+  const SETTINGS_KEYS = [...Object.keys(DEFAULT_SETTINGS), 'vtop_speed_mode'];
+  const SETTINGS_KEY_SET = new Set(SETTINGS_KEYS);
+
   const Storage = {
     DEFAULT_SETTINGS,
 
@@ -40,7 +43,7 @@
           resolve(DEFAULT_SETTINGS);
           return;
         }
-        chrome.storage.local.get(null, (items) => {
+        chrome.storage.local.get(SETTINGS_KEYS, (items) => {
           if (chrome.runtime.lastError) {
             console.warn('[VTOP++] Error reading storage:', chrome.runtime.lastError);
             resolve(DEFAULT_SETTINGS);
@@ -66,9 +69,13 @@
         chrome.storage.onChanged.addListener((changes, areaName) => {
           if (areaName === 'local') {
             const updated = {};
+            let hasSettingChange = false;
             for (const key of Object.keys(changes)) {
+              if (!SETTINGS_KEY_SET.has(key)) continue;
               updated[key] = changes[key].newValue;
+              hasSettingChange = true;
             }
+            if (!hasSettingChange) return;
             if (updated.vtop_speed_mode && !updated.downloadPacing) {
               updated.downloadPacing = updated.vtop_speed_mode;
             }

@@ -8,6 +8,7 @@
 
   if (window.__vtop_plus_injected) return;
   if (window !== window.top) return; // Prevent duplicate instances in nested frames
+  if (!window.VTOP_PLUS) return;
   window.__vtop_plus_injected = true;
 
   const {
@@ -188,6 +189,8 @@
 
   function isExtensionNode(node) {
     if (!node || node.nodeType !== 1) return false;
+    if (node.id && node.id.startsWith('vtop-')) return true;
+    if (typeof node.className === 'string' && node.className.includes('vtop-')) return true;
     if (node.matches && node.matches(EXTENSION_SELECTORS)) return true;
     return Boolean(node.closest && node.closest(EXTENSION_SELECTORS));
   }
@@ -201,6 +204,7 @@
       const isInternal = mutations.every((m) => {
         if (isExtensionNode(m.target)) return true;
         const changedEls = [...m.addedNodes, ...m.removedNodes].filter((n) => n.nodeType === 1);
+        if (changedEls.length === 0 && m.target?.id === 'b5-pagewrapper') return true;
         return changedEls.length > 0 && changedEls.every(isExtensionNode);
       });
       if (isInternal) return;
@@ -230,7 +234,7 @@
         return;
       }
 
-      // Check Course Downloader if #materialTable buttons exist but panel is not mounted/visible
+      // Check Course Downloader if #materialTable buttons exist but panel is not mounted
       if (currentSettings.enableDownloader !== false && CourseDownloader) {
         const materialTable = document.getElementById('materialTable');
         const hasDownloadBtn = Boolean(
@@ -239,8 +243,7 @@
             : document.querySelector('button#downloadmat[data-fileid], button[data-fileid], .download-btn[data-fileid]')
         );
         const panel = document.getElementById('vtop-zip-panel');
-        const isPanelVisible = panel && panel.style.display !== 'none';
-        if (hasDownloadBtn && (!panel || !isPanelVisible)) {
+        if (hasDownloadBtn && !panel) {
           CourseDownloader.init();
         }
       }
@@ -257,6 +260,13 @@
   }
 
   function applyModuleStates() {
+    if (DarkMode && typeof currentSettings.enableDarkMode === 'boolean') {
+      DarkMode.set(currentSettings.enableDarkMode);
+    }
+    if (PrivacyMode && typeof currentSettings.enablePrivacyMode === 'boolean') {
+      PrivacyMode.set(currentSettings.enablePrivacyMode);
+    }
+
     if (currentSettings.enableQuickDock !== false) QuickDock?.init();
     else QuickDock?.destroy();
 
@@ -282,6 +292,8 @@
    */
   function setupMessageListener() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (!message || typeof message.action !== 'string') return;
+
       if (message.action === 'FORCE_SCAN') {
         const scanPromise = CourseDownloader?.scanPageForMaterials
           ? CourseDownloader.scanPageForMaterials()
@@ -332,11 +344,11 @@
       }
 
       if (message.action === 'APPLY_SETTINGS') {
-        currentSettings = { ...currentSettings, ...message.settings };
-
-        if (message.settings.enableDarkMode !== undefined && DarkMode) {
-          DarkMode.set(Boolean(message.settings.enableDarkMode));
+        if (!message.settings || typeof message.settings !== 'object') {
+          sendResponse({ success: false, error: 'Invalid settings payload' });
+          return true;
         }
+        currentSettings = { ...currentSettings, ...message.settings };
 
         applyModuleStates();
         sendResponse({ success: true });

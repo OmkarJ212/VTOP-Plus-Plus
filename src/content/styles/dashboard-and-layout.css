@@ -840,6 +840,14 @@ html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] span[style*="red
 fieldset:has(.col-md-12),
 fieldset:has(#courseAccordion),
 fieldset:has(#materialTable_wrapper),
+fieldset:has(#vtop-custom-course-filter) {
+  display: flow-root !important;
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 .card:has(#courseAccordion),
 .card-body:has(#courseAccordion),
 .box-body:has(#courseAccordion),
@@ -919,9 +927,15 @@ fieldset div[class*="col-"]:has(#courseAccordion),
 #courseAccordion {
   width: 100% !important;
   max-width: 100% !important;
+  min-width: 0 !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
   box-sizing: border-box !important;
+}
+
+#courseAccordion .accordion-button {
+  padding: 10px 14px !important;
+  font-size: 13.5px !important;
 }
 
 /* Global Shadow Reset across Dashboard and all VTOP pages */

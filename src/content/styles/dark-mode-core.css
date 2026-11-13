@@ -161,12 +161,13 @@ html.vtop-dark-theme #vtop-header a {
 
 /* 7.2c QuickLinks Bar (Home, Printer, Star, Quick Links Dropdown) */
 #quickLinks,
-#quickLinks *,
-#quickLinks a,
-#quickLinks a *,
-#quickLinks i,
-#quickLinks span,
-#quickLinks button,
+#quickLinks > *:not(.dropdown-menu):not(.dropdown):not(.btn-group),
+#quickLinks .dropdown > button:not(.deleteQuickLinkBtn),
+#quickLinks .dropdown > button:not(.deleteQuickLinkBtn) *,
+#quickLinks > a,
+#quickLinks > a *,
+#quickLinks > button,
+#quickLinks > button *,
 #favouriteBtn,
 #favouriteBtn *,
 #favouriteBtn i,
@@ -175,6 +176,35 @@ html.vtop-dark-theme #vtop-header a {
 #printVTOPCoreDocument i,
 #printVTOPCoreDocument * {
   color: var(--vtop-text-inverse) !important;
+}
+
+/* QuickLinks Dropdown Menu Items (Readable dark text in Light Mode, light text in Dark Mode) */
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu,
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu .dropdown-item,
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu .dropdown-item span,
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu .dropdown-item i,
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu .deleteQuickLinkBtn {
+  color: var(--vtop-text-heading) !important;
+}
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu .dropdown-item:hover,
+html:not(.vtop-dark-theme) #quickLinks .dropdown-menu .dropdown-item:focus {
+  background-color: var(--vtop-bg-row-hover) !important;
+  color: var(--vtop-text-heading) !important;
+}
+html.vtop-dark-theme #quickLinks .dropdown-menu .dropdown-item,
+html.vtop-dark-theme #quickLinks .dropdown-menu .dropdown-item span,
+html.vtop-dark-theme #quickLinks .dropdown-menu .dropdown-item i,
+html.vtop-dark-theme #quickLinks .dropdown-menu .deleteQuickLinkBtn {
+  color: var(--vtop-text-primary) !important;
+}
+html.vtop-dark-theme #quickLinks .dropdown-menu .dropdown-item:hover,
+html.vtop-dark-theme #quickLinks .dropdown-menu .dropdown-item:focus {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-accent) !important;
+}
+html.vtop-dark-theme #quickLinks .dropdown-menu .deleteQuickLinkBtn {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
 }
 
 /* QuickLinks Dropdown Button (Clean white text, no outline/border) */
@@ -437,8 +467,8 @@ html.vtop-dark-theme div[id^="MG0"] button:hover {
   color: var(--vtop-text-inverse) !important;
 }
 
-.navbar:not(.navbar-light):not(#top-hmenu-bar) svg:not(.vtop-dock-icon),
-#vtop-header svg:not(.vtop-dock-icon):not(.dropdown-menu svg) {
+.navbar:not(.navbar-light):not(#top-hmenu-bar) svg:not(.vtop-dock-icon):not([fill="none"]),
+#vtop-header svg:not(.vtop-dock-icon):not(.dropdown-menu svg):not([fill="none"]) {
   color: var(--vtop-text-inverse) !important;
   fill: currentColor !important;
 }
@@ -509,17 +539,27 @@ html.vtop-dark-theme [bgcolor] {
   border-color: var(--vtop-dark-border) !important;
 }
 
-/* Override inline background attributes on cells and rows */
-html.vtop-dark-theme td[style*="background"],
-html.vtop-dark-theme tr[style*="background"],
+/* Override white/light inline background attributes on cells, rows, and containers while preserving colored timetable slots */
+html.vtop-dark-theme td[style*="background: #fff" i],
+html.vtop-dark-theme td[style*="background-color: #fff" i],
+html.vtop-dark-theme td[style*="background: white" i],
+html.vtop-dark-theme td[style*="background-color: white" i],
+html.vtop-dark-theme td[style*="background: rgb(255" i],
+html.vtop-dark-theme td[style*="background-color: rgb(255" i],
+html.vtop-dark-theme tr[style*="background: #fff" i],
+html.vtop-dark-theme tr[style*="background-color: #fff" i],
+html.vtop-dark-theme tr[style*="background: white" i],
+html.vtop-dark-theme tr[style*="background-color: white" i],
+html.vtop-dark-theme tr[style*="background: rgb(255" i],
+html.vtop-dark-theme tr[style*="background-color: rgb(255" i],
 html.vtop-dark-theme th[style*="background"],
 html.vtop-dark-theme table[style*="background"],
-html.vtop-dark-theme div[style*="background: #fff"],
-html.vtop-dark-theme div[style*="background-color: #fff"],
-html.vtop-dark-theme div[style*="background: white"],
-html.vtop-dark-theme div[style*="background-color: white"],
-html.vtop-dark-theme div[style*="background: rgb(255"],
-html.vtop-dark-theme div[style*="background-color: rgb(255"] {
+html.vtop-dark-theme div[style*="background: #fff" i],
+html.vtop-dark-theme div[style*="background-color: #fff" i],
+html.vtop-dark-theme div[style*="background: white" i],
+html.vtop-dark-theme div[style*="background-color: white" i],
+html.vtop-dark-theme div[style*="background: rgb(255" i],
+html.vtop-dark-theme div[style*="background-color: rgb(255" i] {
   background-color: var(--vtop-dark-bg-surface) !important;
   color: var(--vtop-dark-text-main) !important;
 }
@@ -610,6 +650,11 @@ html.vtop-dark-theme .card-header h2,
 html.vtop-dark-theme .card-header h3,
 html.vtop-dark-theme .card-header .h3 {
   color: var(--vtop-dark-accent) !important;
+}
+
+/* Prevent nested Bootstrap containers/tabs inside cards, panels, boxes, modals, or fieldsets from painting canvas bg (#0b0f19) over surface bg (#131c2e) */
+html.vtop-dark-theme :is(.card, .card-body, .panel, .panel-body, .box, .box-body, .modal-content, .accordion-body, fieldset) :is(.container, .container-fluid, .tab-content) {
+  background-color: transparent !important;
 }
 
 /* 7.5 Universal Forms, Inputs, Controls */

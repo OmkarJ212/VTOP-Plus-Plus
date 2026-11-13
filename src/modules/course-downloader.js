@@ -18,6 +18,7 @@
   const REGEX_STD_FILENAME = /filename=((['"]).*?\2|[^;\n]*)/i;
   const REGEX_SPACES = /\s+/g;
   const REGEX_ILLEGAL_FS = /[\/\\:*?"<>|]/g;
+  const REGEX_CTRL_CHARS = /[\x00-\x1f\x7f]/g;
   const REGEX_ONCLICK_FILEID = /downloadCourseMaterialFacultyPdf\s*\(\s*['"]?([a-zA-Z0-9_\-]+)['"]?/i;
   const REGEX_TOTAL_ENTRIES = /of\s+([\d,]+)\s+entries/i;
 
@@ -39,6 +40,7 @@
   let cancelRequested = false;
   let isCrawlingPages = false;
   let hasAutoCrawled = false;
+  let crawlGen = 0;
 
   function extractBaseCourseCode(code) {
     if (!code) return '';
@@ -48,6 +50,7 @@
   const CourseDownloader = {
     selectedFaculty: '__ALL__',
     _observer: null,
+    _statusTimer: null,
 
     getFileCount() {
       return allCourseFiles.size;
@@ -58,6 +61,7 @@
     },
 
     resetCourse() {
+      crawlGen++;
       allCourseFiles.clear();
       hasAutoCrawled = false;
       activeBaseCourseCode = null;
@@ -293,56 +297,63 @@
     async crawlAllPages() {
       if (isCrawlingPages) return;
       isCrawlingPages = true;
+      const gen = crawlGen;
 
-      this.showStatus('Scanning all pages for materials...', 3000);
-      this.updateFileCountLabel('Scanning pages...');
+      try {
+        this.showStatus('Scanning all pages for materials...', 3000);
+        this.updateFileCountLabel('Scanning pages...');
 
-      let maxPages = 20;
-      while (maxPages-- > 0) {
-        this.scanVisibleRows();
+        let maxPages = 20;
+        while (maxPages-- > 0) {
+          if (crawlGen !== gen) return;
+          this.scanVisibleRows();
 
-        const nextLi =
-          document.getElementById('materialTable_next') ||
-          document.querySelector('#materialTable_paginate .next, .paginate_button.next');
-        if (!nextLi || nextLi.classList.contains('disabled') || nextLi.getAttribute('aria-disabled') === 'true') {
-          break;
-        }
-
-        const nextA = nextLi.querySelector('a') || nextLi;
-        const snapshot = this.getTableStateSnapshot();
-        nextA.click();
-        await this.waitForTableStateChange(snapshot, 2500);
-      }
-
-      this.scanVisibleRows();
-
-      // Return to page 1
-      const firstBtn =
-        document.getElementById('materialTable_first') ||
-        document.querySelector('#materialTable_paginate .first a, #materialTable_paginate .paginate_button.first');
-      let targetBtn = firstBtn;
-      if (!targetBtn) {
-        const pageLinks = document.querySelectorAll(
-          '#materialTable_paginate .paginate_button, #materialTable_paginate .page-link, #materialTable_paginate a'
-        );
-        for (const btn of pageLinks) {
-          const txt = (btn.innerText || btn.textContent || '').trim();
-          if (txt === '1') {
-            targetBtn = btn;
+          const nextLi =
+            document.getElementById('materialTable_next') ||
+            document.querySelector('#materialTable_paginate .next, .paginate_button.next');
+          if (!nextLi || nextLi.classList.contains('disabled') || nextLi.getAttribute('aria-disabled') === 'true') {
             break;
           }
+
+          const nextA = nextLi.querySelector('a') || nextLi;
+          const snapshot = this.getTableStateSnapshot();
+          nextA.click();
+          await this.waitForTableStateChange(snapshot, 2500);
+          if (crawlGen !== gen) return;
         }
-      }
 
-      if (targetBtn) {
-        const snapshot = this.getTableStateSnapshot();
-        targetBtn.click();
-        await this.waitForTableStateChange(snapshot, 1500);
-      }
+        this.scanVisibleRows();
 
-      isCrawlingPages = false;
-      this.updateFacultyDropdown();
-      this.showStatus(`Found ${allCourseFiles.size} materials across all pages.`, 4000);
+        // Return to page 1
+        const firstBtn =
+          document.getElementById('materialTable_first') ||
+          document.querySelector('#materialTable_paginate .first a, #materialTable_paginate .paginate_button.first');
+        let targetBtn = firstBtn;
+        if (!targetBtn) {
+          const pageLinks = document.querySelectorAll(
+            '#materialTable_paginate .paginate_button, #materialTable_paginate .page-link, #materialTable_paginate a'
+          );
+          for (const btn of pageLinks) {
+            const txt = (btn.innerText || btn.textContent || '').trim();
+            if (txt === '1') {
+              targetBtn = btn;
+              break;
+            }
+          }
+        }
+
+        if (targetBtn) {
+          const snapshot = this.getTableStateSnapshot();
+          targetBtn.click();
+          await this.waitForTableStateChange(snapshot, 1500);
+          if (crawlGen !== gen) return;
+        }
+
+        this.updateFacultyDropdown();
+        this.showStatus(`Found ${allCourseFiles.size} materials across all pages.`, 4000);
+      } finally {
+        isCrawlingPages = false;
+      }
     },
 
     getTeachersMap() {
@@ -376,12 +387,12 @@
           </div>
           <div class="vtop-panel-body">
             <div class="vtop-form-group">
-              <label class="vtop-form-label" for="vtop-faculty-select">Select Faculty / Teacher:</label>
+              <label class="vtop-form-label" for="vtop-faculty-select">Faculty:</label>
               <select class="vtop-form-select" id="vtop-faculty-select"></select>
             </div>
 
             <div class="vtop-form-group">
-              <label class="vtop-form-label" for="vtop-regno-input">Student Registration No:</label>
+              <label class="vtop-form-label" for="vtop-regno-input">Registration No:</label>
               <input class="vtop-form-input" type="text" id="vtop-regno-input" placeholder="e.g. 24BCE0000" />
             </div>
 
@@ -429,6 +440,44 @@
         });
         header.addEventListener('dblclick', () => {
           panel.classList.toggle('vtop-minimized');
+        });
+
+        // Draggable floating panel via header
+        header.addEventListener('mousedown', (e) => {
+          if (e.button !== 0 || e.target.closest('#vtop-min-btn, button')) return;
+          const startX = e.clientX;
+          const startY = e.clientY;
+          const rect = panel.getBoundingClientRect();
+          let dragging = false;
+
+          const onMouseMove = (moveEvt) => {
+            const dx = moveEvt.clientX - startX;
+            const dy = moveEvt.clientY - startY;
+            if (!dragging && Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
+            if (!dragging) {
+              dragging = true;
+              panel.classList.add('vtop-panel-dragging');
+              panel.style.right = 'auto';
+              panel.style.bottom = 'auto';
+            }
+            const maxLeft = Math.max(0, window.innerWidth - panel.offsetWidth);
+            const maxTop = Math.max(0, window.innerHeight - panel.offsetHeight);
+            const nextLeft = Math.min(maxLeft, Math.max(0, rect.left + dx));
+            const nextTop = Math.min(maxTop, Math.max(0, rect.top + dy));
+            panel.style.left = `${nextLeft}px`;
+            panel.style.top = `${nextTop}px`;
+          };
+
+          const onMouseUp = () => {
+            if (dragging) {
+              panel.classList.remove('vtop-panel-dragging');
+            }
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+          };
+
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
         });
 
         document.getElementById('vtop-start-btn').addEventListener('click', () => this.handleDownloadAll());
@@ -613,11 +662,16 @@
     showStatus(text, autoHideMs = 0) {
       const msg = document.getElementById('vtop-status-msg');
       if (!msg) return;
+      if (this._statusTimer) {
+        clearTimeout(this._statusTimer);
+        this._statusTimer = null;
+      }
       msg.textContent = text;
       msg.style.display = 'block';
       if (autoHideMs > 0) {
-        setTimeout(() => {
+        this._statusTimer = setTimeout(() => {
           msg.style.display = 'none';
+          this._statusTimer = null;
         }, autoHideMs);
       }
     },
@@ -631,11 +685,16 @@
     },
 
     sanitizeFileName(name) {
-      if (!name) return '';
-      return name
+      if (!name || typeof name !== 'string') return '';
+      const cleaned = name
+        .replace(REGEX_CTRL_CHARS, '')
         .replace(REGEX_ILLEGAL_FS, '_')
         .replace(REGEX_WHITESPACE, ' ')
+        .trim()
+        .replace(/^\.+/, '')
         .trim();
+      if (!cleaned || cleaned === '.' || cleaned === '..') return '';
+      return cleaned;
     },
 
     base64ToArrayBuffer(base64) {
@@ -738,7 +797,7 @@
               fileName = `${fileInfo.courseCode}_${safeMatText}_${fileInfo.fileId}.${ext}`;
             }
 
-            fileName = this.sanitizeFileName(fileName);
+            fileName = this.sanitizeFileName(fileName) || `Material_${fileInfo.fileId}.${this.getExtensionFromContentType(fileData.contentType)}`;
 
             let uniqueName = fileName;
             let counter = 1;
@@ -796,7 +855,7 @@
           );
 
           const suffix = cancelRequested ? '_Partial' : '';
-          const zipFileName = `${courseCode}_${cleanTeacherName}_Materials${suffix}.zip`;
+          const zipFileName = this.sanitizeFileName(`${courseCode}_${cleanTeacherName}_Materials${suffix}.zip`) || 'Course_Materials.zip';
           this.triggerBlobDownload(zipBlob, zipFileName);
 
           if (progressBar) progressBar.style.width = '100%';
@@ -872,45 +931,48 @@
           let contentType = '';
           let contentDisposition = '';
 
+          let bgHandled = false;
           if (bgResult && bgResult.success && bgResult.base64Data) {
             arrayBuffer = this.base64ToArrayBuffer(bgResult.base64Data);
             contentType = bgResult.contentType || '';
             contentDisposition = bgResult.contentDisposition || '';
-          } else if (bgResult && bgResult.error) {
-            if (bgResult.error.includes('429')) {
-              throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
-            }
-            throw new Error(bgResult.error);
-          } else {
+            bgHandled = true;
+          } else if (bgResult && bgResult.error && bgResult.error.includes('429')) {
+            throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
+          }
+
+          if (!bgHandled) {
             // Attempt 2: Fallback to direct fetch in page context
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-            const response = await fetch(targetUrl, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                ...customHeaders
-              },
-              body: bodyString,
-              credentials: 'include',
-              redirect: 'follow',
-              signal: controller.signal
-            });
+            try {
+              const response = await fetch(targetUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                  ...customHeaders
+                },
+                body: bodyString,
+                credentials: 'include',
+                redirect: 'follow',
+                signal: controller.signal
+              });
 
-            clearTimeout(timeoutId);
+              if (response.status === 429) {
+                throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
+              }
 
-            if (response.status === 429) {
-              throw new Error('HTTP 429: VTOP has temporarily rate-limited downloads. Please wait a few minutes.');
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status} ${response.statusText}`);
+              }
+
+              contentType = response.headers.get('content-type') || '';
+              contentDisposition = response.headers.get('content-disposition') || '';
+              arrayBuffer = await response.arrayBuffer();
+            } finally {
+              clearTimeout(timeoutId);
             }
-
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status} ${response.statusText}`);
-            }
-
-            contentType = response.headers.get('content-type') || '';
-            contentDisposition = response.headers.get('content-disposition') || '';
-            arrayBuffer = await response.arrayBuffer();
           }
 
           if (!arrayBuffer || arrayBuffer.byteLength === 0) {
@@ -996,7 +1058,7 @@
       setTimeout(() => {
         if (a.parentNode) document.body.removeChild(a);
         URL.revokeObjectURL(url);
-      }, 60000);
+      }, 10000);
     }
   };
 
