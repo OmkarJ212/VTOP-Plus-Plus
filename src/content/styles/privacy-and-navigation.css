@@ -61,7 +61,7 @@
   transform: translateZ(0);
 }
 .vtop-top-progress.vtop-progress-active {
-  background: linear-gradient(90deg, #38bdf8, #0284c7, #10b981, #38bdf8);
+  background: linear-gradient(90deg, transparent, #38bdf8, transparent);
   background-size: 200% 100%;
   animation: vtopProgressAnim 1.2s linear infinite;
 }
@@ -352,18 +352,17 @@ html.vtop-privacy-active #vtop-dock-priv-btn:hover {
   background: #ffffff;
   color: #64748b;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1050;
   box-shadow: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .vtop-drawer-close-btn:hover {
   background: #ef4444;
   color: #ffffff;
   border-color: #dc2626;
-  transform: scale(1.08);
 }

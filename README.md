@@ -22,7 +22,7 @@ It brings batch course material downloads, live course filtering, attendance bun
 
 ### 3. Attendance Bunk Calculator & Debarment Alerts
 - Analyzes attendance tables across VTOP:
-  - Shows how many classes you can **safely bunk** when above your target, or how many consecutive classes you **must attend** when below it.
+  - Shows how many classes you can **safely bunk** (`Can bunk X classes` / `Can bunk all remaining`) when above your target, or how many classes you **need to attend** (`Need to attend X classes` / `Impossible` when recovery exceeds realistic semester limits) when below it, rendered as clean inline text.
 - **Continuous Target Slider & Input (`1%–100%`):** Persists your target percentage (default `75%`) and shows a warning banner if set below VIT's `75%` debarment threshold.
 - **Summary Card:** Tracks Average Attendance, Safe Subjects (`≥80%`), Warning (`75%–79%`), Debarred Risk (`<75%`), and On-Duty (OD) classes.
 
@@ -49,9 +49,9 @@ It brings batch course material downloads, live course filtering, attendance bun
 
 ### 9. Navbar Quick Dock, Dark Mode, Privacy Mode & Dashboard Widgets
 - **Navbar-Integrated Quick Dock:** Adds 1-click page shortcut pills, a top linear navigation progress bar, and instant icon toggles directly into the VTOP navbar.
-- **Zero-Leak Dark Mode Engine:** Applied at `document_start` to avoid white flash (FOUC), includes automatic `@media print` reset for clean fee receipts/hall tickets, and pairs with consistent rounded slate scrollbars in both light and dark modes.
+- **Zero-Leak Dark Mode Engine:** Applied at `document_start` to avoid white flash (FOUC), preserves identical geometry across light and dark toggles (zero layout shift), includes automatic `@media print` reset for clean fee receipts/hall tickets, and pairs with consistent rounded slate scrollbars in both themes.
 - **Privacy Mode:** One-click toggle that blurs student photos, registration numbers, profile names, and CGPA values on screen (reveals on hover).
-- **Home Class Messages & Dashboard Modernization:** Fetches faculty class messages into a Home dashboard card (with 5-minute cache), styles dashboard Events/Spotlight/sidebar cards, and adds backdrop + close controls to VTOP mega-menu drawers.
+- **Home Class Messages & Page Modernization:** Fetches faculty class messages into a Home dashboard card (with 5-minute cache), unifies card rounding (`0.375rem`) and styling across Dashboard, Course Page, and My Curriculum (category cards, tabs, and DataTables), strips stray VTOP DOM artifacts, and adds backdrop + close controls to VTOP mega-menu drawers.
 
 ---
 

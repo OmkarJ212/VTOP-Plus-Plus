@@ -284,7 +284,7 @@
       box.className = 'vtop-plus-course-filter-panel';
       box.style.cssText =
         'display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding:16px;' +
-        `background:${boxBg};border:1px solid ${boxBorder};border-radius:12px;margin:12px 0 16px;width:100%;` +
+        `background:${boxBg};border:1px solid ${boxBorder};border-radius:0.375rem;margin:12px 0 16px;width:100%;` +
         'box-sizing:border-box;box-shadow:none;font-family:inherit;';
 
       const selCss = `width:100%;height:38px;padding:6px 12px;border:1px solid ${selBorder};border-radius:6px;background:${selBg};font-size:13px;color:${textColor};`;

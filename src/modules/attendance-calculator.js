@@ -9,6 +9,8 @@
 
   window.VTOP_PLUS = window.VTOP_PLUS || {};
 
+  const HARD_MAX_NEEDED = 100;
+
   const AttendanceCalculator = {
     targetPercent: 75,
     _settingsLoaded: false,
@@ -103,8 +105,8 @@
             <label for="vtop-target-slider" style="font-weight: 600; font-size: 13px; color: #334155;">Target:</label>
             <input type="range" id="vtop-target-slider" min="1" max="100" step="1" value="${this.targetPercent}" style="width: 120px; cursor: pointer;" />
             <div style="display: flex; align-items: center; gap: 2px;">
-              <input type="number" id="vtop-target-num" min="1" max="100" value="${this.targetPercent}" class="vtop-target-input" style="width: 52px; padding: 4px 6px; font-size: 13px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center;" />
-              <span style="font-weight: 700; color: #475569; font-size: 13px;">%</span>
+              <input type="number" id="vtop-target-num" min="1" max="100" value="${this.targetPercent}" class="vtop-target-input" style="width: 52px; padding: 4px 6px; font-size: 13px; font-weight: 600; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center; font-variant-numeric: tabular-nums;" />
+              <span style="font-weight: 600; color: #475569; font-size: 13px;">%</span>
             </div>
           </div>
         </div>
@@ -166,6 +168,24 @@
 
       slider?.addEventListener('input', (e) => updateTarget(e.target.value));
       numInput?.addEventListener('change', (e) => updateTarget(e.target.value));
+    },
+
+    getCourseType(row) {
+      const rowText = (row.textContent || '').toLowerCase();
+      if (/\b(lab\s*only|embedded\s*lab|lo|ela)\b/i.test(rowText)) {
+        return 'lab';
+      }
+      return 'theory';
+    },
+
+    estimateMaxRemaining(totalConducted, courseType) {
+      // ~15-week VIT semester cap (~30 lab sessions, ~60 theory/SS classes)
+      const semesterCap = courseType === 'lab' ? 30 : 60;
+      if (totalConducted < semesterCap) {
+        return semesterCap - totalConducted;
+      }
+      // Small buffer if instructor already conducted more than the typical cap
+      return courseType === 'lab' ? 4 : 6;
     },
 
     /**
@@ -317,6 +337,8 @@
         else if (currentPct >= 75) warnCount++;
         else dangerCount++;
 
+        const courseType = this.getCourseType(row);
+        const maxRemaining = this.estimateMaxRemaining(data.total, courseType);
         const target = Math.max(0.01, this.targetPercent / 100);
         let statusHtml = '';
 
@@ -326,13 +348,13 @@
             const missed = data.total - data.attended;
             statusHtml = `
               <span class="vtop-badge vtop-badge-danger" title="Cannot achieve 100% attendance as ${missed} class${missed === 1 ? ' was' : 'es were'} missed">
-                100% Impossible (already missed ${missed})
+                Impossible (missed ${missed})
               </span>
             `;
           } else {
             statusHtml = `
               <span class="vtop-badge vtop-badge-warn" title="Must attend every remaining class to stay at 100%">
-                Must attend every class (0 bunks)
+                Need to attend all
               </span>
             `;
           }
@@ -342,23 +364,42 @@
           if (safeBunks === 0) {
             statusHtml = `
               <span class="vtop-badge ${badgeClass}" title="Current attendance is right at target. Bunking the next class will drop you below ${this.targetPercent}%">
-                On target (cannot bunk next class)
+                On target (0 bunks left)
+              </span>
+            `;
+          } else if (safeBunks > maxRemaining || safeBunks > HARD_MAX_NEEDED) {
+            statusHtml = `
+              <span class="vtop-badge ${badgeClass}" title="Mathematically ${safeBunks} bunks above ${this.targetPercent}%, covering all remaining classes in the semester">
+                Can bunk all remaining
               </span>
             `;
           } else {
             statusHtml = `
               <span class="vtop-badge ${badgeClass}">
-                Can bunk <strong>${safeBunks}</strong> class${safeBunks === 1 ? '' : 'es'}
+                Can bunk ${safeBunks} class${safeBunks === 1 ? '' : 'es'}
               </span>
             `;
           }
         } else {
           const needed = Math.max(1, Math.ceil((target * data.total - data.attended) / (1 - target)));
-          statusHtml = `
-            <span class="vtop-badge vtop-badge-danger">
-              Attend <strong>${needed}</strong> consecutive class${needed === 1 ? '' : 'es'}
-            </span>
-          `;
+          const maxPossiblePct =
+            data.total + maxRemaining > 0
+              ? ((data.attended + maxRemaining) / (data.total + maxRemaining)) * 100
+              : data.percentage;
+
+          if (needed > maxRemaining || needed > HARD_MAX_NEEDED || maxPossiblePct < this.targetPercent) {
+            statusHtml = `
+              <span class="vtop-badge vtop-badge-danger" title="Need to attend ${needed} consecutive classes to reach ${this.targetPercent}%, which exceeds realistic remaining classes in a semester">
+                Impossible
+              </span>
+            `;
+          } else {
+            statusHtml = `
+              <span class="vtop-badge vtop-badge-danger">
+                Need to attend ${needed} class${needed === 1 ? '' : 'es'}
+              </span>
+            `;
+          }
         }
 
         // Clarify On Duty in cell if present

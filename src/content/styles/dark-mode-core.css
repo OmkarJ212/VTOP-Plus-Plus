@@ -491,7 +491,7 @@ body.vtop-dark-theme .text-light {
 
 html.vtop-dark-theme .dropdown-menu {
   background-color: var(--vtop-dark-bg-elevated) !important;
-  border: 1px solid var(--vtop-dark-border) !important;
+  border-color: var(--vtop-dark-border) !important;
   box-shadow: none !important;
 }
 
@@ -581,7 +581,7 @@ html.vtop-dark-theme .table-bordered > tfoot > tr > th,
 html.vtop-dark-theme .table-bordered > thead > tr > td,
 html.vtop-dark-theme .table-bordered > tbody > tr > td,
 html.vtop-dark-theme .table-bordered > tfoot > tr > td {
-  border: 1px solid var(--vtop-dark-border) !important;
+  border-color: var(--vtop-dark-border) !important;
 }
 
 /* 7.4 Containers (Panels, Boxes, Cards, Wells, Modals) */

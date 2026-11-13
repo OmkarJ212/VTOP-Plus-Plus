@@ -83,7 +83,7 @@
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="text" id="vtop-palette-input" class="vtop-palette-input"
-              placeholder="Search all VTOP pages (e.g. course page, marks, attendance, timetable, da, leave)..."
+              placeholder="Search VTOP pages"
               autocomplete="off" spellcheck="false" />
             <kbd class="vtop-palette-esc">ESC</kbd>
           </div>
