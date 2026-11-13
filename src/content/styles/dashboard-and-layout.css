@@ -1282,7 +1282,7 @@ html.vtop-dark-theme #curriculumCategoryView .dataTables_filter label {
 html.vtop-dark-theme #curriculumCategoryView .table-responsive,
 html.vtop-dark-theme #curriculumCategoryView .dt-row,
 html.vtop-dark-theme #curriculumCategoryView table.table {
-  background-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
 }
 
 html.vtop-dark-theme #curriculumCategoryView thead.bg-gradient-light {
