@@ -109,7 +109,7 @@
         if (idMatch && idMatch[1]) return idMatch[1].toUpperCase();
       }
 
-      const bodyText = document.body?.innerText || document.body?.textContent || '';
+      const bodyText = document.body?.textContent || '';
       const regMatch = bodyText.match(/\b(2[0-9][A-Z]{3}[0-9]{4,5})\b/i);
       if (regMatch) return regMatch[1].toUpperCase();
 

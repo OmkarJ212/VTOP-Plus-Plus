@@ -25,6 +25,7 @@
       this.prevSelectedIndex = 0;
       this._keyboardListenerAttached = false;
       this._keydownHandler = null;
+      this.lastFocusedElement = null;
     }
 
     init() {
@@ -44,6 +45,12 @@
         this.modal.remove();
         this.modal = null;
       }
+      this.input = null;
+      this.resultsContainer = null;
+      this.emptyState = null;
+      this.rowPool = [];
+      this.filteredItems = [];
+      this.lastFocusedElement = null;
     }
 
     initKeyboardListener() {
@@ -67,6 +74,7 @@
         this.modal = document.getElementById('vtop-plus-palette-overlay');
         this.input = document.getElementById('vtop-palette-input');
         this.resultsContainer = document.getElementById('vtop-palette-list');
+        this.emptyState = document.getElementById('vtop-palette-empty');
         return;
       }
 
@@ -95,8 +103,6 @@
           <div class="vtop-palette-footer">
             <span class="vtop-palette-hint"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
             <span class="vtop-palette-hint"><kbd>Enter</kbd> Select</span>
-            <span class="vtop-palette-hint"><kbd>Esc</kbd> Close</span>
-            <span style="margin-left:auto;font-weight:600;color:var(--vtop-accent-sky);font-size:12px;">Search Pages</span>
           </div>
         </div>
       `;
@@ -134,12 +140,7 @@
         mainEl.appendChild(titleEl);
         mainEl.appendChild(subEl);
 
-        const actionEl = document.createElement('span');
-        actionEl.className = 'vtop-palette-item-action';
-        actionEl.textContent = 'Open →';
-
         row.appendChild(mainEl);
-        row.appendChild(actionEl);
 
         const poolEntry = { row, titleEl, subEl, item: null };
         row.addEventListener('click', () => {
@@ -162,6 +163,7 @@
         window.VTOP_PLUS.Crawler.scan();
       }
 
+      this.lastFocusedElement = document.activeElement;
       this.modal.style.display = 'flex';
       this.isOpen = true;
       this.selectedIndex = 0;
@@ -181,6 +183,10 @@
     close() {
       if (this.modal) this.modal.style.display = 'none';
       this.isOpen = false;
+      if (this.lastFocusedElement && this.lastFocusedElement.isConnected && typeof this.lastFocusedElement.focus === 'function') {
+        this.lastFocusedElement.focus();
+      }
+      this.lastFocusedElement = null;
     }
 
     toggle() {
@@ -256,32 +262,7 @@
     handleSearch(query) {
       const q = (query || '').trim().toLowerCase();
       const crawler = window.VTOP_PLUS.Crawler;
-      const crawledItems = crawler ? crawler.getAllItems() : [];
-
-      const builtInActions = [
-        {
-          id: 'vtop-action-dark-mode',
-          title: 'Toggle Dark Mode',
-          category: 'Quick Action',
-          isAction: true,
-          action: () => window.VTOP_PLUS.DarkMode?.toggle(),
-          acronym: 'dm',
-          words: ['toggle', 'dark', 'mode', 'theme', 'night'],
-          synonyms: ['dark', 'night', 'theme', 'black', 'mode', 'light']
-        },
-        {
-          id: 'vtop-action-privacy-mode',
-          title: 'Toggle Privacy Blur',
-          category: 'Quick Action',
-          isAction: true,
-          action: () => window.VTOP_PLUS.PrivacyMode?.toggle(),
-          acronym: 'pm',
-          words: ['toggle', 'privacy', 'blur', 'mode', 'incognito'],
-          synonyms: ['privacy', 'blur', 'hide', 'censor', 'incognito']
-        }
-      ];
-
-      const allItems = [...builtInActions, ...crawledItems];
+      const allItems = crawler ? crawler.getAllItems() : [];
 
       if (!q) {
         this.filteredItems = allItems.slice(0, POOL_SIZE);
@@ -366,6 +347,10 @@
     }
 
     handleKeyDown(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        return;
+      }
       if (!this.filteredItems.length) return;
 
       if (e.key === 'ArrowDown') {

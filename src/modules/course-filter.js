@@ -39,6 +39,14 @@
     courseCol: 1,
     native: null,
     timer: null,
+    waitObserver: null,
+    waitRaf: null,
+    finishTimer: null,
+    finishObserver: null,
+    bodyObserver: null,
+    bodyObserverTarget: null,
+    filterDebounceTimer: null,
+    lastDtQuery: '',
     pending: null
   };
 
@@ -152,6 +160,22 @@
     destroy() {
       stopWaiting();
 
+      if (state.bodyObserver) {
+        state.bodyObserver.disconnect();
+        state.bodyObserver = null;
+      }
+      if (state.bodyObserverTarget) {
+        delete state.bodyObserverTarget.dataset.vtopFilterBound;
+        state.bodyObserverTarget = null;
+      }
+      if (state.filterDebounceTimer) {
+        clearTimeout(state.filterDebounceTimer);
+        state.filterDebounceTimer = null;
+      }
+
+      state.topicQ = '';
+      state.fac = 'ALL';
+
       // 1. Remove course dropdown UI
       const ui = document.getElementById(UI_ID);
       if (ui) ui.remove();
@@ -170,11 +194,22 @@
       const bar = document.getElementById(TABLE_BAR_ID);
       if (bar) bar.remove();
 
-      // 4. Reset table rows display
+      // 4. Reset table rows display and clear any DataTables query set by CourseFilter
       const table = this.findMaterialsTable();
       if (table) {
+        if (state.lastDtQuery) {
+          const wrap = table.closest('.dataTables_wrapper, .dt-container') || document;
+          const dtInput = wrap.querySelector('.dataTables_filter input, .dt-search input');
+          if (dtInput && dtInput.value === state.lastDtQuery) {
+            dtInput.value = '';
+            dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          state.lastDtQuery = '';
+        }
         const rows = table.querySelectorAll('tbody tr');
         rows.forEach((r) => (r.style.display = ''));
+      } else {
+        state.lastDtQuery = '';
       }
     },
 
@@ -275,28 +310,28 @@
       box.id = UI_ID;
       box.className = 'vtop-plus-course-filter-panel';
       box.style.cssText =
-        'display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding:16px;' +
-        'background:var(--vtop-bg-surface);border:1px solid var(--vtop-border-strong);border-radius:0.375rem;margin:12px 0 16px;width:100%;' +
+        'display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:10px 12px;' +
+        'background:var(--vtop-bg-surface);border:1px solid var(--vtop-border-strong);border-radius:0.375rem;margin:8px 0 12px;width:100%;max-width:100%;min-width:0;' +
         'box-sizing:border-box;box-shadow:none;font-family:inherit;';
 
-      const selCss = 'width:100%;height:38px;padding:6px 12px;border:1px solid var(--vtop-border-strong);border-radius:6px;background:var(--vtop-bg-input);font-size:13px;color:var(--vtop-text-primary);';
-      const lblCss = 'font-weight:700;font-size:12px;color:var(--vtop-text-secondary);margin-bottom:6px;display:block;';
+      const selCss = 'width:100%;min-width:0;height:34px;padding:4px 10px;border:1px solid var(--vtop-border-strong);border-radius:6px;background:var(--vtop-bg-input);font-size:12.5px;color:var(--vtop-text-primary);box-sizing:border-box;';
+      const lblCss = 'font-weight:700;font-size:11.5px;color:var(--vtop-text-secondary);margin-bottom:4px;display:block;';
 
       box.innerHTML = `
         <div style="display:flex;flex-direction:column;justify-content:flex-end;">
-          <label style="${lblCss}">1. Select Semester (Recent First)</label>
+          <label style="${lblCss}">Semester</label>
           <select id="vtop-sem-select" class="form-control" style="${selCss}">
             <option value="">-- Choose Semester --</option>
           </select>
         </div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end;">
-          <label style="${lblCss}">2. Select Subject</label>
+          <label style="${lblCss}">Subject</label>
           <select id="vtop-subj-select" class="form-control" style="${selCss}" disabled>
             <option value="">-- Select Semester First --</option>
           </select>
         </div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end;">
-          <label style="${lblCss}">3. Filter by Faculty</label>
+          <label style="${lblCss}">Faculty</label>
           <select id="vtop-fac-select" class="form-control" style="${selCss}" disabled>
             <option value="ALL">-- Select Subject First --</option>
           </select>
@@ -415,7 +450,7 @@
       const def = document.createElement('option');
       def.value = '';
       def.textContent = list.length
-        ? `-- Choose Subject (${list.length} shown) --`
+        ? '-- Choose Subject --'
         : '-- No subjects found --';
       frag.appendChild(def);
       list.forEach((c) => {
@@ -441,7 +476,7 @@
       const frag = document.createDocumentFragment();
       const all = document.createElement('option');
       all.value = 'ALL';
-      all.textContent = `All Faculty (${list.length} shown)`;
+      all.textContent = 'All Faculty';
       frag.appendChild(all);
       list.forEach((f) => {
         const o = document.createElement('option');
@@ -551,15 +586,25 @@
       // Observe tbody so DataTables page changes automatically re-apply active filter
       const tbody = table.querySelector('tbody');
       if (tbody && !tbody.dataset.vtopFilterBound) {
+        if (state.bodyObserver) {
+          state.bodyObserver.disconnect();
+          state.bodyObserver = null;
+        }
+        if (state.bodyObserverTarget) {
+          delete state.bodyObserverTarget.dataset.vtopFilterBound;
+        }
         tbody.dataset.vtopFilterBound = 'true';
-        let debounceTimer = null;
-        const bodyObs = new MutationObserver(() => {
+        state.bodyObserverTarget = tbody;
+        state.bodyObserver = new MutationObserver(() => {
           if (state.topicQ || state.fac !== 'ALL') {
-            if (debounceTimer) clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => this.applyFilter(), 40);
+            if (state.filterDebounceTimer) clearTimeout(state.filterDebounceTimer);
+            state.filterDebounceTimer = setTimeout(() => {
+              state.filterDebounceTimer = null;
+              this.applyFilter();
+            }, 40);
           }
         });
-        bodyObs.observe(tbody, { childList: true });
+        state.bodyObserver.observe(tbody, { childList: true });
       }
     },
 
@@ -576,9 +621,18 @@
       const dtInput = wrap.querySelector('.dataTables_filter input, .dt-search input');
       if (dtInput) {
         const desiredVal = (selectedFac !== 'ALL' && !query) ? selectedFac : '';
-        if (dtInput.value !== desiredVal && (desiredVal || dtInput.value)) {
-          dtInput.value = desiredVal;
+        if (desiredVal) {
+          if (dtInput.value !== desiredVal) {
+            dtInput.value = desiredVal;
+            state.lastDtQuery = desiredVal;
+            dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        } else if (state.lastDtQuery && dtInput.value === state.lastDtQuery) {
+          dtInput.value = '';
+          state.lastDtQuery = '';
           dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+        } else if (!dtInput.value) {
+          state.lastDtQuery = '';
         }
       }
 
@@ -673,10 +727,16 @@
     };
     setBusy(true);
 
-    // React immediately when #page_outline receives the AJAX-injected #materialTable
+    // React when #page_outline receives the AJAX-injected #materialTable (coalesced per frame)
     const watchRoot = document.getElementById('page_outline') || document.body;
     if (watchRoot) {
-      state.waitObserver = new MutationObserver(() => tryExtract(filterInstance));
+      state.waitObserver = new MutationObserver(() => {
+        if (state.waitRaf) return;
+        state.waitRaf = requestAnimationFrame(() => {
+          state.waitRaf = null;
+          tryExtract(filterInstance);
+        });
+      });
       state.waitObserver.observe(watchRoot, { childList: true, subtree: true });
     }
 
@@ -687,9 +747,21 @@
   function stopWaiting() {
     clearInterval(state.timer);
     state.timer = null;
+    if (state.waitRaf) {
+      cancelAnimationFrame(state.waitRaf);
+      state.waitRaf = null;
+    }
     if (state.waitObserver) {
       state.waitObserver.disconnect();
       state.waitObserver = null;
+    }
+    if (state.finishTimer) {
+      clearTimeout(state.finishTimer);
+      state.finishTimer = null;
+    }
+    if (state.finishObserver) {
+      state.finishObserver.disconnect();
+      state.finishObserver = null;
     }
     state.pending = null;
     setBusy(false);
@@ -778,19 +850,27 @@
     }
 
     // Otherwise observe tbody for instant redraw completion, with short 120ms fallback
+    const targetSubj = state.subj;
     let done = false;
-    let bodyObs = null;
     const runOnce = () => {
       if (done) return;
       done = true;
-      if (bodyObs) bodyObs.disconnect();
+      if (state.finishObserver) {
+        state.finishObserver.disconnect();
+        state.finishObserver = null;
+      }
+      if (state.finishTimer) {
+        clearTimeout(state.finishTimer);
+        state.finishTimer = null;
+      }
+      if (state.subj !== targetSubj || !table.isConnected) return;
       extractRows();
     };
     if (tbody) {
-      bodyObs = new MutationObserver(runOnce);
-      bodyObs.observe(tbody, { childList: true });
+      state.finishObserver = new MutationObserver(runOnce);
+      state.finishObserver.observe(tbody, { childList: true });
     }
-    setTimeout(runOnce, 120);
+    state.finishTimer = setTimeout(runOnce, 120);
   }
 
   window.VTOP_PLUS.CourseFilter = CourseFilter;

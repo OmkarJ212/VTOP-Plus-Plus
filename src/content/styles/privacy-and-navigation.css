@@ -30,17 +30,32 @@
 .vtop-privacy-active .vtop-privacy-blur-target {
   filter: blur(8px) !important;
   user-select: none !important;
-  transition: filter 0.2s ease-in-out;
 }
 
 /* Smooth hover-to-reveal for convenience */
 .vtop-privacy-active #authorizedID:hover,
+.vtop-privacy-active #authorizedIDX:hover,
+.vtop-privacy-active input[name*="regNo" i]:hover,
+.vtop-privacy-active .student-photo:hover,
+.vtop-privacy-active img[src*="StudentPhoto" i]:hover,
+.vtop-privacy-active img[src*="photo" i]:hover,
+.vtop-privacy-active .cgpa-score:hover,
+.vtop-privacy-active td[aria-describedby*="cgpa"]:hover,
 .vtop-privacy-active #navbarDropdown:hover,
 .vtop-privacy-active .navbar-nav .dropdown-toggle:hover,
+.vtop-privacy-active .user-profile:hover,
 .vtop-privacy-active .img-circle:hover,
 .vtop-privacy-active .user-image:hover,
 .vtop-privacy-active .profile-user-img:hover,
-.vtop-privacy-active img[src*="StudentPhoto" i]:hover,
+.vtop-privacy-active img[class*="avatar" i]:hover,
+.vtop-privacy-active img[class*="circle" i]:hover,
+.vtop-privacy-active .navbar-custom-menu img:not([src*="logo" i]):not([src*="icon" i]):hover,
+.vtop-privacy-active .navbar-nav img:not([src*="logo" i]):not([src*="icon" i]):hover,
+.vtop-privacy-active .user-menu img:hover,
+.vtop-privacy-active .user-panel img:hover,
+.vtop-privacy-active img[alt*="student" i]:hover,
+.vtop-privacy-active img[alt*="user" i]:hover,
+.vtop-privacy-active img[alt*="profile" i]:hover,
 .vtop-privacy-active .vtop-privacy-blur-photo:hover,
 .vtop-privacy-active .vtop-privacy-blur-target:hover {
   filter: blur(0px) !important;

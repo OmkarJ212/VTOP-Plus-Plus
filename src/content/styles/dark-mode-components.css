@@ -163,7 +163,6 @@ html.vtop-dark-theme .paginate_button.current:hover {
 .paginate_button.disabled:hover,
 .paginate_button.disabled .page-link,
 .paginate_button.disabled a,
-#materialTable_previous .page-link,
 #materialTable_previous.disabled .page-link,
 #materialTable_next.disabled .page-link,
 [id$="_previous"].disabled .page-link,
@@ -180,7 +179,6 @@ html.vtop-dark-theme .paginate_button.disabled,
 html.vtop-dark-theme .paginate_button.disabled:hover,
 html.vtop-dark-theme .paginate_button.disabled .page-link,
 html.vtop-dark-theme .paginate_button.disabled a,
-html.vtop-dark-theme #materialTable_previous .page-link,
 html.vtop-dark-theme #materialTable_previous.disabled .page-link,
 html.vtop-dark-theme #materialTable_next.disabled .page-link,
 html.vtop-dark-theme [id$="_previous"].disabled .page-link,
@@ -469,18 +467,38 @@ html.vtop-dark-theme .offcanvas-title {
   color: var(--vtop-dark-accent) !important;
 }
 
-/* 7.25 VTOP Custom Page Wrappers (Kills white background & white borders around cards) */
-html.vtop-dark-theme .WhiteBackground,
-html.vtop-dark-theme .whiteBackground,
-html.vtop-dark-theme [class*="WhiteBackground" i],
-html.vtop-dark-theme [class*="whiteBackground" i],
+/* 7.25 VTOP Custom Page Wrappers (Removes outer white box/border around cards in both Light & Dark modes) */
+.WhiteBackground:has(> .card, > .box, > .panel, > fieldset),
+.whiteBackground:has(> .card, > .box, > .panel, > fieldset),
+[class*="WhiteBackground" i]:has(> .card, > .box, > .panel, > fieldset),
+[class*="whiteBackground" i]:has(> .card, > .box, > .panel, > fieldset),
+.col-12.WhiteBackground,
+.col-12.whiteBackground,
+.col-12[class*="WhiteBackground" i],
+.col-12[class*="whiteBackground" i] {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme .WhiteBackground:not(.col-12):not(:has(> .card, > .box, > .panel, > fieldset)),
+html.vtop-dark-theme .whiteBackground:not(.col-12):not(:has(> .card, > .box, > .panel, > fieldset)),
+html.vtop-dark-theme [class*="WhiteBackground" i]:not(.col-12):not(:has(> .card, > .box, > .panel, > fieldset)),
+html.vtop-dark-theme [class*="whiteBackground" i]:not(.col-12):not(:has(> .card, > .box, > .panel, > fieldset)),
 html.vtop-dark-theme [class*="WhiteBg" i],
 html.vtop-dark-theme [class*="whiteBg" i],
 html.vtop-dark-theme [class*="white-bg" i] {
   background-color: var(--vtop-dark-bg-canvas) !important;
   background: var(--vtop-dark-bg-canvas) !important;
-  border-color: var(--vtop-dark-border) !important;
+  border: none !important;
   box-shadow: none !important;
+}
+
+html.vtop-dark-theme :is(.card, .card-body, .panel, .panel-body, .box, .box-body, .modal-content, .accordion-body, fieldset) :is(.WhiteBackground, .whiteBackground, [class*="WhiteBackground" i], [class*="whiteBackground" i], [class*="WhiteBg" i], [class*="whiteBg" i], [class*="white-bg" i]) {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 /* Custom VTOP Border & Header utilities */

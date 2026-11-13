@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Load stored settings
   if (chrome?.storage?.local) {
     chrome.storage.local.get(null, (items) => {
+      if (chrome.runtime.lastError || !items) return;
       for (const [key, elem] of Object.entries(toggles)) {
         if (elem && items[key] !== undefined) {
           elem.checked = Boolean(items[key]);
@@ -120,10 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnPrivacy) {
     btnPrivacy.addEventListener('click', () => {
-      const newState = !toggles.enablePrivacyMode?.checked;
-      if (toggles.enablePrivacyMode) {
-        toggles.enablePrivacyMode.checked = newState;
-      }
+      const newState = !btnPrivacy.classList.contains('active');
       if (chrome?.storage?.local) {
         chrome.storage.local.set({ enablePrivacyMode: newState });
       }
@@ -162,13 +160,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  let statusTimer = null;
   function showStatus(text, type = 'success') {
     if (!statusMsg) return;
     statusMsg.textContent = text;
     statusMsg.className = 'status-message ' + type;
     statusMsg.style.display = 'block';
-    setTimeout(() => {
+    if (statusTimer) clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => {
       statusMsg.style.display = 'none';
+      statusTimer = null;
     }, 3000);
   }
 });

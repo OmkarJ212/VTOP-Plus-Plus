@@ -17,16 +17,20 @@
   function sanitizeFragmentNode(root) {
     if (!root) return;
 
-    root.querySelectorAll('script, style, iframe, object, embed, link, meta').forEach((el) => el.remove());
+    root.querySelectorAll('script, style, iframe, object, embed, link, meta, svg, math, base, form, template').forEach((el) => el.remove());
 
+    const DANGEROUS_URI_ATTRS = new Set(['href', 'src', 'xlink:href', 'action', 'formaction', 'poster']);
     const all = [root, ...root.querySelectorAll('*')];
     for (const el of all) {
       for (const attr of Array.from(el.attributes)) {
         const name = attr.name.toLowerCase();
         if (name.startsWith('on')) {
           el.removeAttribute(attr.name);
-        } else if ((name === 'href' || name === 'src') && /^\s*javascript:/i.test(attr.value)) {
-          el.removeAttribute(attr.name);
+        } else if (DANGEROUS_URI_ATTRS.has(name)) {
+          const normalized = String(attr.value || '').replace(/[\x00-\x20\x7f]+/g, '');
+          if (/^(javascript|vbscript|data):/i.test(normalized)) {
+            el.removeAttribute(attr.name);
+          }
         }
       }
 
@@ -249,7 +253,10 @@
       };
 
       const html = await attempt(true);
-      if (/view\s+class\s+messages|no\s+messages\s+sent\s+by\s+faculty|class\s+message/i.test(html)) {
+      if (
+        /view\s+class\s+messages|no\s+messages\s+sent\s+by\s+faculty|class\s+message/i.test(html) ||
+        /id="vtopLoginForm"|id="loginForm"|Login\s*-\s*VTOP/i.test(html)
+      ) {
         return html;
       }
 
@@ -374,7 +381,9 @@
       body.innerHTML = '';
       const contentWrap = document.createElement('div');
       contentWrap.className = 'vtop-msg-content';
-      contentWrap.innerHTML = parsed.bodyHtml;
+      const sanitizedDoc = new DOMParser().parseFromString(parsed.bodyHtml || '', 'text/html');
+      sanitizeFragmentNode(sanitizedDoc.body);
+      contentWrap.innerHTML = sanitizedDoc.body ? sanitizedDoc.body.innerHTML : '';
       wireExpandToggles(contentWrap);
       body.appendChild(contentWrap);
 

@@ -23,8 +23,8 @@
       this.stuckWatchdogTimer = null;
       this.fallbackSettleTimer = null;
       this.progressBar = null;
-
-      this.initBlockUIObserver();
+      this.blockUIObserver = null;
+      this.observedRoot = null;
     }
 
     /**
@@ -52,29 +52,43 @@
     /**
      * Watches VTOP's native BlockUI overlay only during in-flight navigation
      */
-    initBlockUIObserver() {
-      const observer = new MutationObserver((mutations) => {
-        if (!this.isInFlight) return;
+    startBlockUIObserver() {
+      if (!this.blockUIObserver) {
+        this.blockUIObserver = new MutationObserver((mutations) => {
+          if (!this.isInFlight) return;
 
-        const isBlocked = Boolean(document.querySelector('.blockUI, .blockOverlay'));
+          const isBlocked = Boolean(document.querySelector('.blockUI, .blockOverlay'));
 
-        if (isBlocked) {
-          this.hasSeenBlockUI = true;
-        } else if (!isBlocked && this.hasSeenBlockUI) {
-          this.hasSeenBlockUI = false;
-          this.onNavigationComplete();
-        } else if (!isBlocked && !this.hasSeenBlockUI) {
-          const mainContent = document.getElementById('page_outline') || document.querySelector('main, .page-content');
-          if (mainContent && mutations.some((m) => mainContent.contains(m.target))) {
+          if (isBlocked) {
+            this.hasSeenBlockUI = true;
+          } else if (!isBlocked && this.hasSeenBlockUI) {
+            this.hasSeenBlockUI = false;
             this.onNavigationComplete();
+          } else if (!isBlocked && !this.hasSeenBlockUI) {
+            const mainContent = document.getElementById('page_outline') || document.querySelector('main, .page-content');
+            if (mainContent && mutations.some((m) => m.addedNodes.length > 0 && mainContent.contains(m.target))) {
+              this.onNavigationComplete();
+            }
           }
-        }
-      });
+        });
+      }
 
-      observer.observe(document.body || document.documentElement, {
-        childList: true,
-        subtree: true
-      });
+      const root = document.body || document.documentElement;
+      if (root && this.observedRoot !== root) {
+        this.blockUIObserver.disconnect();
+        this.blockUIObserver.observe(root, {
+          childList: true,
+          subtree: true
+        });
+        this.observedRoot = root;
+      }
+    }
+
+    stopBlockUIObserver() {
+      if (this.blockUIObserver) {
+        this.blockUIObserver.disconnect();
+      }
+      this.observedRoot = null;
     }
 
     setInFlight(inFlight) {
@@ -88,6 +102,7 @@
       if (inFlight) {
         clearTimeout(this.stuckWatchdogTimer);
         clearTimeout(this.fallbackSettleTimer);
+        this.startBlockUIObserver();
 
         // Fallback: if view settled instantly without showing BlockUI
         this.fallbackSettleTimer = setTimeout(() => {
@@ -106,7 +121,10 @@
       } else {
         clearTimeout(this.stuckWatchdogTimer);
         clearTimeout(this.fallbackSettleTimer);
+        this.stuckWatchdogTimer = null;
+        this.fallbackSettleTimer = null;
         this.hasSeenBlockUI = false;
+        this.stopBlockUIObserver();
       }
     }
 
@@ -159,6 +177,11 @@
       window.VTOP_PLUS.MenuDrawer?.closeAllDrawers();
 
       const crawler = window.VTOP_PLUS.Crawler;
+      if (!crawler) {
+        this.onNavigationComplete();
+        return;
+      }
+
       this.setInFlight(true);
       this.activePill = pill;
       if (pill) pill.classList.add('vtop-pill-loading');
@@ -281,9 +304,11 @@
 
         pill.innerHTML = `
           <span class="vtop-pill-icon">${iconSvg}</span>
-          <span class="vtop-pill-text">${shortTitle}</span>
+          <span class="vtop-pill-text"></span>
           <span class="vtop-pill-spinner"></span>
         `;
+        const textSpan = pill.querySelector('.vtop-pill-text');
+        if (textSpan) textSpan.textContent = shortTitle;
 
         pill.addEventListener('click', (e) => {
           e.preventDefault();
@@ -394,6 +419,10 @@
     }
 
     destroy() {
+      this.setInFlight(false);
+      this.pendingTarget = null;
+      this.activePill = null;
+
       document.querySelectorAll('.vtop-navbar-has-items').forEach((el) => {
         el.classList.remove('vtop-navbar-has-items');
       });

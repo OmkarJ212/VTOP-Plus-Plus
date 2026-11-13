@@ -39,15 +39,25 @@
       seconds = s;
     }
 
-    // 1. DD-MM-YYYY, DD/MM/YYYY, or DD.MM.YYYY
-    const numMatch = str.match(/\b(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})\b/);
+    // 1. YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY, or DD.MM.YYYY
+    const numMatch = str.match(/\b(\d{1,4})[-\/.](\d{1,2})[-\/.](\d{1,4})\b/);
     if (numMatch) {
-      const d = parseInt(numMatch[1], 10);
-      const m = parseInt(numMatch[2], 10) - 1;
-      let y = parseInt(numMatch[3], 10);
-      if (y < 100) y += 2000;
+      let d, m, y;
+      if (numMatch[1].length === 4) {
+        y = parseInt(numMatch[1], 10);
+        m = parseInt(numMatch[2], 10) - 1;
+        d = parseInt(numMatch[3], 10);
+      } else {
+        d = parseInt(numMatch[1], 10);
+        m = parseInt(numMatch[2], 10) - 1;
+        y = parseInt(numMatch[3], 10);
+        if (y < 100) y += 2000;
+      }
       const dt = new Date(y, m, d, hours, minutes, seconds);
-      return isNaN(dt.getTime()) ? null : dt;
+      if (isNaN(dt.getTime()) || dt.getFullYear() !== y || dt.getMonth() !== m || dt.getDate() !== d) {
+        return null;
+      }
+      return dt;
     }
 
     // 2. DD-MMM-YYYY or DD MMM YYYY (e.g. 25-Nov-2026, 22 Oct 2026, 05-Jan-2025)
@@ -61,13 +71,14 @@
       if (y < 100) y += 2000;
       if (m !== undefined) {
         const dt = new Date(y, m, d, hours, minutes, seconds);
-        return isNaN(dt.getTime()) ? null : dt;
+        if (isNaN(dt.getTime()) || dt.getFullYear() !== y || dt.getMonth() !== m || dt.getDate() !== d) {
+          return null;
+        }
+        return dt;
       }
     }
 
-    // 3. Fallback
-    const fallback = new Date(str);
-    return isNaN(fallback.getTime()) ? null : fallback;
+    return null;
   }
 
   function getRemainingTime(targetDate) {
@@ -89,7 +100,7 @@
     if (isOverdue) {
       badgeType = 'red';
       const absDays = Math.abs(diffDays);
-      badgeText = absDays <= 1 ? 'Overdue (today)' : `Overdue (${absDays}d ago)`;
+      badgeText = absDays === 0 ? 'Overdue (today)' : `Overdue (${absDays}d ago)`;
     } else if (isToday) {
       badgeType = 'purple';
       badgeText = diffHours > 1 ? `Due Today (${diffHours}h left)` : 'Due Today';
@@ -126,15 +137,16 @@
         'button[name="downloadStudentDA"], button[id="downloadStudentDA"], a[href*="downloadSTudentDA"], [data-code][id*="StudentDA" i]'
       )
     );
-    const cellTexts = Array.from(cells).map((c) => (c.innerText || c.textContent || '').trim());
+    const cellTexts = Array.from(cells).map((c) => (c.textContent || '').trim());
     const hasTimestamp = cellTexts.some(
       (txt) =>
         /\b\d{1,2}\s+[A-Za-z]{3}\s+\d{4}\b|\b\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}\b/.test(txt) &&
         (txt.includes('AM') || txt.includes('PM') || txt.includes(':'))
     );
-    const rowText = (row.innerText || row.textContent || '').toLowerCase();
+    const statusCells = cells.length >= 4 ? Array.from(cells).slice(-3) : Array.from(cells);
+    const statusText = statusCells.map((c) => (c.textContent || '').toLowerCase()).join(' ');
     const hasSubmittedText =
-      rowText.includes('uploaded') || rowText.includes('submitted') || rowText.includes('view file');
+      statusText.includes('uploaded') || statusText.includes('submitted') || statusText.includes('view file');
     const hasUploadAction = Boolean(
       row.querySelector(
         'input[type="file"], #studDaUpload, button[name="digitalAssignmentSubmit"], button[name="editAssignment"]'
@@ -144,17 +156,22 @@
     if (hasStudentDownload || (hasTimestamp && !hasUploadAction) || hasSubmittedText) {
       return true;
     }
-    return rowText.includes('not applicable') || rowText.includes('n/a');
+    return statusText.includes('not applicable') || statusText.includes('n/a');
   }
 
   const DaTracker = {
     isScanning: false,
+    _scanToken: 0,
+    _rescanPending: false,
 
     init() {
       this.checkAndTrack();
     },
 
     destroy() {
+      this._scanToken++;
+      this._rescanPending = false;
+      document.querySelectorAll('#vtop-da-summary-banner, .vtop-da-summary-banner').forEach((el) => el.remove());
       document.querySelectorAll('.vtop-th-da-status, .vtop-td-da-status').forEach((el) => el.remove());
       document.querySelectorAll('.vtop-da-cell-augmented').forEach((el) => {
         el.classList.remove('vtop-da-cell-augmented');
@@ -178,8 +195,10 @@
     },
 
     checkAndTrack() {
+      const overviewTable = this.findCourseOverviewTable();
+
       // 1. Check for single-course assignment upload view (where student actually views/uploads files)
-      const singleTable = this.findSingleCourseDaTable();
+      const singleTable = this.findSingleCourseDaTable(overviewTable);
       if (singleTable) {
         this.clearCache();
         this.augmentSingleCourseDaTable(singleTable);
@@ -187,7 +206,6 @@
       }
 
       // 2. Check for course overview table (where student selects a course)
-      const overviewTable = this.findCourseOverviewTable();
       if (overviewTable) {
         this.augmentCourseOverviewTable(overviewTable);
       }
@@ -197,7 +215,7 @@
     // 1. SINGLE-COURSE ASSIGNMENT UPLOAD VIEW (Inner DA View)
     // =========================================================================
 
-    findSingleCourseDaTable() {
+    findSingleCourseDaTable(knownOverviewTable = null) {
       // 1. O(1) scoped check inside #fixedTableContainer > table.customTable
       const scopedTables = document.querySelectorAll('#fixedTableContainer table.customTable');
       for (const table of scopedTables) {
@@ -211,7 +229,7 @@
       }
 
       // 2. Fallback: scan all tables using textContent (no layout reflow)
-      const overview = this.findCourseOverviewTable();
+      const overview = knownOverviewTable || this.findCourseOverviewTable();
       const allTables = Array.from(document.querySelectorAll('table'));
 
       for (const table of allTables) {
@@ -270,41 +288,134 @@
 
       if (dataRows.length === 0) return;
 
+      let titleColIdx = -1;
+      headerCells.forEach((cell, idx) => {
+        const txt = (cell.textContent || '').toLowerCase();
+        if (txt.includes('title') || txt.includes('assignment')) {
+          titleColIdx = idx;
+        }
+      });
+
+      let submittedCount = 0;
+      let pendingCount = 0;
+      let closestPending = null;
+      let closestTitle = '';
+
       dataRows.forEach((row) => {
         const cells = row.querySelectorAll('td');
         if (cells.length < 3) return;
 
         const isSubmitted = isDaRowSubmitted(row, cells);
         const dueCell = cells[dueDateColIdx] || cells[3] || cells[2];
-        const dateSource = (dueCell?.innerText || dueCell?.textContent || row.innerText || row.textContent || '').trim();
+        const dateSource = (dueCell?.textContent || '').trim();
         const parsedDate = extractDateFromText(dateSource);
+        const rowTitle = (cells[titleColIdx !== -1 ? titleColIdx : 1]?.textContent || '').replace(/\s+/g, ' ').trim();
 
         if (isSubmitted) {
+          submittedCount++;
           if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
             dueCell.classList.add('vtop-da-cell-augmented');
             const badge = document.createElement('div');
             badge.className = 'vtop-da-cell-badge';
-            badge.innerHTML = '<span class="vtop-da-badge vtop-da-badge-green">Submitted</span>';
+            const span = document.createElement('span');
+            span.className = 'vtop-da-badge vtop-da-badge-green';
+            span.textContent = 'Submitted';
+            badge.appendChild(span);
             dueCell.appendChild(badge);
           }
-        } else if (parsedDate) {
-          const rem = getRemainingTime(parsedDate);
-          if (rem) {
-            // Augment the table cell with an inline countdown badge
-            if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
-              dueCell.classList.add('vtop-da-cell-augmented');
-              const badge = document.createElement('div');
-              badge.className = 'vtop-da-cell-badge';
-              badge.innerHTML = `<span class="vtop-da-badge vtop-da-badge-${rem.badgeType}">${rem.badgeText}</span>`;
-              dueCell.appendChild(badge);
+        } else {
+          pendingCount++;
+          if (parsedDate) {
+            const rem = getRemainingTime(parsedDate);
+            if (rem) {
+              if (
+                !closestPending ||
+                (rem.diffMs >= 0 && (closestPending.isOverdue || rem.diffMs < closestPending.diffMs)) ||
+                (rem.isOverdue && closestPending.isOverdue && rem.diffMs > closestPending.diffMs)
+              ) {
+                closestPending = rem;
+                closestTitle = rowTitle;
+              }
 
-              if (rem.badgeType === 'purple' || rem.badgeType === 'red') {
-                row.classList.add('vtop-da-urgent-row');
+              // Augment the table cell with an inline countdown badge
+              if (dueCell && !dueCell.classList.contains('vtop-da-cell-augmented')) {
+                dueCell.classList.add('vtop-da-cell-augmented');
+                const badge = document.createElement('div');
+                badge.className = 'vtop-da-cell-badge';
+                const span = document.createElement('span');
+                span.className = `vtop-da-badge vtop-da-badge-${rem.badgeType}`;
+                span.textContent = rem.badgeText;
+                badge.appendChild(span);
+                dueCell.appendChild(badge);
+
+                if (rem.badgeType === 'purple' || rem.badgeType === 'red') {
+                  row.classList.add('vtop-da-urgent-row');
+                }
               }
             }
           }
         }
       });
+
+      this.renderSingleCourseBanner(table, {
+        totalCount: dataRows.length,
+        submittedCount,
+        pendingCount,
+        closestPending,
+        closestTitle
+      });
+    },
+
+    renderSingleCourseBanner(table, summary) {
+      const anchor = table.closest('.table-responsive') || table;
+      if (!anchor || !anchor.parentNode) return;
+
+      let banner = document.getElementById('vtop-da-summary-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'vtop-da-summary-banner';
+        banner.className = 'vtop-plus-card vtop-da-summary-banner';
+        anchor.parentNode.insertBefore(banner, anchor);
+      } else if (banner.nextElementSibling !== anchor) {
+        anchor.parentNode.insertBefore(banner, anchor);
+      }
+
+      let statusType = 'green';
+      let statusLabel = 'All submissions done';
+      if (summary.pendingCount > 0) {
+        if (summary.closestPending) {
+          statusType = summary.closestPending.badgeType;
+          const prefix = summary.closestTitle ? `${summary.closestTitle}: ` : 'Next Due: ';
+          statusLabel = `${prefix}${summary.closestPending.badgeText}`;
+        } else {
+          statusType = 'purple';
+          statusLabel = `${summary.pendingCount} pending submission${summary.pendingCount === 1 ? '' : 's'}`;
+        }
+      }
+
+      banner.innerHTML = `
+        <div class="vtop-da-banner-row">
+          <div class="vtop-da-banner-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>DA Deadline Summary</span>
+          </div>
+          <div class="vtop-da-banner-meta">
+            <span class="vtop-da-banner-stat">${summary.submittedCount} / ${summary.totalCount} Submitted</span>
+            <span class="vtop-da-banner-sep">•</span>
+            <span class="vtop-da-banner-stat">${summary.pendingCount} Pending</span>
+            <span class="vtop-da-banner-sep">•</span>
+            <span class="vtop-da-badge vtop-da-badge-${statusType}">${this.escapeHtml ? this.escapeHtml(statusLabel) : statusLabel}</span>
+          </div>
+        </div>
+      `;
+    },
+
+    escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
     },
 
     // =========================================================================
@@ -383,15 +494,19 @@
       const pendingRows = dataRows.filter((r) => r.querySelector('.vtop-da-badge-loading'));
       if (pendingRows.length === 0) return;
 
-      if (this.isScanning) return;
+      if (this.isScanning) {
+        this._rescanPending = true;
+        return;
+      }
       this.isScanning = true;
+      const myToken = ++this._scanToken;
 
       const DOM = window.VTOP_PLUS?.DOM;
       const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
       const csrf = DOM?.getCsrfToken ? DOM.getCsrfToken() : '';
 
       const processRow = async (row) => {
-        if (!document.body.contains(row)) return false;
+        if (myToken !== this._scanToken || !document.body.contains(row)) return false;
 
         const cell = row.querySelector('.vtop-td-da-status');
         if (!cell) return false;
@@ -416,11 +531,11 @@
           '';
 
         if (!classId) {
-          cell.innerHTML = '<span class="vtop-da-badge vtop-da-badge-green">All submissions done</span>';
+          this.applyRowBadge(cell, { type: 'done', text: 'All submissions done' });
           return false;
         }
 
-        const cacheKey = `vtop_da_status_${classId}`;
+        const cacheKey = `vtop_da_status_${authId || 'anon'}_${classId}`;
         let status = null;
         let didFetch = false;
         try {
@@ -437,6 +552,7 @@
           didFetch = true;
           try {
             status = await this.fetchCourseStatus(classId, authId, csrf);
+            if (myToken !== this._scanToken) return false;
             if (status && status.type !== 'error') {
               try {
                 sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: status }));
@@ -448,6 +564,8 @@
           }
         }
 
+        if (myToken !== this._scanToken || !document.body.contains(row)) return false;
+
         if (!status) {
           status = { type: 'error', text: 'Check failed' };
         }
@@ -458,13 +576,21 @@
 
       try {
         for (let i = 0; i < pendingRows.length; i++) {
+          if (myToken !== this._scanToken) break;
           const didFetch = await processRow(pendingRows[i]);
+          if (myToken !== this._scanToken) break;
           if (didFetch && i < pendingRows.length - 1) {
             await new Promise((r) => setTimeout(r, Math.floor(300 + Math.random() * 150)));
           }
         }
       } finally {
-        this.isScanning = false;
+        if (myToken === this._scanToken) {
+          this.isScanning = false;
+          if (this._rescanPending) {
+            this._rescanPending = false;
+            this.checkAndTrack();
+          }
+        }
       }
     },
 
@@ -624,7 +750,10 @@
         badgeClass = 'vtop-da-badge-green';
       }
 
-      cell.innerHTML = `<span class="vtop-da-badge ${badgeClass}">${status.text}</span>`;
+      const span = document.createElement('span');
+      span.className = `vtop-da-badge ${badgeClass}`;
+      span.textContent = status.text || '';
+      cell.replaceChildren(span);
     }
   };
 

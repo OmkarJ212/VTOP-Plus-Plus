@@ -14,6 +14,7 @@
   const AttendanceCalculator = {
     targetPercent: 75,
     _settingsLoaded: false,
+    _settingsPromise: null,
 
     init() {
       this.checkAndCalculate();
@@ -33,8 +34,12 @@
         return;
       }
 
-      this.loadTargetSettings().then(() => {
-        this._settingsLoaded = true;
+      if (!this._settingsPromise) {
+        this._settingsPromise = this.loadTargetSettings().then(() => {
+          this._settingsLoaded = true;
+        });
+      }
+      this._settingsPromise.then(() => {
         this.renderSummaryWidget(table);
         this.augmentTable(table);
       });
@@ -305,6 +310,15 @@
         return cells.length >= 3;
       });
 
+      const sig = `${this.targetPercent}|${dataRows.length}|${dataRows.map((r) => {
+        const c = r.querySelectorAll('td');
+        return `${c[attendedIdx]?.textContent || ''}/${c[totalIdx]?.textContent || ''}`;
+      }).join(';')}`;
+      if (table.dataset.vtopAttSig === sig && document.getElementById('vtop-attendance-summary-card')) {
+        return;
+      }
+      table.dataset.vtopAttSig = sig;
+
       let totalAttendedSum = 0;
       let totalConductedSum = 0;
       let totalODSum = 0;
@@ -339,11 +353,11 @@
 
         const courseType = this.getCourseType(row);
         const maxRemaining = this.estimateMaxRemaining(data.total, courseType);
-        const target = Math.max(0.01, this.targetPercent / 100);
+        const targetPct = Math.max(1, Math.min(100, this.targetPercent));
         let statusHtml = '';
 
-        // Calculate bunks strictly from actual classes conducted
-        if (this.targetPercent === 100) {
+        // Calculate bunks strictly from actual classes conducted using exact integer math
+        if (targetPct === 100) {
           if (data.attended < data.total) {
             const missed = data.total - data.attended;
             statusHtml = `
@@ -358,18 +372,18 @@
               </span>
             `;
           }
-        } else if (currentPct >= this.targetPercent) {
-          const safeBunks = Math.max(0, Math.floor((data.attended - target * data.total) / target));
+        } else if (100 * data.attended >= targetPct * data.total) {
+          const safeBunks = Math.max(0, Math.floor((100 * data.attended - targetPct * data.total) / targetPct));
           const badgeClass = currentPct >= 80 ? 'vtop-badge-safe' : 'vtop-badge-warn';
           if (safeBunks === 0) {
             statusHtml = `
-              <span class="vtop-badge ${badgeClass}" title="Current attendance is right at target. Bunking the next class will drop you below ${this.targetPercent}%">
+              <span class="vtop-badge ${badgeClass}" title="Current attendance is right at target. Bunking the next class will drop you below ${targetPct}%">
                 On target (0 bunks left)
               </span>
             `;
           } else if (safeBunks > maxRemaining || safeBunks > HARD_MAX_NEEDED) {
             statusHtml = `
-              <span class="vtop-badge ${badgeClass}" title="Mathematically ${safeBunks} bunks above ${this.targetPercent}%, covering all remaining classes in the semester">
+              <span class="vtop-badge ${badgeClass}" title="Mathematically ${safeBunks} bunks above ${targetPct}%, covering all remaining classes in the semester">
                 Can bunk all remaining
               </span>
             `;
@@ -381,15 +395,15 @@
             `;
           }
         } else {
-          const needed = Math.max(1, Math.ceil((target * data.total - data.attended) / (1 - target)));
+          const needed = Math.max(1, Math.ceil((targetPct * data.total - 100 * data.attended) / (100 - targetPct)));
           const maxPossiblePct =
             data.total + maxRemaining > 0
               ? ((data.attended + maxRemaining) / (data.total + maxRemaining)) * 100
               : data.percentage;
 
-          if (needed > maxRemaining || needed > HARD_MAX_NEEDED || maxPossiblePct < this.targetPercent) {
+          if (needed > maxRemaining || needed > HARD_MAX_NEEDED || maxPossiblePct < targetPct) {
             statusHtml = `
-              <span class="vtop-badge vtop-badge-danger" title="Need to attend ${needed} consecutive classes to reach ${this.targetPercent}%, which exceeds realistic remaining classes in a semester">
+              <span class="vtop-badge vtop-badge-danger" title="Need to attend ${needed} consecutive classes to reach ${targetPct}%, which exceeds realistic remaining classes in a semester">
                 Impossible
               </span>
             `;
@@ -440,12 +454,17 @@
       const odBox = document.getElementById('vtop-box-od');
       const odElem = document.getElementById('vtop-stat-od');
 
-      if (overallElem && totalConductedSum > 0) {
-        const overallPct = ((totalAttendedSum / totalConductedSum) * 100).toFixed(1);
-        overallElem.textContent = `${overallPct}%`;
-        if (overallPct >= 80) overallElem.style.color = 'var(--vtop-success-bright)';
-        else if (overallPct >= 75) overallElem.style.color = 'var(--vtop-warn-bright)';
-        else overallElem.style.color = 'var(--vtop-danger-bright)';
+      if (overallElem) {
+        if (totalConductedSum > 0) {
+          const overallNum = (totalAttendedSum / totalConductedSum) * 100;
+          overallElem.textContent = `${overallNum.toFixed(1)}%`;
+          if (overallNum >= 80) overallElem.style.color = 'var(--vtop-success-bright)';
+          else if (overallNum >= 75) overallElem.style.color = 'var(--vtop-warn-bright)';
+          else overallElem.style.color = 'var(--vtop-danger-bright)';
+        } else {
+          overallElem.textContent = '--%';
+          overallElem.style.color = '';
+        }
       }
 
       if (safeElem) safeElem.textContent = safeCount;

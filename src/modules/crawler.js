@@ -31,7 +31,7 @@
       title: 'Student Mark View',
       category: 'Examinations',
       dataUrl: 'examinations/StudentMarkView',
-      fallbackDataUrls: ['examinations/examGradeView/StudentGradeHistory', 'examinations/StudentMarks'],
+      fallbackDataUrls: ['examinations/StudentMarks'],
       patterns: [/student\s*mark/i, /^marks$/i, /mark\s*view/i, /marks\s*&\s*grades/i],
       synonyms: ['marks', 'cat', 'fat', 'grades', 'score', 'results', 'mark', 'internals', 'assessment']
     },
@@ -262,6 +262,7 @@
           if (rawText && rawText.length >= 3) {
             matchedCore.title = rawText;
           }
+          Object.assign(matchedCore, enrichItemMetadata(matchedCore));
           continue;
         }
 
@@ -305,7 +306,8 @@
           if (!item.element) {
             const urlsToTry = [item.dataUrl, ...(item.fallbackDataUrls || [])].filter(Boolean);
             for (const u of urlsToTry) {
-              const el = document.querySelector(`a[data-url="${u}"], button[data-url="${u}"], [data-url*="${u}"]`);
+              const esc = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(u) : u.replace(/["\\]/g, '\\$&');
+              const el = document.querySelector(`a[data-url="${esc}"], button[data-url="${esc}"], [data-url*="${esc}"]`);
               if (el) {
                 item.element = el;
                 item.dataUrl = el.getAttribute('data-url') || u;
@@ -360,8 +362,9 @@
       // 2. Query document directly across primary and fallback data-urls
       const urlsToTry = [item.dataUrl, ...(item.fallbackDataUrls || [])].filter(Boolean);
       for (const u of urlsToTry) {
+        const esc = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(u) : u.replace(/["\\]/g, '\\$&');
         const found = document.querySelector(
-          `a[data-url="${u}"], button[data-url="${u}"], [data-url*="${u}"]`
+          `a[data-url="${esc}"], button[data-url="${esc}"], [data-url*="${esc}"]`
         );
         if (found) {
           item.element = found;

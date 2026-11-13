@@ -106,20 +106,39 @@
 
     startObserver() {
       if (this._observer) return;
+      this._pendingRoots = this._pendingRoots || new Set();
       this._observer = new MutationObserver((mutations) => {
         if (!this.isActive || this._isSanitizing) return;
 
-        // Skip mutations originating purely from VTOP++ injected components
-        const hasExternalChanges = mutations.some((m) => {
+        let hasExternalChanges = false;
+        for (const m of mutations) {
           const t = m.target;
-          return !t || (!t.closest?.('.vtop-plus-dock, .vtop-nav-item, .vtop-dock-pill, .vtop-dock-icon-btn, .vtop-dock-sep, [data-vtop-nav-item], .vtop-plus-panel, .vtop-palette-overlay, .vtop-plus-card') &&
-                 !(typeof t.id === 'string' && t.id.startsWith('vtop-')));
-        });
+          if (
+            t &&
+            (t.closest?.('.vtop-plus-dock, .vtop-nav-item, .vtop-dock-pill, .vtop-dock-icon-btn, .vtop-dock-sep, [data-vtop-nav-item], .vtop-plus-panel, .vtop-palette-overlay, .vtop-plus-card') ||
+             (typeof t.id === 'string' && t.id.startsWith('vtop-')))
+          ) {
+            continue;
+          }
+          for (const node of m.addedNodes) {
+            if (node.nodeType === 1 && !this._isProtectedElement(node)) {
+              this._pendingRoots.add(node);
+              hasExternalChanges = true;
+            }
+          }
+        }
         if (!hasExternalChanges) return;
 
         if (this._debounceTimer) clearTimeout(this._debounceTimer);
         this._debounceTimer = setTimeout(() => {
-          if (this.isActive) this.sanitizeDynamicElements();
+          const roots = Array.from(this._pendingRoots);
+          this._pendingRoots.clear();
+          if (!this.isActive) return;
+          for (const r of roots) {
+            if (r.isConnected) {
+              this.sanitizeDynamicElements(r);
+            }
+          }
         }, 150);
       });
 
@@ -137,6 +156,9 @@
         clearTimeout(this._debounceTimer);
         this._debounceTimer = null;
       }
+      if (this._pendingRoots) {
+        this._pendingRoots.clear();
+      }
       if (this._observer) {
         this._observer.disconnect();
         this._observer = null;
@@ -148,12 +170,18 @@
      * and black text from freshly injected AJAX chunks without touching captcha or status indicators.
      */
     sanitizeDynamicElements(root = document) {
-      if (!this.isActive || this._isSanitizing) return;
+      if (!this.isActive || this._isSanitizing || !root) return;
       this._isSanitizing = true;
 
       try {
+        const queryAll = (sel) => {
+          const list = root.querySelectorAll ? Array.from(root.querySelectorAll(sel)) : [];
+          if (root !== document && root.matches?.(sel)) list.unshift(root);
+          return list;
+        };
+
         // 1. Remove legacy HTML bgcolor attributes across all elements
-        const bgElements = root.querySelectorAll?.('[bgcolor]') || [];
+        const bgElements = queryAll('[bgcolor]');
         for (let i = 0; i < bgElements.length; i++) {
           const el = bgElements[i];
           if (this._isProtectedElement(el)) continue;
@@ -161,7 +189,7 @@
         }
 
         // 1b. Clear WhiteBackground wrappers inline backgrounds
-        const whiteWrappers = root.querySelectorAll?.('.WhiteBackground, [class*="WhiteBackground" i]') || [];
+        const whiteWrappers = queryAll('.WhiteBackground, [class*="WhiteBackground" i]');
         for (let i = 0; i < whiteWrappers.length; i++) {
           whiteWrappers[i].style.backgroundColor = '';
           whiteWrappers[i].style.background = '';
@@ -173,21 +201,13 @@
         }
 
         // 1d. Clear any hardcoded blue/inline text colors from navbar elements to ensure pure white text
-        const headerElements = root.querySelectorAll?.('#vtop-header [style*="color"], .navbar [style*="color"], #quickLinks [style*="color"], #navbarDropdown [style*="color"]') || [];
+        const headerElements = queryAll('#vtop-header [style*="color"], .navbar [style*="color"], #quickLinks [style*="color"], #navbarDropdown [style*="color"]');
         for (let i = 0; i < headerElements.length; i++) {
           headerElements[i].style.color = '';
         }
 
-        // 1e. Clear any hardcoded/inline borders and outlines on navigation items (Academics, Examination, Feedback, etc.)
-        const navBtnElements = root.querySelectorAll?.('.hmenuItem, #top-hmenu-bar .btn, .sidebar .btn, [data-bs-toggle="collapse"].btn, div[id^="MG0"] .btn, .hmenu .btn-outline') || [];
-        for (let i = 0; i < navBtnElements.length; i++) {
-          navBtnElements[i].style.border = 'none';
-          navBtnElements[i].style.outline = 'none';
-          navBtnElements[i].style.boxShadow = 'none';
-        }
-
         // 2. Clear hardcoded white/near-white inline background styles and near-black text
-        const styledElements = root.querySelectorAll?.('[style*="background"], [style*="color"]') || [];
+        const styledElements = queryAll('[style*="background"], [style*="color"]');
         for (let i = 0; i < styledElements.length; i++) {
           const el = styledElements[i];
           if (this._isProtectedElement(el)) continue;
