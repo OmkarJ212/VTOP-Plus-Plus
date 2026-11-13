@@ -1339,3 +1339,86 @@ html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"] 
 html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"]:hover {
   color: #7dd3fc !important;
 }
+
+/* Bootstrap Toasts (e.g. #quickLinkMsg) */
+.toast {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.toast .toast-header {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+}
+
+.toast .toast-header strong {
+  font-weight: 600 !important;
+}
+
+.toast .toast-header .btn-close {
+  box-shadow: none !important;
+}
+
+.toast .toast-body {
+  padding: 10px 12px !important;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast .toast-body .bi,
+.toast .toast-body i {
+  margin-bottom: 0 !important;
+  line-height: 1 !important;
+  flex-shrink: 0;
+}
+
+html.vtop-dark-theme .toast {
+  background-color: var(--vtop-dark-bg-elevated) !important;
+  color: var(--vtop-dark-text-main) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .toast .toast-header {
+  background-color: #0f192b !important;
+  color: var(--vtop-dark-text-main) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .toast .toast-header small {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+html.vtop-dark-theme .toast .toast-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(180%) !important;
+  opacity: 0.75;
+}
+
+html.vtop-dark-theme .toast .toast-header .btn-close:hover {
+  opacity: 1;
+}
+
+html.vtop-dark-theme .toast .toast-body {
+  background-color: var(--vtop-dark-bg-elevated) !important;
+  color: var(--vtop-dark-text-main) !important;
+}
+
+html.vtop-dark-theme .toast .toast-body .text-success {
+  color: #4ade80 !important;
+}
+
+html.vtop-dark-theme .toast .toast-body .text-danger {
+  color: #f87171 !important;
+}
+
+html.vtop-dark-theme .toast .toast-body .text-warning {
+  color: #fbbf24 !important;
+}
