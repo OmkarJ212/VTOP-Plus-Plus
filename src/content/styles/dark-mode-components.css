@@ -219,7 +219,7 @@ html.vtop-dark-theme .nav-pills > li.active > a {
 
 /* 7.15 Modals & Overlays */
 html.vtop-dark-theme .modal-content {
-  border: 1px solid var(--vtop-dark-border) !important;
+  border-color: var(--vtop-dark-border) !important;
 }
 html.vtop-dark-theme .modal-backdrop {
   background-color: #000000 !important;
@@ -239,7 +239,7 @@ html.vtop-dark-theme .login-card-body,
 html.vtop-dark-theme #loginForm,
 html.vtop-dark-theme .card-login {
   background-color: var(--vtop-dark-bg-surface) !important;
-  border: 1px solid var(--vtop-dark-border) !important;
+  border-color: var(--vtop-dark-border) !important;
   color: var(--vtop-dark-text-main) !important;
 }
 html.vtop-dark-theme .login-logo a,
@@ -528,8 +528,16 @@ html:not(.vtop-dark-theme) .card:not(.hmenubox .card) {
   border: 1px solid #e2e8f0 !important;
 }
 
+html.vtop-dark-theme .card:not(.hmenubox .card) {
+  border: 1px solid var(--vtop-dark-border) !important;
+}
+
 html:not(.vtop-dark-theme) .card-header:not(.hmenubox .card-header) {
   border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html.vtop-dark-theme .card-header:not(.hmenubox .card-header) {
+  border-bottom: 1px solid var(--vtop-dark-border) !important;
 }
 
 html:not(.vtop-dark-theme) .card-header:not(.hmenubox .card-header):not([class*="bg-"]) {

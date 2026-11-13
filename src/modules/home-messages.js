@@ -104,8 +104,8 @@
 
       card.innerHTML = `
         <div class="card-header d-flex flex-column flex-md-row primaryBorderTop vtop-msg-header">
-          <span class="fs-6 fontcolor3 flex-fill text-nowrap fw-bold vtop-msg-title">
-            CLASS MESSAGES SENT BY FACULTY
+          <span class="fs-6 fontcolor3 flex-fill text-nowrap fw-semibold vtop-msg-title">
+            Class messages sent by faculty
           </span>
           <div class="vtop-msg-header-actions">
             <span class="vtop-msg-badge vtop-msg-badge-muted">Checking...</span>
@@ -359,7 +359,7 @@
         }
         body.innerHTML = `
           <div class="vtop-msg-empty">
-            <div class="vtop-msg-empty-title">No Messages Sent by Faculty</div>
+            <div class="vtop-msg-empty-title">No messages sent by faculty</div>
             <div class="vtop-msg-note">Note: ${this.escapeHtml(parsed.note || 'Messages expire automatically after their expiry date.')}</div>
           </div>
         `;

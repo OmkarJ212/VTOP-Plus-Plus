@@ -257,6 +257,18 @@ html.vtop-dark-theme .vtop-da-badge-green {
 html.vtop-dark-theme .vtop-da-badge-loading {
   color: var(--vtop-dark-text-muted) !important;
 }
+html.vtop-dark-theme .vtop-badge-safe {
+  color: #86efac !important;
+}
+html.vtop-dark-theme .vtop-badge-warn {
+  color: #fbbf24 !important;
+}
+html.vtop-dark-theme .vtop-badge-danger {
+  color: #f87171 !important;
+}
+html.vtop-dark-theme .vtop-bunk-meta {
+  color: var(--vtop-dark-text-muted) !important;
+}
 
 /* 8. Universal Dark Mode Scrollbars & Range Sliders */
 html.vtop-dark-theme,

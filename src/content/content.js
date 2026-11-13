@@ -84,6 +84,18 @@
     // Permanently remove Campus Etiquette button if re-injected by VTOP
     document.getElementById('campusEtiquetteBtn')?.remove();
 
+    // Remove stray backtick text node in VTOP's #b5-pagewrapper
+    const pageWrapper = document.getElementById('b5-pagewrapper');
+    if (pageWrapper) {
+      for (const node of Array.from(pageWrapper.childNodes)) {
+        if (node.nodeType === Node.TEXT_NODE && node.nodeValue && node.nodeValue.includes('`')) {
+          const cleaned = node.nodeValue.replace(/`/g, '');
+          if (cleaned.trim() === '') node.remove();
+          else node.nodeValue = cleaned;
+        }
+      }
+    }
+
     // Remove Action Plan card on the Home page only if explicitly enabled by user
     if (currentSettings.enableHideActionPlan) {
       document.querySelectorAll('.card.goldenBorderTop.lightGoldenbackground2').forEach((card) => {

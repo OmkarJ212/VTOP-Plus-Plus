@@ -3,7 +3,7 @@
 /* 9. Modernized Home Cards (#course-data & #vtop-home-class-messages) */
 #course-data,
 #vtop-home-class-messages {
-  border-radius: 12px !important;
+  border-radius: 0.375rem !important;
   border: 1px solid #e2e8f0 !important;
   box-shadow: none !important;
   overflow: hidden !important;
@@ -22,14 +22,12 @@
 #course-data .card-header .fontcolor3,
 #vtop-home-class-messages .card-header .fontcolor3 {
   font-size: 0.9rem !important;
-  letter-spacing: 0.025em;
 }
 
 #course-data .card-header .bg-warning {
   border-radius: 8px !important;
   padding: 4px 10px !important;
   font-size: 0.8rem !important;
-  letter-spacing: 0.04em;
   border: 1px solid rgba(220, 38, 38, 0.18);
 }
 
@@ -48,9 +46,7 @@
 #course-data table.table thead th,
 #vtop-home-class-messages table.table thead th {
   font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-weight: 600 !important;
   padding: 10px 12px !important;
   border-bottom: 1px solid #e2e8f0 !important;
   white-space: nowrap;
@@ -96,11 +92,11 @@
 #vtop-home-class-messages .vtop-msg-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
-  border-radius: 999px;
+  padding: 3px 8px;
+  border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 #vtop-home-class-messages .vtop-msg-badge-muted {
@@ -347,7 +343,7 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 .col-12.col-md-6:has(> .card > #events-info-content) > .card {
   height: 100%;
   margin-bottom: 0 !important;
-  border-radius: 12px !important;
+  border-radius: 0.375rem !important;
   border: 1px solid #e2e8f0 !important;
   border-top: 3px solid #2563eb !important;
   box-shadow: none !important;
@@ -372,7 +368,6 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
   color: #1e293b !important;
   font-size: 0.95rem !important;
   line-height: 1.5 !important;
-  letter-spacing: 0.02em;
   padding: 12px 16px !important;
   margin: 0 !important;
   box-shadow: none !important;
@@ -387,7 +382,7 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
   border: 1px solid #e2e8f0 !important;
   border-top: 3px solid #2563eb !important;
-  border-radius: 12px 12px 0 0 !important;
+  border-radius: 0.375rem 0.375rem 0 0 !important;
 }
 
 #events-info-content,
@@ -402,7 +397,7 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
   background-color: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
   border-top: none !important;
-  border-radius: 0 0 12px 12px !important;
+  border-radius: 0 0 0.375rem 0.375rem !important;
   box-shadow: none !important;
   --bs-gutter-x: 0;
   --bs-gutter-y: 0;
@@ -412,7 +407,7 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 #events-info-content > .card,
 .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card {
   border: 1px solid #e2e8f0 !important;
-  border-radius: 8px !important;
+  border-radius: 0.375rem !important;
   box-shadow: none !important;
   background-color: #ffffff !important;
   overflow: hidden;
@@ -430,7 +425,6 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 #events-info-content .card-title.fontcolor5 {
   color: #2563eb !important;
   font-size: 0.85rem !important;
-  letter-spacing: 0.02em;
   margin-bottom: 0.6rem !important;
   padding-bottom: 0.4rem !important;
   border-bottom: 1px solid #e2e8f0 !important;
@@ -498,7 +492,7 @@ html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
 div:has(> .card > #last-five-feedbacks) > .card {
   margin-top: 0 !important;
   margin-bottom: 1rem !important;
-  border-radius: 12px !important;
+  border-radius: 0.375rem !important;
   border: 1px solid #e2e8f0 !important;
   box-shadow: none !important;
   background-color: #ffffff !important;
@@ -520,7 +514,6 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
   color: #1e293b !important;
   font-size: 0.95rem !important;
   line-height: 1.5 !important;
-  letter-spacing: 0.02em;
 }
 
 #proctor-message,
@@ -615,9 +608,7 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
 #digital-assignments table.table thead th,
 #last-five-feedbacks table.table thead th {
   font-size: 0.75rem !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-weight: 600 !important;
   padding: 10px 12px !important;
   background-color: #f8fafc !important;
   color: #475569 !important;
@@ -791,13 +782,14 @@ html.vtop-dark-theme #last-five-feedbacks table.table td.text-primary {
 [style*="#f2dede" i],
 [style*="242, 222, 222"] {
   border-radius: 10px !important;
+  border: 1px solid rgba(220, 38, 38, 0.2) !important;
   padding: 16px !important;
 }
 
 html.vtop-dark-theme [style*="#f2dede" i],
 html.vtop-dark-theme [style*="242, 222, 222"] {
   background-color: rgba(239, 68, 68, 0.14) !important;
-  border: 1px solid rgba(248, 113, 113, 0.3) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
   color: #fca5a5 !important;
 }
 
@@ -827,6 +819,10 @@ html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] span[style*="red
 }
 
 /* Fix Bootstrap .card > .card-header.row negative margins spilling header/title outside .card box */
+.card:not(.hmenubox .card) {
+  border-radius: 0.375rem !important;
+}
+
 .card > .card-header.row {
   margin-left: 0 !important;
   margin-right: 0 !important;
@@ -840,15 +836,63 @@ html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] span[style*="red
   padding-right: 0;
 }
 
-/* Course Page accordion containment inside outer fieldset / card / box */
+/* Course Page accordion & materials table containment inside outer fieldset / card / box */
 fieldset:has(.col-md-12),
 fieldset:has(#courseAccordion),
+fieldset:has(#materialTable_wrapper),
 .card:has(#courseAccordion),
 .card-body:has(#courseAccordion),
 .box-body:has(#courseAccordion),
 .panel-body:has(#courseAccordion) {
   display: flow-root !important;
+  min-width: 0 !important;
+  width: 100% !important;
   max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+fieldset:has(#materialTable_wrapper) > .container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.table-responsive:has(> .card) {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: visible !important;
+  box-sizing: border-box !important;
+}
+
+.card:has(#materialTable_wrapper) {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.card:has(#materialTable_wrapper) > .card-body {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.dataTables_wrapper > .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.dataTables_wrapper > .row > [class*="col-"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#materialTable {
+  width: 100% !important;
   box-sizing: border-box !important;
 }
 
@@ -944,4 +988,354 @@ html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb:hover {
 html:not(.vtop-dark-theme)::-webkit-scrollbar-corner,
 html:not(.vtop-dark-theme) *::-webkit-scrollbar-corner {
   background: #f1f5f9 !important;
+}
+
+/* My Curriculum Page (#studentWiseCurriculum) */
+.card:has(#studentWiseCurriculum) {
+  overflow: hidden !important;
+}
+
+.card:has(#studentWiseCurriculum) > .card-header {
+  padding: 12px 16px !important;
+  border-top: 3px solid #2563eb !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+}
+
+.card:has(#studentWiseCurriculum) > .card-header h3 {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+}
+
+html.vtop-dark-theme .card:has(#studentWiseCurriculum) > .card-header {
+  background-color: #0f192b !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme .card:has(#studentWiseCurriculum) > .card-header h3 {
+  color: var(--vtop-dark-accent) !important;
+}
+
+#studentWiseCurriculum .fs-5 {
+  font-size: 0.95rem !important;
+  line-height: 1.6;
+  color: #1e293b;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .fs-5 {
+  color: var(--vtop-dark-text-main) !important;
+}
+
+#studentWiseCurriculum .dashboard-cards {
+  margin-bottom: 10px;
+}
+
+#studentWiseCurriculum .card.categoty-card {
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  margin-bottom: 0 !important;
+  background-color: #ffffff !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card {
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+#studentWiseCurriculum .card.categoty-card:hover {
+  border-color: #94a3b8 !important;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card:hover {
+  border-color: var(--vtop-dark-accent) !important;
+}
+
+#studentWiseCurriculum .card.categoty-card > .row {
+  margin: 0 !important;
+  align-items: center !important;
+  --bs-gutter-x: 0;
+}
+
+#studentWiseCurriculum .card.categoty-card .col-4 {
+  padding: 0 !important;
+  align-self: stretch;
+  display: flex;
+}
+
+#studentWiseCurriculum .card.categoty-card .symbol-label {
+  width: 100%;
+  padding: 10px 8px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  background-image: none !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
+#studentWiseCurriculum .card.categoty-card .symbol-label.bg-info {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+#studentWiseCurriculum .card.categoty-card .symbol-label.bg-info small.text-muted {
+  color: #64748b !important;
+  font-weight: 500;
+}
+
+#studentWiseCurriculum .card.categoty-card .symbol-label.bg-success {
+  background-color: rgba(22, 163, 74, 0.12) !important;
+  color: #166534 !important;
+  border-right-color: rgba(22, 163, 74, 0.25) !important;
+}
+
+#studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small,
+#studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small.text-white {
+  color: #15803d !important;
+  font-weight: 500;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label {
+  border-right-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-info {
+  background-color: #0f192b !important;
+  color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-info small.text-muted {
+  color: #94a3b8 !important;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success {
+  background-color: rgba(22, 163, 74, 0.18) !important;
+  color: #86efac !important;
+  border-right-color: rgba(74, 222, 128, 0.3) !important;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small,
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .symbol-label.bg-success small.text-white {
+  color: #86efac !important;
+}
+
+#studentWiseCurriculum .card.categoty-card .col-6 {
+  padding: 10px 12px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .col-6 {
+  color: var(--vtop-dark-text-main) !important;
+}
+
+#studentWiseCurriculum .card.categoty-card .col-2 {
+  padding: 0 8px 0 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#studentWiseCurriculum .card.categoty-card .icon-button {
+  appearance: none;
+  background: transparent !important;
+  border: none !important;
+  padding: 4px !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#studentWiseCurriculum .card.categoty-card .icon-button .fs-2 {
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+}
+
+html.vtop-dark-theme #studentWiseCurriculum .card.categoty-card .icon-button {
+  color: #94a3b8 !important;
+}
+
+#curriculumCategoryView table.table thead th {
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#curriculumCategoryView table.table tbody td {
+  vertical-align: middle !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.vtop-dark-theme #curriculumCategoryView table.table thead th {
+  background-color: #0b1322 !important;
+  color: var(--vtop-dark-accent) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .basket-option label {
+  color: var(--vtop-dark-text-main) !important;
+}
+
+#curriculumCategoryView .card.card-tabs {
+  overflow: hidden !important;
+}
+
+#curriculumCategoryView .card.card-tabs > .card-header {
+  padding: 0 !important;
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .card.card-tabs > .card-header {
+  background-color: #0f192b !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+#curriculumCategoryView .card.card-tabs .nav-tabs {
+  border-bottom: none !important;
+  padding: 6px 8px 0 8px;
+  gap: 4px;
+}
+
+#curriculumCategoryView .card.card-tabs .nav-tabs .nav-link {
+  border: 1px solid transparent !important;
+  border-bottom: none !important;
+  border-radius: 6px 6px 0 0 !important;
+  padding: 8px 14px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  background-color: transparent !important;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+#curriculumCategoryView .card.card-tabs .nav-tabs .nav-link:hover {
+  color: #0f172a !important;
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+#curriculumCategoryView .card.card-tabs .nav-tabs .nav-link.active {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link:hover {
+  color: #f8fafc !important;
+  background-color: rgba(56, 189, 248, 0.08) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .card.card-tabs .nav-tabs .nav-link.active {
+  color: var(--vtop-dark-accent) !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+#curriculumCategoryView .card.card-tabs > .card-body.tab-content {
+  padding: 16px !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .text-success {
+  color: #4ade80 !important;
+}
+
+#curriculumCategoryView .dataTables_wrapper > .row:first-child {
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+#curriculumCategoryView .dataTables_length label,
+#curriculumCategoryView .dataTables_filter label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #475569;
+  margin: 0;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .dataTables_length label,
+html.vtop-dark-theme #curriculumCategoryView .dataTables_filter label {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+#curriculumCategoryView thead.bg-gradient-light {
+  background-image: none !important;
+  background-color: #f8fafc !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView .table-responsive,
+html.vtop-dark-theme #curriculumCategoryView .dt-row,
+html.vtop-dark-theme #curriculumCategoryView table.table {
+  background-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView thead.bg-gradient-light {
+  background-color: #0b1322 !important;
+}
+
+#curriculumCategoryView table.table tbody td {
+  padding: 9px 12px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:nth-of-type(even) td {
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView table.table tbody td {
+  border-bottom-color: rgba(148, 163, 184, 0.1) !important;
+}
+
+#curriculumCategoryView table.table tbody tr:hover td {
+  background-color: rgba(15, 23, 42, 0.025) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView table.table tbody tr:hover td {
+  background-color: rgba(56, 189, 248, 0.06) !important;
+}
+
+#curriculumCategoryView td:has(button[name="courseSyllabusDwnld"]) {
+  white-space: nowrap;
+}
+
+#curriculumCategoryView button[name="courseSyllabusDwnld"] {
+  appearance: none;
+  background: transparent !important;
+  border: none !important;
+  padding: 2px 4px !important;
+  margin-left: 8px;
+  color: #2563eb !important;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: color 0.15s ease;
+}
+
+#curriculumCategoryView button[name="courseSyllabusDwnld"]:hover {
+  color: #1d4ed8 !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"] {
+  color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme #curriculumCategoryView button[name="courseSyllabusDwnld"]:hover {
+  color: #7dd3fc !important;
 }
