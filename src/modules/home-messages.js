@@ -76,6 +76,8 @@
     isFetching: false,
 
     init() {
+      this.syncDashboardEmptyStates();
+
       const courseData = document.getElementById('course-data');
       if (!courseData) {
         this.destroy();
@@ -94,6 +96,67 @@
       const card = this.createCard();
       courseData.insertAdjacentElement('afterend', card);
       this.load(false);
+    },
+
+    syncDashboardEmptyStates() {
+      const proctorEl = document.getElementById('proctor-message');
+      if (proctorEl) {
+        const hasProctorMsg = Array.from(proctorEl.childNodes).some((node) => {
+          if (node.nodeType === Node.TEXT_NODE) return node.nodeValue.trim().length > 0;
+          if (node.nodeType !== Node.ELEMENT_NODE) return false;
+          if (node.classList.contains('vtop-dashboard-empty')) return false;
+          if (node.textContent.trim().length > 0) return true;
+          return Boolean(node.querySelector('img, table, a, button'));
+        });
+        this.toggleEmptyState(
+          proctorEl,
+          !hasProctorMsg,
+          'No message from proctor',
+          'Messages from your proctor will appear here.'
+        );
+      }
+
+      const daEl = document.getElementById('digital-assignments');
+      if (daEl) {
+        const tbody = daEl.querySelector('table tbody');
+        const hasDaRows = tbody
+          ? Array.from(tbody.querySelectorAll('tr')).some((tr) => tr.textContent.trim().length > 0)
+          : Array.from(daEl.childNodes).some((node) => {
+              if (node.nodeType === Node.TEXT_NODE) return node.nodeValue.trim().length > 0;
+              if (node.nodeType !== Node.ELEMENT_NODE) return false;
+              if (node.classList.contains('vtop-dashboard-empty')) return false;
+              return node.textContent.trim().length > 0;
+            });
+        this.toggleEmptyState(
+          daEl,
+          !hasDaRows,
+          'No DA Pending',
+          'Upcoming digital assignment deadlines will appear here.'
+        );
+      }
+    },
+
+    toggleEmptyState(container, isEmpty, title, note) {
+      const existing = container.querySelector(':scope > .vtop-dashboard-empty');
+      if (!isEmpty) {
+        if (existing) existing.remove();
+        return;
+      }
+      if (existing) return;
+
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'vtop-dashboard-empty';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'vtop-dashboard-empty-title';
+      titleEl.textContent = title;
+
+      const noteEl = document.createElement('div');
+      noteEl.className = 'vtop-dashboard-empty-note';
+      noteEl.textContent = note;
+
+      emptyEl.append(titleEl, noteEl);
+      container.appendChild(emptyEl);
     },
 
     destroy() {

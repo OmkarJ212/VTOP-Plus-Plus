@@ -599,6 +599,32 @@ div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
   overflow: auto !important;
 }
 
+#proctor-message:has(> .vtop-dashboard-empty) {
+  padding: 0 !important;
+}
+
+#digital-assignments:has(> .vtop-dashboard-empty) > table {
+  display: none !important;
+}
+
+.vtop-dashboard-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--vtop-text-muted);
+}
+
+.vtop-dashboard-empty-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vtop-text-secondary);
+  margin-bottom: 4px;
+}
+
+.vtop-dashboard-empty-note {
+  font-size: 0.76rem;
+  color: var(--vtop-text-muted);
+}
+
 #digital-assignments table.table,
 #last-five-feedbacks table.table {
   margin-bottom: 0 !important;
@@ -776,6 +802,15 @@ html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover td {
 
 html.vtop-dark-theme #last-five-feedbacks table.table td.text-primary {
   color: var(--vtop-accent-light) !important;
+}
+
+html.vtop-dark-theme .vtop-dashboard-empty,
+html.vtop-dark-theme .vtop-dashboard-empty-note {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-dashboard-empty-title {
+  color: var(--vtop-text-secondary) !important;
 }
 
 /* Standardize hardcoded #f2dede empty-state alert banner (e.g. Class Messages page) */
