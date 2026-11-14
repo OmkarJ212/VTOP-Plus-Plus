@@ -712,21 +712,59 @@ html.vtop-dark-theme .btn-primary {
   color: var(--vtop-text-inverse) !important;
 }
 
-/* 7.6 BlockUI Loading Overlays (Prevents blinding white flash during AJAX page fetches) */
-html.vtop-dark-theme .blockUI,
+/* 7.6 BlockUI Loading Overlays & Page Loaders (Prevents blinding white flash & inverted loader GIFs) */
+html.vtop-dark-theme .blockUI.blockOverlay,
 html.vtop-dark-theme .blockOverlay {
-  background-color: var(--vtop-bg-blockui) !important;
-  opacity: 0.82 !important;
+  background-color: #0b0f19 !important;
+  opacity: 0.75 !important;
 }
 .blockMsg {
   border: 1px solid var(--vtop-border) !important;
   border-radius: 10px !important;
   box-shadow: none !important;
 }
+html.vtop-dark-theme .blockUI.blockMsg,
+html.vtop-dark-theme .blockUI.blockMsg.blockPage,
+html.vtop-dark-theme .blockUI.blockMsg.blockElement,
 html.vtop-dark-theme .blockMsg {
-  background-color: var(--vtop-bg-elevated) !important;
-  color: var(--vtop-text-primary) !important;
-  border-color: var(--vtop-border) !important;
+  background-color: #111827 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  border-radius: 10px !important;
+  padding: 12px 18px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  font-size: 14px !important;
+}
+
+/* Smaller (20x20) dark-mode-inverted loading GIFs across BlockUI, #popup, and all VTOP pages */
+html.vtop-dark-theme .blockUI.blockMsg img,
+html.vtop-dark-theme .blockMsg img,
+html.vtop-dark-theme img[src*="482.GIF" i],
+html.vtop-dark-theme img[src*="ajax-loader" i],
+html.vtop-dark-theme img[src$=".gif" i][src*="load" i],
+html.vtop-dark-theme img[src$=".gif" i][src*="spinner" i],
+html.vtop-dark-theme #popup img[src*="ajax-loader" i],
+html.vtop-dark-theme #popup img[src*="482" i] {
+  width: 20px !important;
+  height: 20px !important;
+  object-fit: contain !important;
+  vertical-align: middle !important;
+  margin-right: 8px !important;
+  filter: invert(1) hue-rotate(180deg) brightness(1.1) !important;
+  mix-blend-mode: screen;
+}
+
+/* #popup card loader (other VTOP pages) */
+html.vtop-dark-theme #popup .card,
+html.vtop-dark-theme #popup .card-body {
+  background-color: #111827 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+}
+html.vtop-dark-theme #popup .card-header {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-bottom: 1px solid #334155 !important;
 }
 
 /* 7.7 Captcha & OCR Image Protection */
