@@ -497,14 +497,10 @@ html:not(.vtop-dark-theme) #vtopHeaderBarControl .dropdown-menu a:not(.btn) .fa 
 }
 
 /* Universal text-light override across entire portal */
-.text-light,
-span.text-light,
-a.text-light,
-i.text-light,
-button.text-light,
-small.text-light,
-html.vtop-dark-theme .text-light,
-body.vtop-dark-theme .text-light {
+:is(#vtop-header, .navbar, .btn, .badge) .text-light,
+:is(#vtop-header, .navbar, .btn, .badge).text-light,
+html.vtop-dark-theme .text-light:not(.modal-header):not(.modal-header *),
+body.vtop-dark-theme .text-light:not(.modal-header):not(.modal-header *) {
   color: var(--vtop-text-inverse) !important;
 }
 
@@ -718,33 +714,12 @@ html.vtop-dark-theme .blockOverlay {
   background-color: #0b0f19 !important;
   opacity: 0.75 !important;
 }
-.blockMsg {
-  border: 1px solid var(--vtop-border) !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-}
-html.vtop-dark-theme .blockUI.blockMsg,
-html.vtop-dark-theme .blockUI.blockMsg.blockPage,
-html.vtop-dark-theme .blockUI.blockMsg.blockElement,
-html.vtop-dark-theme .blockMsg {
-  background-color: #111827 !important;
-  color: #f1f5f9 !important;
-  border: 1px solid #334155 !important;
-  border-radius: 10px !important;
-  padding: 12px 18px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
-  font-size: 14px !important;
-}
 
-/* Smaller (20x20) dark-mode-inverted loading GIFs across BlockUI, #popup, and all VTOP pages */
-html.vtop-dark-theme .blockUI.blockMsg img,
-html.vtop-dark-theme .blockMsg img,
+/* Smaller (20x20) dark-mode-inverted loading GIFs across VTOP pages */
 html.vtop-dark-theme img[src*="482.GIF" i],
 html.vtop-dark-theme img[src*="ajax-loader" i],
 html.vtop-dark-theme img[src$=".gif" i][src*="load" i],
-html.vtop-dark-theme img[src$=".gif" i][src*="spinner" i],
-html.vtop-dark-theme #popup img[src*="ajax-loader" i],
-html.vtop-dark-theme #popup img[src*="482" i] {
+html.vtop-dark-theme img[src$=".gif" i][src*="spinner" i] {
   width: 20px !important;
   height: 20px !important;
   object-fit: contain !important;
@@ -752,19 +727,6 @@ html.vtop-dark-theme #popup img[src*="482" i] {
   margin-right: 8px !important;
   filter: invert(1) hue-rotate(180deg) brightness(1.1) !important;
   mix-blend-mode: screen;
-}
-
-/* #popup card loader (other VTOP pages) */
-html.vtop-dark-theme #popup .card,
-html.vtop-dark-theme #popup .card-body {
-  background-color: #111827 !important;
-  color: #f1f5f9 !important;
-  border: 1px solid #334155 !important;
-}
-html.vtop-dark-theme #popup .card-header {
-  background-color: #1e293b !important;
-  color: #f1f5f9 !important;
-  border-bottom: 1px solid #334155 !important;
 }
 
 /* 7.7 Captcha & OCR Image Protection */

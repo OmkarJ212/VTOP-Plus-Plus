@@ -84,6 +84,7 @@
         this.startObserver();
       } else {
         this.stopObserver();
+        this.restoreSanitizedElements();
       }
 
       console.log(`[VTOP++] Universal Dark Mode ${this.isActive ? 'Enabled' : 'Disabled'}`);
@@ -180,19 +181,29 @@
           return list;
         };
 
-        // 1. Remove legacy HTML bgcolor attributes across all elements
+        // 1. Remove legacy HTML bgcolor attributes across all elements (preserving original for Light Mode switch-back)
         const bgElements = queryAll('[bgcolor]');
         for (let i = 0; i < bgElements.length; i++) {
           const el = bgElements[i];
           if (this._isProtectedElement(el)) continue;
+          if (!el.hasAttribute('data-vtop-orig-bgcolor')) {
+            el.setAttribute('data-vtop-orig-bgcolor', el.getAttribute('bgcolor') || '');
+          }
           el.removeAttribute('bgcolor');
         }
 
         // 1b. Clear WhiteBackground wrappers inline backgrounds
         const whiteWrappers = queryAll('.WhiteBackground, [class*="WhiteBackground" i]');
         for (let i = 0; i < whiteWrappers.length; i++) {
-          whiteWrappers[i].style.backgroundColor = '';
-          whiteWrappers[i].style.background = '';
+          const w = whiteWrappers[i];
+          if (w.style.backgroundColor && !w.hasAttribute('data-vtop-orig-bg')) {
+            w.setAttribute('data-vtop-orig-bg', w.style.backgroundColor);
+          }
+          if (w.style.background && !w.hasAttribute('data-vtop-orig-background')) {
+            w.setAttribute('data-vtop-orig-background', w.style.background);
+          }
+          w.style.backgroundColor = '';
+          w.style.background = '';
         }
 
         // 1c. Ensure injected course filter bars stay dark
@@ -203,7 +214,11 @@
         // 1d. Clear any hardcoded blue/inline text colors from navbar elements to ensure pure white text
         const headerElements = queryAll('#vtop-header [style*="color"], .navbar [style*="color"], #quickLinks [style*="color"], #navbarDropdown [style*="color"]');
         for (let i = 0; i < headerElements.length; i++) {
-          headerElements[i].style.color = '';
+          const h = headerElements[i];
+          if (h.style.color && !h.hasAttribute('data-vtop-orig-color')) {
+            h.setAttribute('data-vtop-orig-color', h.style.color);
+          }
+          h.style.color = '';
         }
 
         // 2. Clear hardcoded white/near-white inline background styles and near-black text
@@ -214,15 +229,44 @@
 
           const css = el.style.cssText;
           if (WHITE_BG_REGEX.test(css)) {
+            if (el.style.backgroundColor && !el.hasAttribute('data-vtop-orig-bg')) {
+              el.setAttribute('data-vtop-orig-bg', el.style.backgroundColor);
+            }
             el.style.backgroundColor = '';
           }
           if (DARK_TEXT_REGEX.test(css)) {
+            if (el.style.color && !el.hasAttribute('data-vtop-orig-color')) {
+              el.setAttribute('data-vtop-orig-color', el.style.color);
+            }
             el.style.color = '';
           }
         }
       } finally {
         this._isSanitizing = false;
       }
+    },
+
+    /**
+     * Restore original inline attributes/styles cleared by sanitizeDynamicElements
+     * so live switching from Dark Mode back to Light Mode never leaves broken contrast.
+     */
+    restoreSanitizedElements() {
+      document.querySelectorAll('[data-vtop-orig-bgcolor]').forEach((el) => {
+        el.setAttribute('bgcolor', el.getAttribute('data-vtop-orig-bgcolor') || '');
+        el.removeAttribute('data-vtop-orig-bgcolor');
+      });
+      document.querySelectorAll('[data-vtop-orig-bg]').forEach((el) => {
+        el.style.backgroundColor = el.getAttribute('data-vtop-orig-bg') || '';
+        el.removeAttribute('data-vtop-orig-bg');
+      });
+      document.querySelectorAll('[data-vtop-orig-background]').forEach((el) => {
+        el.style.background = el.getAttribute('data-vtop-orig-background') || '';
+        el.removeAttribute('data-vtop-orig-background');
+      });
+      document.querySelectorAll('[data-vtop-orig-color]').forEach((el) => {
+        el.style.color = el.getAttribute('data-vtop-orig-color') || '';
+        el.removeAttribute('data-vtop-orig-color');
+      });
     },
 
     _isProtectedElement(el) {

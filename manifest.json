@@ -31,7 +31,9 @@
         "src/content/styles/dark-mode-core.css",
         "src/content/styles/dark-mode-components.css",
         "src/content/styles/dark-mode-widgets.css",
-        "src/content/styles/dashboard-and-layout.css"
+        "src/content/styles/dashboard-and-layout.css",
+        "src/content/styles/curriculum-and-course.css",
+        "src/content/styles/legacy-pages.css"
       ],
       "js": [
         "src/modules/dark-mode.js"
@@ -78,14 +80,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "models/velloreWeights.json",
-        "src/content/styles/themes.css",
-        "src/content/styles/privacy-and-navigation.css",
-        "src/content/styles/widgets.css",
-        "src/content/styles/dark-mode-core.css",
-        "src/content/styles/dark-mode-components.css",
-        "src/content/styles/dark-mode-widgets.css",
-        "src/content/styles/dashboard-and-layout.css"
+        "models/velloreWeights.json"
       ],
       "matches": [
         "*://vtop.vit.ac.in/*"

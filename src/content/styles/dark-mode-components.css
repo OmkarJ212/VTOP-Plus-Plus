@@ -572,3 +572,188 @@ html.vtop-dark-theme .text-danger,
 html.vtop-dark-theme span.text-danger {
   color: var(--vtop-danger-bright) !important;
 }
+
+/* ==========================================================================
+   7.26 Additive Dark Mode Fixes for Remaining VTOP Pages & Inline Styles
+   ========================================================================== */
+
+/* Inline saturated / dark text colors on dark surfaces */
+html.vtop-dark-theme [style*="color: blue" i],
+html.vtop-dark-theme [style*="color:blue" i],
+html.vtop-dark-theme [style*="color: #0000ff" i],
+html.vtop-dark-theme [style*="color: #00f" i],
+html.vtop-dark-theme [style*="color: #3c8dbc" i],
+html.vtop-dark-theme [style*="color: #106d8c" i],
+html.vtop-dark-theme [style*="color:#106d8c" i],
+html.vtop-dark-theme [style*="color: aqua" i],
+html.vtop-dark-theme [style*="color:aqua" i],
+html.vtop-dark-theme [style*="color: rgb(0, 102, 153)" i] {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme [style*="color: green" i],
+html.vtop-dark-theme [style*="color:green" i],
+html.vtop-dark-theme [style*="color : green" i],
+html.vtop-dark-theme [style*="color: rgb(1, 156, 80)" i] {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme [style*="color: red" i],
+html.vtop-dark-theme [style*="color:red" i],
+html.vtop-dark-theme [style*="color: maroon" i],
+html.vtop-dark-theme [style*="color:maroon" i],
+html.vtop-dark-theme [style*="color: brown" i],
+html.vtop-dark-theme [style*="color:brown" i],
+html.vtop-dark-theme [style*="color: #c7254e" i] {
+  color: var(--vtop-danger-bright) !important;
+}
+
+html.vtop-dark-theme [style*="color: rgb(204, 102, 0)" i],
+html.vtop-dark-theme [style*="color: orange" i] {
+  color: var(--vtop-warn-bright) !important;
+}
+
+html.vtop-dark-theme [style*="color:#555" i],
+html.vtop-dark-theme [style*="color:#444" i],
+html.vtop-dark-theme [style*="color:#222" i],
+html.vtop-dark-theme [style*="color:#111" i],
+html.vtop-dark-theme [style*="color: rgb(68" i],
+html.vtop-dark-theme [style*="color: rgb(34" i],
+html.vtop-dark-theme [style*="color: rgb(85" i] {
+  color: var(--vtop-text-primary) !important;
+}
+
+/* Inline light/pastel backgrounds on non-table elements */
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #d4d3d3" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #bbcbfd" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #f5dee7" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #aba6bf" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #a5bbff" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #DCDCDC" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: lightgray" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #d2d6de" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #FAF0DD" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: antiquewhite" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #FDFDFD" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background:#FDFDFD" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: rgb(224, 224, 224)" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: rgb(254, 251, 237)" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #eef4f9" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: #d5d8dc" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: rgb(253, 253, 253)" i],
+html.vtop-dark-theme :is(div, span, p, section, fieldset, .panel-heading, .card-header, .box-header, .modal-header)[style*="background-color: rgb(224, 238, 238)" i] {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme :is(div, span, p, h3, h4, .panel-heading, .card-header, .box-header)[style*="background-color: #2672a4" i],
+html.vtop-dark-theme :is(div, span, p, h3, h4, .panel-heading, .card-header, .box-header)[style*="background-color: #3c8dbc" i],
+html.vtop-dark-theme :is(div, span, p, h3, h4, .panel-heading, .card-header, .box-header)[style*="background-color: #9675ce" i],
+html.vtop-dark-theme :is(div, span, p, h3, h4, .panel-heading, .card-header, .box-header)[style*="background-color: #656565" i],
+html.vtop-dark-theme :is(div, span, p, h3, h4, .panel-heading, .card-header, .box-header)[style*="background-color: #626d71" i] {
+  background-color: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme span[style*="background-color: rgb(255, 255, 0)" i] {
+  background-color: var(--vtop-warn-alert-bg) !important;
+  color: var(--vtop-warn-alert-text) !important;
+}
+
+html.vtop-dark-theme [style*="background-color: orange" i],
+html.vtop-dark-theme [style*="background-color:orange" i] {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-warn-bright) !important;
+}
+
+/* Faculty Open Project light badges inside dark table rows */
+html.vtop-dark-theme .badge.bg-light {
+  background-color: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+/* Bootstrap 5 .table-primary rows */
+html.vtop-dark-theme tr.table-primary,
+html.vtop-dark-theme tr.table-primary > td,
+html.vtop-dark-theme tr.table-primary > th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+/* Inline stark borders */
+html.vtop-dark-theme [style*="border:1px solid #000" i],
+html.vtop-dark-theme [style*="border: 1px solid #000" i],
+html.vtop-dark-theme [style*="border-color: Blue" i],
+html.vtop-dark-theme [style*="border: solid 2px #f2dede" i],
+html.vtop-dark-theme [style*="border: solid 2px #3c8dbc" i],
+html.vtop-dark-theme [style*="border: 1px solid #546984" i],
+html.vtop-dark-theme [style*="border-color: #bbcbfd" i],
+html.vtop-dark-theme [style*="border-color:#bbcbfd" i],
+html.vtop-dark-theme [style*="border-color: #3c8dbc" i],
+html.vtop-dark-theme [style*="solid orange" i] {
+  border-color: var(--vtop-border) !important;
+}
+
+/* Bootstrap 4/5 Nav Tabs (.nav-link) */
+html.vtop-dark-theme .nav-tabs .nav-link {
+  color: var(--vtop-text-muted) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+html.vtop-dark-theme .nav-tabs .nav-link:hover {
+  background-color: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .nav-tabs .nav-link.active,
+html.vtop-dark-theme .nav-tabs .nav-link.active:hover,
+html.vtop-dark-theme .nav-tabs .nav-link.active:focus {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) var(--vtop-border) transparent !important;
+}
+
+/* Form Checkboxes & Radios */
+html.vtop-dark-theme .form-check-input {
+  background-color: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-border-strong) !important;
+}
+
+html.vtop-dark-theme .form-check-input:checked {
+  background-color: var(--vtop-accent-hover) !important;
+  border-color: var(--vtop-accent) !important;
+}
+
+/* Legacy Bootstrap 3 .label-* badges */
+html.vtop-dark-theme .label-default {
+  background-color: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .label-info {
+  background-color: var(--vtop-info-alert-bg) !important;
+  color: var(--vtop-info-alert-text) !important;
+}
+
+html.vtop-dark-theme .label-primary {
+  background-color: var(--vtop-accent-soft) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .label-success {
+  background-color: var(--vtop-success-alert-bg) !important;
+  color: var(--vtop-success-text) !important;
+}
+
+html.vtop-dark-theme .label-warning {
+  background-color: var(--vtop-warn-alert-bg) !important;
+  color: var(--vtop-warn-alert-text) !important;
+}
+
+html.vtop-dark-theme .label-danger {
+  background-color: var(--vtop-danger-alert-bg) !important;
+  color: var(--vtop-danger-text) !important;
+}

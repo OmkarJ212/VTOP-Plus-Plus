@@ -146,7 +146,8 @@
     registration: ['ffcs', 'add drop', 'wishlist', 'course registration'],
     mooc: ['nptel', 'coursera', 'online courses'],
     pat: ['placement', 'cdc', 'internship', 'jobs', 'recruitment'],
-    calendar: ['holidays', 'academic calendar', 'schedule']
+    calendar: ['holidays', 'academic calendar', 'schedule'],
+    profile: ['student profile', 'personal', 'details', 'info', 'address']
   };
 
   function extractAcronym(str) {
@@ -233,8 +234,8 @@
 
         // Strict filtering against junk/branding/collapse buttons
         if (!rawText || rawText.length < 3 || rawText.length > 70) continue;
-        if (/^(vit|vtop|home|dashboard|logout|sign out|change password|profile|my profile|menu|navigation)$/i.test(rawText)) continue;
-        if (/logout|sign out|change password/i.test(rawText)) continue;
+        if (/^(vit|vtop|home|dashboard|logout|sign out|menu|navigation)$/i.test(rawText)) continue;
+        if (/logout|sign out/i.test(rawText)) continue;
         if (link.getAttribute('data-bs-toggle') === 'collapse' || link.getAttribute('data-toggle') === 'collapse') continue;
         if (href && href.startsWith('#MG')) continue;
         if (!dataUrl && (!href || href === '#' || href === 'javascript:void(0);') && !link.getAttribute('onclick')) continue;
@@ -246,6 +247,10 @@
         }
         if (!matchedCore) {
           for (const item of itemsMap.values()) {
+            // Do not overwrite an already-bound core page with a different data-url
+            if (item.element && dataUrl && item.dataUrl && item.dataUrl.toLowerCase() !== dataUrl.toLowerCase()) {
+              continue;
+            }
             if (item.patterns && item.patterns.some((p) => p.test(rawText))) {
               matchedCore = item;
               break;

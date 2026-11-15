@@ -195,6 +195,9 @@
     },
 
     checkAndTrack() {
+      // Never inject DA columns on unrelated pages such as Additional Learning (#addLeanForm)
+      if (document.getElementById('addLeanForm')) return;
+
       const overviewTable = this.findCourseOverviewTable();
 
       // 1. Check for single-course assignment upload view (where student actually views/uploads files)
@@ -234,6 +237,10 @@
 
       for (const table of allTables) {
         if (table === overview) continue;
+        // Skip Home/Dashboard summary cards (e.g. #digital-assignments Forthcoming DA card)
+        if (table.closest('#digital-assignments, #course-data, #edu-status, #last-five-feedbacks, #proctor-message, #vtop-home-class-messages')) {
+          continue;
+        }
 
         const text = (table.textContent || '').toLowerCase();
         const hasDueDate = text.includes('due date') || text.includes('deadline') || text.includes('last date');
@@ -423,6 +430,13 @@
     // =========================================================================
 
     findCourseOverviewTable() {
+      // Only augment course overview tables on Digital Assignment pages
+      const isDaPage = Boolean(document.getElementById('digitalAssignment')) ||
+        Array.from(document.querySelectorAll('.card-header, .box-header')).some((h) =>
+          /assignment/i.test(h.textContent || '')
+        );
+      if (!isDaPage) return null;
+
       // 1. O(1) scoped check inside #fixedTableContainer > table.customTable
       const scopedTables = document.querySelectorAll('#fixedTableContainer table.customTable');
       for (const table of scopedTables) {

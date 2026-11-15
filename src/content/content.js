@@ -97,16 +97,45 @@
       }
     }
 
-    // Remove Action Plan card on the Home page only if explicitly enabled by user
-    if (currentSettings.enableHideActionPlan) {
-      document.querySelectorAll('.card.goldenBorderTop.lightGoldenbackground2').forEach((card) => {
-        const titleText = (card.querySelector('.card-title')?.textContent || '').replace(/\s+/g, ' ').trim();
-        if (/action\s*plan/i.test(titleText) || card.querySelector('#pdfModal')) {
-          const colWrapper = card.closest('.col-12.col-md-8.mb-3');
-          (colWrapper || card).remove();
+    // Fix VTOP's Course Outcome accordion button missing `.collapsed` when collapsed (`aria-expanded="false"`)
+    document
+      .querySelectorAll('#courseAccordion .accordion-button[aria-expanded="false"]:not(.collapsed)')
+      .forEach((btn) => {
+        const targetSel = btn.getAttribute('data-bs-target');
+        const target = targetSel ? document.querySelector(targetSel) : null;
+        if (!target || !target.classList.contains('show')) {
+          btn.classList.add('collapsed');
         }
       });
-    }
+
+    // Upgrade legacy Bootstrap 3 data-toggle / data-dismiss attributes (e.g. FAQ #falistfrag, Event Registration) to Bootstrap 5
+    document.querySelectorAll('[data-toggle]:not([data-bs-toggle])').forEach((el) => {
+      const val = el.getAttribute('data-toggle');
+      if (val === 'collapse' || val === 'modal' || val === 'tab' || val === 'pill' || val === 'tooltip') {
+        el.setAttribute('data-bs-toggle', val);
+        const target = el.getAttribute('data-target') || el.getAttribute('href');
+        if (target && !el.hasAttribute('data-bs-target') && target.startsWith('#')) {
+          el.setAttribute('data-bs-target', target);
+        }
+      }
+    });
+    document.querySelectorAll('[data-dismiss="modal"]:not([data-bs-dismiss])').forEach((el) => {
+      el.setAttribute('data-bs-dismiss', 'modal');
+    });
+
+    // Strip legacy inline colors/floats inside FAQ (#falistfrag) so theme CSS governs both Light & Dark cleanly
+    document.querySelectorAll('#falistfrag .panel, #falistfrag .panel-heading, #falistfrag .panel-title, #falistfrag .panel-title h4, #falistfrag .panel-collapse, #falistfrag .panel-body, #falistfrag .faqcontent').forEach((el) => {
+      if (el.dataset.vtopFaqCleaned) return;
+      el.style.removeProperty('color');
+      el.style.removeProperty('border-color');
+      el.style.removeProperty('background');
+      el.style.removeProperty('background-color');
+      el.style.removeProperty('float');
+      el.removeAttribute('data-vtop-orig-color');
+      el.removeAttribute('data-vtop-orig-bg');
+      el.removeAttribute('data-vtop-orig-background');
+      el.dataset.vtopFaqCleaned = '1';
+    });
 
     // 0a. Refresh dynamic link indexer and mega-menu close buttons
     if (Crawler) Crawler.scan();

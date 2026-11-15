@@ -18,7 +18,6 @@
     enableQuickDock: true,
     enablePrivacyMode: false,
     enableDarkMode: false,
-    enableHideActionPlan: false,
     downloadPacing: 'human', // 'human', 'fast'
     attendanceTarget: 75 // 75, 80, 85, 90
   };

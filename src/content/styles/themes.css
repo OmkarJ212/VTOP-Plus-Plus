@@ -142,7 +142,6 @@ body.vtop-dark-theme,
   --vtop-bg-active: rgba(56, 189, 248, 0.14);
   --vtop-tab-hover-bg: rgba(56, 189, 248, 0.08);
   --vtop-bg-navbar-dark: #0d1527;
-  --vtop-bg-blockui: #070b13;
 
   /* Borders & Hairlines */
   --vtop-border: #293548;
@@ -231,10 +230,8 @@ body.vtop-dark-theme,
   --vtop-dark-bg-elevated: var(--vtop-bg-elevated);
   --vtop-dark-bg-input: var(--vtop-bg-input);
   --vtop-dark-border: var(--vtop-border);
-  --vtop-dark-border-subtle: var(--vtop-border-muted);
   --vtop-dark-text-main: var(--vtop-text-primary);
   --vtop-dark-text-muted: var(--vtop-text-muted);
   --vtop-dark-text-dim: var(--vtop-text-dim);
   --vtop-dark-accent: var(--vtop-accent);
-  --vtop-dark-accent-hover: var(--vtop-accent-hover);
 }
