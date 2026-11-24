@@ -1,0 +1,551 @@
+/* VTOP++ - Dark Mode Overrides for Injected Extension Widgets & Scrollbars */
+
+/* ==========================================================================
+   7.26 VTOP++ INJECTED EXTENSION COMPONENTS (Universal Dark Shield)
+   ========================================================================== */
+
+/* 1. Live Course Materials Table Filter Bar */
+html.vtop-dark-theme .vtop-plus-filter-container,
+html.vtop-dark-theme #vtop-plus-table-filter-bar {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .vtop-filter-input,
+html.vtop-dark-theme #vtop-table-filter-search {
+  background-color: var(--vtop-dark-bg-input) !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-dark-text-main) !important;
+  caret-color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-filter-input::placeholder,
+html.vtop-dark-theme #vtop-table-filter-search::placeholder {
+  color: var(--vtop-dark-text-dim) !important;
+}
+
+html.vtop-dark-theme .vtop-filter-input:focus,
+html.vtop-dark-theme #vtop-table-filter-search:focus {
+  border-color: var(--vtop-accent) !important;
+  box-shadow: 0 0 0 2px var(--vtop-accent-focus) !important;
+}
+
+html.vtop-dark-theme .vtop-filter-btn,
+html.vtop-dark-theme #vtop-table-filter-reset {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-filter-btn:hover,
+html.vtop-dark-theme #vtop-table-filter-reset:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+  border-color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-filter-icon {
+  filter: brightness(0.9);
+}
+
+/* 2. Top Consolidated Course Page Filter Panel */
+html.vtop-dark-theme #vtop-custom-course-filter,
+html.vtop-dark-theme .vtop-plus-course-filter-panel {
+  background: var(--vtop-dark-bg-surface) !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme #vtop-custom-course-filter select {
+  background-color: var(--vtop-dark-bg-input) !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-dark-text-main) !important;
+  color-scheme: dark !important;
+}
+
+html.vtop-dark-theme #vtop-custom-course-filter label {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+/* 3. Marks & FAT Target Calculator Card */
+html.vtop-dark-theme .vtop-plus-card {
+  background: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-dark-text-main) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme .vtop-card-title {
+  color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-stat-box {
+  background: var(--vtop-dark-bg-elevated) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .vtop-stat-num {
+  color: var(--vtop-dark-text-main) !important;
+}
+
+html.vtop-dark-theme .vtop-stat-lbl {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-fat-header-row > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-secondary) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme .vtop-fat-header-right {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme #vtop-cgpa-calculator {
+  background-color: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
+  border-top-color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-toggle {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-toggle:hover {
+  background-color: var(--vtop-bg-elevated) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-body {
+  border-top-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-subjects-section {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-input,
+html.vtop-dark-theme .vtop-cgpa-select {
+  background-color: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+  color-scheme: dark !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-btn {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-btn-primary {
+  background-color: var(--vtop-accent-soft) !important;
+  border-color: var(--vtop-accent-border) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-btn-primary:hover:not(:disabled) {
+  background-color: var(--vtop-accent) !important;
+  border-color: var(--vtop-accent) !important;
+  color: #0b0f19 !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-delta-up {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme .vtop-cgpa-delta-down {
+  color: var(--vtop-danger-bright) !important;
+}
+
+/* 4. Floating Materials Downloader Panel */
+html.vtop-dark-theme .vtop-plus-panel {
+  background: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme #vtop-zip-panel,
+html.vtop-dark-theme .vtop-panel-body {
+  background: var(--vtop-bg-input) !important;
+  background-color: var(--vtop-bg-input) !important;
+}
+
+html.vtop-dark-theme .vtop-panel-header {
+  background: var(--vtop-brand) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme .vtop-panel-title {
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .vtop-progress-bar-bg {
+  background: var(--vtop-dark-bg-elevated) !important;
+}
+
+html.vtop-dark-theme .vtop-download-btn {
+  background: #16a34a !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .vtop-download-btn:hover:not(:disabled) {
+  background: #15803d !important;
+}
+
+html.vtop-dark-theme .vtop-cancel-btn {
+  background: #dc2626 !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .vtop-cancel-btn:hover {
+  background: #b91c1c !important;
+}
+
+html.vtop-dark-theme .vtop-status-msg {
+  background: var(--vtop-success-bg-soft) !important;
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme .vtop-status-msg.is-error {
+  background: var(--vtop-danger-bg-soft) !important;
+  color: var(--vtop-danger-bright) !important;
+}
+
+/* 5. Command Palette Modal (Ctrl+K) */
+html.vtop-dark-theme .vtop-palette-dialog {
+  background: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme .vtop-palette-header {
+  border-bottom-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-input {
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-input::placeholder {
+  color: var(--vtop-text-dim) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-esc {
+  background: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-list::-webkit-scrollbar-thumb {
+  background: var(--vtop-scrollbar-thumb) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-item:hover,
+html.vtop-dark-theme .vtop-palette-item.selected {
+  background: var(--vtop-bg-elevated) !important;
+  border-left-color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-item-title {
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-palette-item-sub {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-match {
+  background: var(--vtop-accent-focus) !important;
+  color: var(--vtop-accent) !important;
+}
+
+/* 6. Attendance Bar Overrides */
+html.vtop-dark-theme .vtop-att-overall.is-safe {
+  color: var(--vtop-success-bright) !important;
+}
+html.vtop-dark-theme .vtop-att-overall.is-warn {
+  color: var(--vtop-warn-bright) !important;
+}
+html.vtop-dark-theme .vtop-att-overall.is-danger {
+  color: var(--vtop-danger-bright) !important;
+}
+html.vtop-dark-theme .vtop-att-presets {
+  background: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-border-strong) !important;
+}
+html.vtop-dark-theme .vtop-att-preset-btn {
+  border-right-color: var(--vtop-border) !important;
+  color: var(--vtop-text-secondary) !important;
+}
+html.vtop-dark-theme .vtop-att-preset-btn:hover {
+  background: var(--vtop-bg-elevated) !important;
+  color: var(--vtop-text-primary) !important;
+}
+html.vtop-dark-theme .vtop-att-preset-btn.is-active {
+  background: var(--vtop-accent-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+html.vtop-dark-theme .vtop-att-num-input {
+  background: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+html.vtop-dark-theme .vtop-att-below-note {
+  background: var(--vtop-warn-bg-soft) !important;
+  border-color: var(--vtop-warn-border) !important;
+  color: var(--vtop-warn-bright) !important;
+}
+
+html.vtop-dark-theme .vtop-da-urgent-row > td:first-child {
+  border-left-color: var(--vtop-danger-bright) !important;
+}
+
+html.vtop-dark-theme .vtop-da-badge-purple {
+  color: var(--vtop-purple) !important;
+}
+html.vtop-dark-theme .vtop-da-badge-red {
+  color: var(--vtop-danger-bright) !important;
+}
+html.vtop-dark-theme .vtop-da-badge-green {
+  color: var(--vtop-success-text) !important;
+}
+html.vtop-dark-theme .vtop-da-badge-loading {
+  color: var(--vtop-text-muted) !important;
+}
+html.vtop-dark-theme .vtop-badge-safe {
+  color: var(--vtop-success-text) !important;
+}
+html.vtop-dark-theme .vtop-badge-warn {
+  color: var(--vtop-warn-bright) !important;
+}
+html.vtop-dark-theme .vtop-badge-danger {
+  color: var(--vtop-danger-bright) !important;
+}
+/* 8. Universal Dark Mode Scrollbars & Range Sliders */
+html.vtop-dark-theme,
+html.vtop-dark-theme body,
+html.vtop-dark-theme *,
+html.vtop-dark-theme .table-responsive,
+html.vtop-dark-theme .box-body {
+  color-scheme: dark !important;
+  scrollbar-color: auto !important;
+  scrollbar-width: auto !important;
+}
+
+html.vtop-dark-theme::-webkit-scrollbar,
+html.vtop-dark-theme *::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+html.vtop-dark-theme::-webkit-scrollbar-track,
+html.vtop-dark-theme *::-webkit-scrollbar-track {
+  background: var(--vtop-scrollbar-track) !important;
+  border-radius: 6px !important;
+}
+
+html.vtop-dark-theme::-webkit-scrollbar-thumb,
+html.vtop-dark-theme *::-webkit-scrollbar-thumb {
+  background: var(--vtop-scrollbar-thumb) !important;
+  border-radius: 6px !important;
+  border: 2px solid var(--vtop-scrollbar-track) !important;
+}
+
+html.vtop-dark-theme::-webkit-scrollbar-thumb:hover,
+html.vtop-dark-theme *::-webkit-scrollbar-thumb:hover {
+  background: var(--vtop-scrollbar-thumb-hover) !important;
+}
+
+/* 9. Today's Schedule Widget, Timetable .ics Export & Marks Notifier (Dark Mode) */
+html.vtop-dark-theme .vtop-tt-days-bar {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-day-tab {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-day-tab:hover {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-day-tab.is-today:not(.is-active) {
+  background-color: transparent !important;
+  border-color: var(--vtop-accent-border) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-day-tab.is-active {
+  background-color: var(--vtop-accent-hover) !important;
+  border-color: var(--vtop-accent-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-body {
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-item {
+  background-color: transparent !important;
+  border-bottom-color: var(--vtop-border-subtle) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-item.is-done {
+  background-color: transparent !important;
+  opacity: 0.65;
+}
+
+html.vtop-dark-theme .vtop-tt-item:hover,
+html.vtop-dark-theme .vtop-marks-home-item:hover {
+  background-color: var(--vtop-bg-hover) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-item.is-live {
+  background-color: var(--vtop-accent-tint-bg-soft) !important;
+  border-left-color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-item.is-next {
+  background-color: transparent !important;
+  border-left-color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-time-range,
+html.vtop-dark-theme .vtop-tt-code,
+html.vtop-dark-theme .vtop-marks-home-code {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-meta,
+html.vtop-dark-theme .vtop-tt-slot,
+html.vtop-dark-theme .vtop-tt-state,
+html.vtop-dark-theme .vtop-marks-home-sub {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-type {
+  background-color: var(--vtop-muted-bg) !important;
+  border-color: transparent !important;
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-venue {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-status-live {
+  background-color: var(--vtop-accent-soft) !important;
+  border-color: var(--vtop-accent-border) !important;
+  color: var(--vtop-info-alert-text) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-status-next,
+html.vtop-dark-theme .vtop-marks-diff-pill {
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
+  border-color: var(--vtop-success-border) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-status-done {
+  background-color: var(--vtop-muted-bg) !important;
+  border-color: transparent !important;
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-page-bar {
+  background-color: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-page-bar-info {
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme .vtop-marks-home-footer {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-top-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-btn {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-btn:hover:not(:disabled) {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  border-color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-btn-primary {
+  background-color: #2c6d99 !important;
+  border-color: #3c8dbc !important;
+  color: #f8fafc !important;
+}
+
+html.vtop-dark-theme .vtop-tt-btn-primary:hover:not(:disabled) {
+  background-color: #357fae !important;
+  border-color: #4a96c4 !important;
+  color: #ffffff !important;
+}
+
+html.vtop-dark-theme .vtop-tt-modal,
+html.vtop-dark-theme .vtop-marks-toast {
+  background-color: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-modal-head,
+html.vtop-dark-theme .vtop-tt-modal-foot {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-field input,
+html.vtop-dark-theme .vtop-tt-notify-row input {
+  background-color: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+  color-scheme: dark !important;
+}
+
+html.vtop-dark-theme .vtop-tt-notify-row label {
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme .vtop-tt-notify-suffix {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme tr.vtop-marks-row-changed > td {
+  background-color: var(--vtop-success-bg-soft) !important;
+}
+
+html.vtop-dark-theme .vtop-marks-home-score {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme::-webkit-scrollbar-corner,
+html.vtop-dark-theme *::-webkit-scrollbar-corner {
+  background: var(--vtop-scrollbar-track) !important;
+}
+
+html.vtop-dark-theme input[type="range"] {
+  accent-color: var(--vtop-accent) !important;
+  color-scheme: dark !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}

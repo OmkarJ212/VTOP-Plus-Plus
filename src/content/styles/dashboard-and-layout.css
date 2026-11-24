@@ -1,0 +1,1164 @@
+/* VTOP++ - Home/Dashboard Cards, Layout Fixes & Global Shadow Reset */
+
+/* 9. Modernized Home Cards (#course-data, #vtop-home-class-messages, #vtop-home-today-schedule, #vtop-home-marks-updates) */
+#course-data,
+#vtop-home-class-messages,
+#vtop-home-today-schedule,
+#vtop-home-marks-updates {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#course-data .card-header,
+#vtop-home-class-messages .card-header,
+#vtop-home-today-schedule .card-header,
+#vtop-home-marks-updates .card-header {
+  padding: 12px 16px !important;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+}
+
+#course-data .card-header .fontcolor3,
+#vtop-home-class-messages .card-header .fontcolor3,
+#vtop-home-today-schedule .card-header .fontcolor3,
+#vtop-home-marks-updates .card-header .fontcolor3 {
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+}
+
+#course-data .card-header .bg-warning {
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 0.8rem !important;
+  border: 1px solid var(--vtop-danger-border);
+}
+
+#course-data .courseData.overflow-scroll,
+#vtop-home-class-messages .vtop-msg-body {
+  overflow: auto !important;
+  padding: 0 !important;
+}
+
+#course-data table.table,
+#vtop-home-class-messages table.table {
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+
+#course-data table.table thead th,
+#vtop-home-class-messages table.table thead th {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  white-space: nowrap;
+}
+
+#course-data table.table tbody th,
+#course-data table.table tbody td,
+#vtop-home-class-messages table.table tbody th,
+#vtop-home-class-messages table.table tbody td {
+  padding: 9px 12px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+  transition: background-color 0.15s ease;
+}
+
+#course-data table.table tbody tr:last-child th,
+#course-data table.table tbody tr:last-child td,
+#vtop-home-class-messages table.table tbody tr:last-child th,
+#vtop-home-class-messages table.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#course-data table.table tbody tr:hover th,
+#course-data table.table tbody tr:hover td,
+#vtop-home-class-messages table.table tbody tr:hover th,
+#vtop-home-class-messages table.table tbody tr:hover td {
+  background-color: var(--vtop-bg-hover) !important;
+}
+
+#course-data table.table tbody th[scope="row"],
+#course-data table.table tbody td:nth-child(4) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Home Class Messages Widget Specific Layout */
+#vtop-home-class-messages .vtop-msg-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vtop-msg-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.vtop-msg-badge-muted {
+  background-color: var(--vtop-muted-bg);
+  color: var(--vtop-text-body);
+  border: 1px solid var(--vtop-muted-border);
+}
+
+.vtop-msg-badge-active {
+  background-color: var(--vtop-accent-soft);
+  color: var(--vtop-accent-hover);
+  border: 1px solid var(--vtop-accent-border);
+}
+
+.vtop-msg-badge-warn {
+  background-color: var(--vtop-warn-bg-soft);
+  color: var(--vtop-warn);
+  border: 1px solid var(--vtop-warn-border);
+}
+
+.vtop-msg-icon-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 7px;
+  border: 1px solid var(--vtop-border-strong);
+  background-color: var(--vtop-bg-surface);
+  color: var(--vtop-text-body);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.vtop-msg-icon-btn:hover {
+  background-color: var(--vtop-bg-row-hover);
+  color: var(--vtop-text-primary);
+  border-color: var(--vtop-text-dim);
+}
+
+.vtop-msg-icon-btn.vtop-msg-spinning svg {
+  animation: vtopSpin 0.8s linear infinite;
+}
+
+#vtop-home-class-messages .vtop-msg-state {
+  padding: 16px;
+  text-align: center;
+  color: var(--vtop-text-muted);
+}
+
+#vtop-home-class-messages .vtop-msg-error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#vtop-home-class-messages .vtop-msg-fallback-btn {
+  background-color: var(--vtop-accent);
+  color: var(--vtop-text-inverse);
+  border: none;
+  border-radius: 7px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+#vtop-home-class-messages .vtop-msg-content {
+  padding: 10px 14px;
+}
+
+#vtop-home-class-messages .vtop-msg-content:has(> table.table:only-child) {
+  padding: 0;
+}
+
+#vtop-home-class-messages .vtop-msg-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#vtop-home-class-messages .vtop-msg-item {
+  border-bottom: 1px solid var(--vtop-border-subtle);
+}
+
+#vtop-home-class-messages .vtop-msg-item:last-child {
+  border-bottom: none;
+}
+
+#vtop-home-class-messages .vtop-msg-item-trigger {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 11px 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#vtop-home-class-messages .vtop-msg-item-trigger:hover {
+  background-color: var(--vtop-bg-hover);
+}
+
+#vtop-home-class-messages .vtop-msg-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+#vtop-home-class-messages .vtop-msg-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#vtop-home-class-messages .vtop-msg-course {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+#vtop-home-class-messages .vtop-msg-course-code {
+  font-weight: 700;
+  color: var(--vtop-text-heading);
+}
+
+#vtop-home-class-messages .vtop-msg-course-sep {
+  color: var(--vtop-text-muted);
+}
+
+#vtop-home-class-messages .vtop-msg-course-name {
+  font-weight: 600;
+  color: var(--vtop-text-secondary);
+}
+
+#vtop-home-class-messages .vtop-msg-item-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#vtop-home-class-messages .vtop-msg-date {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background-color: var(--vtop-muted-bg);
+  color: var(--vtop-text-muted);
+  border: 1px solid var(--vtop-muted-border);
+  white-space: nowrap;
+}
+
+#vtop-home-class-messages .vtop-msg-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vtop-text-muted);
+  transition: transform 0.18s ease, color 0.15s ease;
+}
+
+#vtop-home-class-messages .vtop-msg-item.is-expanded .vtop-msg-chevron {
+  transform: rotate(180deg);
+  color: var(--vtop-accent);
+}
+
+#vtop-home-class-messages .vtop-msg-text {
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: var(--vtop-text-body);
+}
+
+#vtop-home-class-messages .vtop-msg-details {
+  padding: 0 14px 12px;
+}
+
+#vtop-home-class-messages .vtop-msg-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface-alt);
+}
+
+#vtop-home-class-messages .vtop-msg-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+#vtop-home-class-messages .vtop-msg-meta-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--vtop-text-muted);
+}
+
+#vtop-home-class-messages .vtop-msg-meta-val {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--vtop-text-primary);
+  word-break: break-word;
+}
+
+#vtop-home-class-messages .expand {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--vtop-border);
+  margin-bottom: 6px;
+  background-color: var(--vtop-bg-surface-alt);
+}
+
+/* Dark Theme Polish for #course-data, #vtop-home-class-messages, #vtop-home-today-schedule & #vtop-home-marks-updates */
+html.vtop-dark-theme #course-data,
+html.vtop-dark-theme #vtop-home-class-messages,
+html.vtop-dark-theme #vtop-home-today-schedule,
+html.vtop-dark-theme #vtop-home-marks-updates {
+  border: 1px solid var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme #course-data .card-header,
+html.vtop-dark-theme #vtop-home-class-messages .card-header,
+html.vtop-dark-theme #vtop-home-today-schedule .card-header,
+html.vtop-dark-theme #vtop-home-marks-updates .card-header {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-dark-border) !important;
+  border-top: 3px solid var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme #course-data .card-header .fontcolor3,
+html.vtop-dark-theme #vtop-home-class-messages .card-header .fontcolor3,
+html.vtop-dark-theme #vtop-home-today-schedule .card-header .fontcolor3,
+html.vtop-dark-theme #vtop-home-marks-updates .card-header .fontcolor3 {
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme #course-data .card-header .bg-warning {
+  background-color: var(--vtop-warn-bg-soft) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+html.vtop-dark-theme #course-data table.table thead th,
+html.vtop-dark-theme #vtop-home-class-messages table.table thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #course-data table.table tbody th,
+html.vtop-dark-theme #course-data table.table tbody td,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody th,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody td {
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+}
+
+html.vtop-dark-theme #course-data table.table tbody tr:hover th,
+html.vtop-dark-theme #course-data table.table tbody tr:hover td,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody tr:hover th,
+html.vtop-dark-theme #vtop-home-class-messages table.table tbody tr:hover td {
+  background-color: var(--vtop-bg-hover) !important;
+}
+
+html.vtop-dark-theme .vtop-msg-badge-muted {
+  background-color: var(--vtop-muted-bg) !important;
+  color: var(--vtop-text-body) !important;
+  border-color: var(--vtop-muted-border) !important;
+}
+
+html.vtop-dark-theme .vtop-msg-badge-active {
+  background-color: var(--vtop-accent-soft) !important;
+  color: var(--vtop-info-alert-text) !important;
+  border-color: var(--vtop-accent-border) !important;
+}
+
+html.vtop-dark-theme .vtop-msg-badge-warn {
+  background-color: var(--vtop-warn-bg-soft) !important;
+  color: var(--vtop-warn-text) !important;
+  border-color: var(--vtop-warn-border) !important;
+}
+
+html.vtop-dark-theme .vtop-msg-icon-btn {
+  background-color: var(--vtop-bg-elevated-alt) !important;
+  border-color: var(--vtop-dark-border) !important;
+  color: var(--vtop-text-body) !important;
+}
+
+html.vtop-dark-theme .vtop-msg-icon-btn:hover {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-state {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .vtop-msg-fallback-btn {
+  background-color: var(--vtop-accent-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme #vtop-home-class-messages .expand {
+  background-color: var(--vtop-bg-input) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #course-data td:nth-child(2) .fw-bold {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #course-data td:nth-child(2) .text-dark:not(.fw-bold) {
+  color: var(--vtop-text-body) !important;
+}
+
+html.vtop-dark-theme #course-data .text-primary {
+  color: var(--vtop-accent-light) !important;
+}
+
+html.vtop-dark-theme #course-data .text-success {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme #course-data .text-warning {
+  color: var(--vtop-warn-bright) !important;
+}
+
+html.vtop-dark-theme #course-data .text-danger {
+  color: var(--vtop-danger-bright) !important;
+}
+
+html.vtop-dark-theme #course-data .text-danger.text-opacity-75 {
+  color: var(--vtop-warn-orange) !important;
+}
+
+/* Hide Action Plan - Academic Performance card immediately to prevent paint flash */
+.col-12.col-md-8.mb-3:has(.card.goldenBorderTop.lightGoldenbackground2 #pdfModal),
+.card.goldenBorderTop.lightGoldenbackground2:has(#pdfModal) {
+  display: none !important;
+}
+
+/* 9b. Modernized Dashboard Events, Spotlight & Sidebar Cards (Light Mode Base + Dark Mode Overrides) */
+
+/* Events & Spotlight side-by-side cards */
+.col-12.col-md-6:has(> .card > #events-info-content) > .card {
+  height: 100%;
+  margin-bottom: 0 !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767.98px) {
+  .col-12.col-md-6:has(> .card > #events-info-content) {
+    margin-bottom: 1rem;
+  }
+}
+
+.card:has(> #events-info-content) > h5.card-title.fontcolor3,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  padding: 12px 16px !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.card:has(> #events-info-content) > h5.card-title.fontcolor3 {
+  border: none !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-radius: 0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-radius: 0.375rem 0.375rem 0 0 !important;
+}
+
+#events-info-content,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
+  padding: 1rem !important;
+  margin: 0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
+  flex: 1 1 auto;
+  align-content: flex-start;
+  background-color: var(--vtop-bg-surface) !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-top: none !important;
+  border-radius: 0 0 0.375rem 0.375rem !important;
+  box-shadow: none !important;
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+  row-gap: 0.75rem;
+}
+
+#events-info-content > .card,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden;
+}
+
+#events-info-content > .card {
+  padding: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+#events-info-content > .card:last-child {
+  margin-bottom: 0 !important;
+}
+
+#events-info-content .card-title.fontcolor5 {
+  color: var(--vtop-accent) !important;
+  font-size: 0.85rem !important;
+  margin-bottom: 0.6rem !important;
+  padding-bottom: 0.4rem !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+#events-info-content .col-2,
+#events-info-content .col-10 {
+  border-bottom: none !important;
+}
+
+#events-info-content .col-2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid var(--vtop-border) !important;
+  padding-right: 0.5rem !important;
+}
+
+#events-info-content .col-2 .fontcolor3 {
+  color: var(--vtop-text-primary) !important;
+  margin-bottom: 0.1rem !important;
+}
+
+#events-info-content .col-2 .subtitle {
+  color: var(--vtop-text-muted) !important;
+  font-size: 0.72rem !important;
+}
+
+#events-info-content .col-10 {
+  display: flex;
+  align-items: center;
+}
+
+#events-info-content .col-10 > .card-body {
+  padding: 0.25rem 0.75rem !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  color: var(--vtop-text-muted) !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col {
+  padding: 0 !important;
+  margin-top: 0 !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-header {
+  padding: 0.5rem 0.75rem !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-body {
+  padding: 0.25rem 0.5rem !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background,
+.col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background .list-group-item {
+  background-color: var(--vtop-bg-surface) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+/* Dashboard Sidebar Cards (PROCTOR Message, CGPA & Credits, Forthcoming DA, Last Five Feedbacks) */
+div:has(> .card > #last-five-feedbacks) > .card {
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden !important;
+}
+
+div:has(> .card > #last-five-feedbacks) > .card:last-child {
+  margin-bottom: 0 !important;
+}
+
+div:has(> .card > #last-five-feedbacks) > .card > .card-header {
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+}
+
+div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+}
+
+#proctor-message,
+#edu-status {
+  padding: 0.85rem 1rem !important;
+}
+
+/* CGPA & Credit Status: keep distinct tint colors, unify number colors & row polish */
+#edu-status .list-group-item {
+  align-items: center !important;
+  padding: 0.45rem 0 !important;
+  gap: 0.75rem;
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+#edu-status .list-group-item:first-child {
+  padding-top: 0 !important;
+}
+
+#edu-status .list-group-item:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+#edu-status .list-group-item .card-title.fontcolor1 {
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+}
+
+#edu-status .list-group-item > .fontcolor3 {
+  border-radius: 6px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-variant-numeric: tabular-nums;
+  color: var(--vtop-text-primary) !important;
+}
+
+#edu-status .list-group-item > .fontcolor3 span {
+  color: var(--vtop-text-primary) !important;
+}
+
+#edu-status table.table {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0 !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+
+#edu-status table.table th {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
+  border-bottom: none !important;
+  border-right: 1px solid var(--vtop-border) !important;
+  padding: 0.45rem 0.65rem !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap;
+}
+
+#edu-status table.table td {
+  padding: 0.45rem 0.65rem !important;
+  font-size: 0.82rem !important;
+  border-bottom: none !important;
+}
+
+#edu-status table.table td.bg-success {
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
+}
+
+#edu-status table.table td.bg-danger {
+  background-color: var(--vtop-danger-bg) !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+/* Forthcoming Digital Assignments & Last Five Feedbacks flush table cards */
+#digital-assignments,
+#last-five-feedbacks {
+  padding: 0 !important;
+  overflow: auto !important;
+}
+
+#proctor-message:has(> .vtop-dashboard-empty) {
+  padding: 0 !important;
+}
+
+#digital-assignments:has(> .vtop-dashboard-empty) > table {
+  display: none !important;
+}
+
+.vtop-dashboard-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--vtop-text-muted);
+}
+
+.vtop-dashboard-empty-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vtop-text-secondary);
+  margin-bottom: 4px;
+}
+
+.vtop-dashboard-empty-note {
+  font-size: 0.76rem;
+  color: var(--vtop-text-muted);
+}
+
+#digital-assignments table.table,
+#last-five-feedbacks table.table {
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+
+#digital-assignments table.table thead th,
+#last-five-feedbacks table.table thead th {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-body) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  white-space: nowrap;
+}
+
+#digital-assignments table.table tbody th,
+#digital-assignments table.table tbody td,
+#last-five-feedbacks table.table tbody th,
+#last-five-feedbacks table.table tbody td {
+  padding: 9px 12px !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+}
+
+#digital-assignments table.table tbody tr:last-child th,
+#digital-assignments table.table tbody tr:last-child td,
+#last-five-feedbacks table.table tbody tr:last-child th,
+#last-five-feedbacks table.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#digital-assignments table.table tbody tr:hover th,
+#digital-assignments table.table tbody tr:hover td,
+#last-five-feedbacks table.table tbody tr:hover th,
+#last-five-feedbacks table.table tbody tr:hover td {
+  background-color: var(--vtop-bg-hover) !important;
+}
+
+.vtop-da-home-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--vtop-accent-border);
+  background: var(--vtop-accent-soft);
+  color: var(--vtop-accent);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.vtop-da-home-upload-btn:hover:not(:disabled) {
+  background: var(--vtop-accent);
+  border-color: var(--vtop-accent);
+  color: var(--vtop-text-inverse);
+}
+
+.vtop-da-home-upload-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+html.vtop-dark-theme .vtop-da-home-upload-btn:hover:not(:disabled) {
+  color: #0b0f19;
+}
+
+/* Dark Theme Overrides for Events, Spotlight & Sidebar Cards */
+html.vtop-dark-theme .col-12.col-md-6:has(> .card > #events-info-content) > .card {
+  border-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme .card:has(> #events-info-content) > h5.card-title.fontcolor3,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme .card:has(> #events-info-content) > h5.card-title.fontcolor3 {
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop {
+  border-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme #events-info-content > .card,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card {
+  border-color: var(--vtop-dark-border) !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme #events-info-content .card-title.fontcolor5 {
+  color: var(--vtop-dark-accent) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #events-info-content .col-2 {
+  border-right-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #events-info-content .col-2 .fontcolor3 {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #events-info-content .col-2 .subtitle,
+html.vtop-dark-theme #events-info-content .col-10 > .card-body {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-header {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) > .primaryBorderTop + .row > .col > .card > .card-body,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background,
+html.vtop-dark-theme .col-12.col-md-6:has(> .primaryBorderTop + .row .spotlight-background) .spotlight-background .list-group-item {
+  background-color: var(--vtop-dark-bg-surface) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card {
+  border-color: var(--vtop-dark-border) !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-dark-bg-surface) !important;
+}
+
+html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card > .card-header {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+  border-top-color: var(--vtop-dark-accent) !important;
+}
+
+html.vtop-dark-theme div:has(> .card > #last-five-feedbacks) > .card > .card-header .fontcolor3 {
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme #edu-status .list-group-item {
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #edu-status .list-group-item .card-title.fontcolor1 {
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme #edu-status .list-group-item > .fontcolor3,
+html.vtop-dark-theme #edu-status .list-group-item > .fontcolor3 span {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #edu-status table.table {
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #edu-status table.table th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-right-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #edu-status table.table td.bg-success {
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
+}
+
+html.vtop-dark-theme #edu-status table.table td.bg-danger {
+  background-color: var(--vtop-danger-bg) !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+html.vtop-dark-theme #digital-assignments table.table thead th,
+html.vtop-dark-theme #last-five-feedbacks table.table thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme #digital-assignments table.table tbody th,
+html.vtop-dark-theme #digital-assignments table.table tbody td,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody th,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody td {
+  border-bottom-color: var(--vtop-border-subtle) !important;
+}
+
+html.vtop-dark-theme #digital-assignments table.table tbody tr:hover th,
+html.vtop-dark-theme #digital-assignments table.table tbody tr:hover td,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover th,
+html.vtop-dark-theme #last-five-feedbacks table.table tbody tr:hover td {
+  background-color: var(--vtop-bg-hover) !important;
+}
+
+html.vtop-dark-theme #last-five-feedbacks table.table td.text-primary {
+  color: var(--vtop-accent-light) !important;
+}
+
+html.vtop-dark-theme .vtop-dashboard-empty,
+html.vtop-dark-theme .vtop-dashboard-empty-note {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme .vtop-dashboard-empty-title {
+  color: var(--vtop-text-secondary) !important;
+}
+
+/* Standardize hardcoded #f2dede empty-state alert banner (e.g. Class Messages page), scoped to div banners */
+div[style*="#f2dede" i],
+div[style*="242, 222, 222"] {
+  border-radius: 10px !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  padding: 16px !important;
+}
+
+html.vtop-dark-theme div[style*="#f2dede" i],
+html.vtop-dark-theme div[style*="242, 222, 222"] {
+  background-color: var(--vtop-danger-bg-soft) !important;
+  border-color: var(--vtop-danger-border) !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+div[style*="#f2dede" i] h3,
+div[style*="242, 222, 222"] h3 {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+}
+
+html.vtop-dark-theme div[style*="#f2dede" i] h3,
+html.vtop-dark-theme div[style*="242, 222, 222"] h3 {
+  color: var(--vtop-danger-text) !important;
+}
+
+.box-info .box-body > h4[style*="green" i] {
+  font-size: 0.92rem !important;
+  margin-bottom: 14px !important;
+}
+
+html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme .box-info .box-body > h4[style*="green" i] span[style*="red" i] {
+  color: var(--vtop-danger-bright) !important;
+}
+
+
+/* Global Shadow Reset across Dashboard and all VTOP pages */
+.shadow,
+.shadow-sm,
+.shadow-lg,
+.card,
+.panel,
+.box,
+.modal-content,
+.dropdown-menu,
+.navbar,
+#vtop-header,
+#top-hmenu-bar,
+div[id^="MG0"],
+.hmenubox,
+.login-box,
+.card-login,
+.vtop-plus-card,
+.vtop-plus-panel,
+.vtop-plus-filter-container,
+.vtop-plus-course-filter-panel,
+.vtop-attendance-card,
+.vtop-palette-dialog,
+.vtop-drawer-close-btn {
+  box-shadow: none !important;
+}
+
+/* Universal Light Mode Scrollbars (matches Dark Mode geometry & slate styling) */
+html:not(.vtop-dark-theme),
+html:not(.vtop-dark-theme) body,
+html:not(.vtop-dark-theme) *,
+html:not(.vtop-dark-theme) .table-responsive,
+html:not(.vtop-dark-theme) .box-body {
+  scrollbar-color: auto !important;
+  scrollbar-width: auto !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-track,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-track {
+  background: var(--vtop-scrollbar-track) !important;
+  border-radius: 6px !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-thumb,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb {
+  background: var(--vtop-scrollbar-thumb) !important;
+  border-radius: 6px !important;
+  border: 2px solid var(--vtop-scrollbar-track) !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-thumb:hover,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-thumb:hover {
+  background: var(--vtop-scrollbar-thumb-hover) !important;
+}
+
+html:not(.vtop-dark-theme)::-webkit-scrollbar-corner,
+html:not(.vtop-dark-theme) *::-webkit-scrollbar-corner {
+  background: var(--vtop-scrollbar-track) !important;
+}
+
+
+/* Bootstrap Toasts (e.g. #quickLinkMsg) */
+.toast {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-heading) !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.toast .toast-header {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+}
+
+.toast .toast-header strong {
+  font-weight: 600 !important;
+}
+
+.toast .toast-header .btn-close {
+  box-shadow: none !important;
+}
+
+.toast .toast-body {
+  padding: 10px 12px !important;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast .toast-body .bi,
+.toast .toast-body i {
+  margin-bottom: 0 !important;
+  line-height: 1 !important;
+  flex-shrink: 0;
+}
+
+html.vtop-dark-theme .toast {
+  background-color: var(--vtop-dark-bg-elevated) !important;
+  color: var(--vtop-dark-text-main) !important;
+  border-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .toast .toast-header {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-dark-text-main) !important;
+  border-bottom-color: var(--vtop-dark-border) !important;
+}
+
+html.vtop-dark-theme .toast .toast-header small {
+  color: var(--vtop-dark-text-muted) !important;
+}
+
+html.vtop-dark-theme .toast .toast-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(180%) !important;
+  opacity: 0.75;
+}
+
+html.vtop-dark-theme .toast .toast-header .btn-close:hover {
+  opacity: 1;
+}
+
+html.vtop-dark-theme .toast .toast-body {
+  background-color: var(--vtop-dark-bg-elevated) !important;
+  color: var(--vtop-dark-text-main) !important;
+}
+
+html.vtop-dark-theme .toast .toast-body .text-success {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme .toast .toast-body .text-danger {
+  color: var(--vtop-danger-bright) !important;
+}
+
+html.vtop-dark-theme .toast .toast-body .text-warning {
+  color: var(--vtop-warn-bright) !important;
+}
+

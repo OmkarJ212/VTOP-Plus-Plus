@@ -1,81 +1,48 @@
-# 🚀 VTOP++ (The Ultimate All-in-One God Extension)
+# VTOP++
 
-**VTOP++** is an all-in-one productivity and intelligence suite tailored exclusively for Vellore Institute of Technology students on the **VIT Vellore portal (vtop.vit.ac.in)**.
+**VTOP++** is a browser extension made specifically for **VIT Vellore** students using VTOP (`vtop.vit.ac.in`). It makes VTOP cleaner, easier to navigate, and saves you time on everyday tasks like downloading notes, checking attendance, and tracking marks.
 
-It merges high-speed material downloads, live course filtering, attendance bunk calculation, FAT grade prediction, digital assignment tracking, login auto-captcha, and keyboard page search navigation into a single, cohesive, modular extension.
-
----
-
-## ✨ Features Breakdown
-
-### 1. 📦 Course Material Downloader (from `vtop-downloader-extension`)
-- **Teacher-Specific Downloads:** Groups notes, slides, and syllabus files by faculty name.
-- **Instant ZIP Packaging:** Uses `STORE` mode compression for near-instantaneous (<100ms) ZIP generation without freezing the browser tab.
-- **Safe Anti-Rate-Limit Pacing:**
-  - **⚡ Fast:** `0.4s – 0.75s` jitter (Safe accelerated mode).
-  - **🛡️ Safe:** `1.5s – 2.5s` jitter (Conservative human simulation).
-  - **🐢 Stealth:** `3.0s – 5.0s` jitter.
-- **Resilient Observer & Watchdog:** Never detaches during SPA navigation.
-
-### 2. 🔍 Live Course Filter (from `vtop-course-filter`)
-- Adds a real-time search bar directly above the course materials table.
-- Filter files instantly by keyword, faculty, or type (Theory vs. Lab).
-
-### 3. 📊 Attendance Bunk Calculator & Debarment Alerts
-- Automatically analyzes the Class Attendance table:
-  - If **≥75%**: Tells you exactly how many classes you can **safely bunk**.
-  - If **<75%**: Tells you how many consecutive classes you **must attend** to escape debarment.
-- Interactive Target Threshold slider (75%, 80%, 85%, 90%).
-- Color-coded badges: 🟢 Safe, 🟡 Warning, 🔴 Debarred Risk.
-
-### 4. 🎯 FAT Grade & Target Marks Predictor
-- Injects into the Marks page:
-  - Extracts continuous assessment marks (CAT-1, CAT-2, DA, Quizzes).
-  - Calculates exactly what raw mark out of 100 you need in the Final Assessment Test (FAT) for **S, A, B, and C grades**.
-
-### 5. 📝 Digital Assignment (DA) Deadline Hub
-- Injects into the Digital Assignment page:
-  - Scans across all courses to show total pending assignments.
-  - Highlights urgent assignments due in `<48 hours` with countdown warnings.
-
-### 6. ⚡ Client-Side Auto-Captcha Solver
-- Binarizes and segments login captchas directly on an offscreen HTML5 canvas.
-- Automatically fills the captcha input upon page load. Zero external server calls.
-
-### 7. ⏱️ 9-Minute Session Keep-Alive
-- Sends background heartbeat pings to prevent VTOP's annoying 15-minute idle session timeout while studying lecture notes.
-
-### 8. 🔍 Search Pages (`Ctrl + K` / `Cmd + K`)
-- Press `Ctrl+K` anywhere on VTOP to open a fast keyboard launcher:
-  - Jump instantly to Attendance, Course Materials, Marks, Leave, or DA without digging through 4-level deep menus.
-
-### 9. 🚀 Floating Quick Dock & Privacy Mode
-- Sleek floating top dock with 1-click shortcuts to top pages.
-- **🔒 Privacy Mode:** One-click toggle that blurs student photos, registration numbers, and CGPA in public spaces (e.g. library, labs, projector).
+> **Note:** Built only for the **VIT Vellore** portal. It does not support Chennai, Bhopal, or AP campuses.
 
 ---
 
-## 🛠️ Installation Guide (Testing & Development)
+## What It Does
 
-1. Open **Google Chrome**, **Brave**, or **Microsoft Edge**.
-2. Navigate to: `chrome://extensions`
-3. Enable **Developer mode** (toggle in top-right corner).
-4. Click **Load unpacked** (top-left).
-5. Select the **`VTOP-Plus-Plus`** folder:
-   ```
-   C:\Users\Omkar Joshi\Desktop\VTOP_Extention\VTOP-Plus-Plus
-   ```
-6. The extension **VTOP++** is now installed and active!
-
----
-
-## 🔒 Privacy & Safety Guarantee
-
-- **100% Client-Side:** Everything runs locally within your browser.
-- **No Password Storage:** The extension never asks for, records, or transmits passwords.
-- **Safe Pacing:** All network interactions respect VTOP rate limits with randomized human jitter.
+- **1-Click Course Material Downloads:** Download all notes, slides, and syllabus files for a course together in a single `.zip` file instead of clicking them one by one.
+- **Easy Course & Material Filtering:** Organize courses by semester, subject, and faculty, search topics directly inside the table, and filter between **Theory** and **Lab** materials.
+- **Attendance Bunk Calculator:** Shows right next to each subject how many classes you can safely miss—or how many you must attend—based on your chosen target percentage (defaults to `75%`).
+- **Marks Summary & CGPA Calculator:** Adds up your total marks scored per subject and gives you a simple **Potential CGPA Calculator** where you can pick expected grades (`S`, `A`, `B`, etc.) to preview your new GPA and CGPA.
+- **New Marks Notifications:** Automatically checks for newly uploaded or updated marks (for both your current and previous semester) and alerts you on the Home page and through browser notifications.
+- **Assignment Deadline Reminders:** Highlights Digital Assignment due dates with color-coded countdowns (purple if due today, red if due soon, green if safe or submitted) and puts upcoming deadlines right on your Home page.
+- **Today's Schedule & Calendar Export:** Displays today's classes on the Home page showing which class is happening now or coming up next, and lets you export your full timetable to **Google Calendar** or a calendar file (`.ics`) with reminders.
+- **Class Messages on Home:** Shows faculty class messages directly on your Home dashboard so you don't have to hunt for them.
+- **Auto-Captcha Login:** Automatically reads and fills in the login captcha for faster sign-in.
+- **Stay Logged In:** Keeps your VTOP session active while you're working so you don't get logged out every 15 minutes. You can toggle this on or off anytime from the extension icon.
+- **Quick Page Search (`Ctrl + K` / `Cmd + K`):** Press `Ctrl + K` (or `Cmd + K` on Mac) from anywhere in VTOP to search and jump straight to any page, or use the quick shortcut buttons added to the top bar.
+- **Light & Dark Mode:** Switch between clean Light and Dark themes across VTOP pages, tables, forms, and popups with one click.
+- **Privacy Blur:** One click in the top bar blurs your photo, registration number, name, and CGPA when you're in public (hover over anything blurred to peek at it).
 
 ---
 
-## ⚖️ License
-MIT License. Built for the students of Vellore Institute of Technology.
+## How to Install
+
+1. Download or clone the **`VTOP-Plus-Plus`** folder to your computer.
+2. Open **Google Chrome**, **Brave**, or **Microsoft Edge**.
+3. Go to `chrome://extensions` in the address bar.
+4. Turn on **Developer mode** (top-right corner).
+5. Click **Load unpacked** and select the **`VTOP-Plus-Plus`** folder.
+6. Visit `https://vtop.vit.ac.in` and you're all set!
+
+---
+
+## Privacy & Safety
+
+- **Runs Completely in Your Browser:** Nothing is sent to any external servers—captcha solving, grade calculations, and file zipping all happen locally on your device.
+- **Never Touches Your Password:** VTOP++ never reads, saves, or shares your VTOP login password.
+- **Gentle on VTOP:** Downloads and background checks are spaced out carefully so they don't overload VTOP or trigger rate limits.
+
+---
+
+## License
+
+MIT License — Built for the students of VIT Vellore.

@@ -1,0 +1,383 @@
+/* VTOP++ - Privacy Mode, Navbar Quick Dock & Mega-Menu Drawer Styles */
+
+/* ==========================================================================
+   1. PRIVACY MODE (Blur sensitive data in public spaces)
+   ========================================================================== */
+.vtop-privacy-active #authorizedID,
+.vtop-privacy-active #authorizedIDX,
+.vtop-privacy-active input[name*="regNo" i],
+.vtop-privacy-active .student-photo,
+.vtop-privacy-active img[src*="StudentPhoto" i],
+.vtop-privacy-active img[src*="photo" i],
+.vtop-privacy-active .cgpa-score,
+.vtop-privacy-active td[aria-describedby*="cgpa"],
+.vtop-privacy-active #navbarDropdown,
+.vtop-privacy-active .navbar-nav .dropdown-toggle,
+.vtop-privacy-active .user-profile,
+.vtop-privacy-active .img-circle,
+.vtop-privacy-active .user-image,
+.vtop-privacy-active .profile-user-img,
+.vtop-privacy-active img[class*="avatar" i],
+.vtop-privacy-active img[class*="circle" i],
+.vtop-privacy-active .navbar-custom-menu img:not([src*="logo" i]):not([src*="icon" i]),
+.vtop-privacy-active .navbar-nav img:not([src*="logo" i]):not([src*="icon" i]),
+.vtop-privacy-active .user-menu img,
+.vtop-privacy-active .user-panel img,
+.vtop-privacy-active img[alt*="student" i],
+.vtop-privacy-active img[alt*="user" i],
+.vtop-privacy-active img[alt*="profile" i],
+.vtop-privacy-active .vtop-privacy-blur-photo,
+.vtop-privacy-active .vtop-privacy-blur-target {
+  filter: blur(8px) !important;
+  user-select: none !important;
+}
+
+/* Smooth hover-to-reveal for convenience */
+.vtop-privacy-active #authorizedID:hover,
+.vtop-privacy-active #authorizedIDX:hover,
+.vtop-privacy-active input[name*="regNo" i]:hover,
+.vtop-privacy-active .student-photo:hover,
+.vtop-privacy-active img[src*="StudentPhoto" i]:hover,
+.vtop-privacy-active img[src*="photo" i]:hover,
+.vtop-privacy-active .cgpa-score:hover,
+.vtop-privacy-active td[aria-describedby*="cgpa"]:hover,
+.vtop-privacy-active #navbarDropdown:hover,
+.vtop-privacy-active .navbar-nav .dropdown-toggle:hover,
+.vtop-privacy-active .user-profile:hover,
+.vtop-privacy-active .img-circle:hover,
+.vtop-privacy-active .user-image:hover,
+.vtop-privacy-active .profile-user-img:hover,
+.vtop-privacy-active img[class*="avatar" i]:hover,
+.vtop-privacy-active img[class*="circle" i]:hover,
+.vtop-privacy-active .navbar-custom-menu img:not([src*="logo" i]):not([src*="icon" i]):hover,
+.vtop-privacy-active .navbar-nav img:not([src*="logo" i]):not([src*="icon" i]):hover,
+.vtop-privacy-active .user-menu img:hover,
+.vtop-privacy-active .user-panel img:hover,
+.vtop-privacy-active img[alt*="student" i]:hover,
+.vtop-privacy-active img[alt*="user" i]:hover,
+.vtop-privacy-active img[alt*="profile" i]:hover,
+.vtop-privacy-active .vtop-privacy-blur-photo:hover,
+.vtop-privacy-active .vtop-privacy-blur-target:hover {
+  filter: blur(0px) !important;
+}
+
+/* ==========================================================================
+   2. NAVBAR INTEGRATED QUICK DOCK & TOP LINEAR PROGRESS BAR
+   ========================================================================== */
+.vtop-top-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: transparent;
+  z-index: 100000;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+.vtop-top-progress.vtop-progress-active {
+  background: linear-gradient(90deg, transparent, var(--vtop-navbar-accent), transparent);
+  background-size: 200% 100%;
+  animation: vtopProgressAnim 1.2s linear infinite;
+}
+@keyframes vtopProgressAnim {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Permanently remove unused Campus Etiquette button */
+#campusEtiquetteBtn,
+button[id*="campusEtiquette" i],
+a[href*="campusEtiquette" i] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Navbar Integrated Quick Items (Directly in VTOP Navbar) */
+.vtop-plus-dock.vtop-dock-navbar {
+  position: static !important;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  z-index: 10;
+  vertical-align: middle;
+  font-family: inherit;
+}
+
+.vtop-dock-pills {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;
+}
+
+@media (min-width: 992px) {
+  .vtop-navbar-has-items {
+    align-items: center;
+    gap: 2px;
+  }
+
+  .vtop-nav-item.vtop-nav-item-first {
+    margin-left: auto;
+  }
+
+  .vtop-nav-item.vtop-nav-item-last {
+    margin-right: auto;
+  }
+}
+
+.vtop-nav-item.vtop-dock-pill {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--vtop-glass-90);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.vtop-nav-item.vtop-dock-pill:hover {
+  background: var(--vtop-glass-12);
+  color: var(--vtop-text-inverse);
+}
+
+.vtop-nav-item.vtop-dock-pill:active {
+  background: var(--vtop-glass-20);
+  color: var(--vtop-text-inverse);
+}
+
+.vtop-nav-item.vtop-dock-pill:focus-visible,
+.vtop-nav-item.vtop-dock-icon-btn:focus-visible {
+  outline: 2px solid var(--vtop-navbar-focus);
+  outline-offset: 1px;
+}
+
+.vtop-nav-item.vtop-dock-pill.vtop-pill-unmapped {
+  opacity: 0.75;
+}
+
+.vtop-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.vtop-dock-icon {
+  fill: none;
+  stroke: currentColor;
+  flex-shrink: 0;
+  display: block;
+}
+
+.vtop-kbd-shortcut {
+  background: var(--vtop-glass-10);
+  border: 1px solid var(--vtop-glass-20);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--vtop-glass-85);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+}
+
+.vtop-nav-item.vtop-dock-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--vtop-glass-22);
+  margin: 0 4px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.vtop-nav-item.vtop-dock-icon-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vtop-glass-90);
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  vertical-align: middle;
+}
+
+.vtop-nav-item.vtop-dock-icon-btn:hover {
+  background: var(--vtop-glass-12);
+  color: var(--vtop-text-inverse);
+}
+
+.vtop-nav-item.vtop-dock-icon-btn:active {
+  background: var(--vtop-glass-20);
+  color: var(--vtop-text-inverse);
+}
+
+#vtop-dock-dark-btn.active,
+html.vtop-privacy-active #vtop-dock-priv-btn {
+  color: var(--vtop-navbar-accent);
+  background: transparent;
+}
+
+#vtop-dock-dark-btn.active:hover,
+html.vtop-privacy-active #vtop-dock-priv-btn:hover {
+  color: var(--vtop-navbar-active-hover);
+  background: var(--vtop-navbar-active-bg);
+}
+
+.vtop-pill-spinner {
+  display: none;
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: vtopSpin 0.7s linear infinite;
+}
+
+@keyframes vtopSpin {
+  100% { transform: rotate(360deg); }
+}
+
+.vtop-pill-loading {
+  background: var(--vtop-glass-14) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+.vtop-pill-loading .vtop-pill-spinner {
+  display: inline-block;
+}
+
+.vtop-pill-loading .vtop-pill-icon {
+  display: none;
+}
+
+.vtop-pill-queued {
+  background: var(--vtop-navbar-queued-bg) !important;
+  color: var(--vtop-navbar-queued-fg) !important;
+}
+
+@media (max-width: 1380px) {
+  .vtop-nav-item.vtop-dock-pill {
+    padding: 0 7px;
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .vtop-nav-item.vtop-dock-icon-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 1240px) {
+  .vtop-kbd-shortcut {
+    display: none;
+  }
+}
+
+@media (max-width: 1120px) and (min-width: 992px) {
+  .vtop-nav-item.vtop-dock-pill:not(.vtop-pill-search) .vtop-pill-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 991px) {
+  .vtop-nav-item.vtop-dock-pill,
+  .vtop-nav-item.vtop-dock-icon-btn {
+    margin: 4px 2px;
+  }
+
+  .vtop-nav-item.vtop-dock-sep {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 4px 4px;
+  }
+
+  .vtop-plus-dock.vtop-dock-navbar {
+    display: flex;
+    margin: 8px 0;
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 4px;
+  }
+
+  .vtop-dock-pills {
+    flex-wrap: nowrap;
+  }
+}
+
+/* ==========================================================================
+   2b. MEGA-MENU DRAWER BACKDROP & CLOSE BUTTON
+   ========================================================================== */
+.vtop-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--vtop-overlay-backdrop);
+  z-index: 1020;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  transition: opacity 0.2s ease;
+}
+.vtop-drawer-backdrop.vtop-backdrop-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.vtop-drawer-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--vtop-border-strong);
+  background: var(--vtop-bg-surface);
+  color: var(--vtop-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  box-shadow: none;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.vtop-drawer-close-btn:hover {
+  background: var(--vtop-danger-bright);
+  color: var(--vtop-text-inverse);
+  border-color: var(--vtop-danger-hover);
+}

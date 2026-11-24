@@ -12,14 +12,18 @@
     enableAttendanceCalc: true,
     enableFatPredictor: true,
     enableDaTracker: true,
+    enableScheduleWidget: true,
+    enableMarksNotifier: true,
     enableAutoCaptcha: true,
     enableSessionKeeper: true,
     enableSpotlight: true,
     enableQuickDock: true,
     enablePrivacyMode: false,
-    downloadPacing: 'fast', // 'safe', 'fast', 'stealth'
-    attendanceTarget: 75 // 75, 80, 85, 90
+    enableDarkMode: false
   };
+
+  const SETTINGS_KEYS = Object.keys(DEFAULT_SETTINGS);
+  const SETTINGS_KEY_SET = new Set(SETTINGS_KEYS);
 
   const Storage = {
     DEFAULT_SETTINGS,
@@ -33,35 +37,12 @@
           resolve(DEFAULT_SETTINGS);
           return;
         }
-        chrome.storage.local.get(null, (items) => {
+        chrome.storage.local.get(SETTINGS_KEYS, (items) => {
           if (chrome.runtime.lastError) {
             console.warn('[VTOP++] Error reading storage:', chrome.runtime.lastError);
             resolve(DEFAULT_SETTINGS);
           } else {
-            const raw = items || {};
-            if (raw.vtop_speed_mode && !raw.downloadPacing) {
-              raw.downloadPacing = raw.vtop_speed_mode;
-            }
-            resolve({ ...DEFAULT_SETTINGS, ...raw });
-          }
-        });
-      });
-    },
-
-    /**
-     * Save updated settings
-     */
-    async saveSettings(newSettings) {
-      return new Promise((resolve, reject) => {
-        if (!chrome?.storage?.local) {
-          resolve();
-          return;
-        }
-        chrome.storage.local.set(newSettings, () => {
-          if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-          } else {
-            resolve();
+            resolve({ ...DEFAULT_SETTINGS, ...(items || {}) });
           }
         });
       });
@@ -75,12 +56,13 @@
         chrome.storage.onChanged.addListener((changes, areaName) => {
           if (areaName === 'local') {
             const updated = {};
+            let hasSettingChange = false;
             for (const key of Object.keys(changes)) {
+              if (!SETTINGS_KEY_SET.has(key)) continue;
               updated[key] = changes[key].newValue;
+              hasSettingChange = true;
             }
-            if (updated.vtop_speed_mode && !updated.downloadPacing) {
-              updated.downloadPacing = updated.vtop_speed_mode;
-            }
+            if (!hasSettingChange) return;
             callback(updated);
           }
         });

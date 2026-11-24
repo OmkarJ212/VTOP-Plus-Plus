@@ -6,18 +6,35 @@
 (function () {
   window.VTOP_PLUS = window.VTOP_PLUS || {};
 
+  let lastActivityTime = Date.now();
+  const MAX_IDLE_KEEP_ALIVE_MS = 20 * 60 * 1000; // 20 minutes idle limit for public safety
+
+  function markActivity() {
+    lastActivityTime = Date.now();
+  }
+
   const SessionKeeper = {
     timer: null,
     lastPingTime: null,
     _onMessage: null,
+    _listenersAttached: false,
 
     init() {
       if (this.timer) clearInterval(this.timer);
 
+      if (!this._listenersAttached) {
+        window.addEventListener('mousemove', markActivity, { passive: true });
+        window.addEventListener('keydown', markActivity, { passive: true });
+        window.addEventListener('scroll', markActivity, { passive: true });
+        window.addEventListener('click', markActivity, { passive: true });
+        window.addEventListener('touchstart', markActivity, { passive: true });
+        this._listenersAttached = true;
+      }
+
       // Listen for background worker alarm pings
-      if (!this._onMessage) {
+      if (!this._onMessage && chrome?.runtime?.onMessage) {
         this._onMessage = (message) => {
-          if (message.action === 'HEARTBEAT_PING') {
+          if (message && message.action === 'HEARTBEAT_PING') {
             this.ping();
           }
         };
@@ -28,39 +45,43 @@
       this.timer = setInterval(() => {
         this.ping();
       }, 8 * 60 * 1000);
-
-      console.log('[VTOP++] Session Keep-Alive module activated (8-minute cycle).');
     },
 
     async ping() {
-      // Only ping if student is actively logged in
-      const authId = document.getElementById('authorizedID')?.value ||
-                     document.getElementById('authorizedIDX')?.value ||
-                     document.querySelector('input[name="authorizedID"]')?.value;
-
-      const isLoginScreen = Boolean(document.querySelector('#loginForm, #vtopLogin, input[name="username"]'));
+      // 1. Only ping if student is actively logged in
+      const DOM = window.VTOP_PLUS?.DOM;
+      const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
+      const isLoginScreen = Boolean(document.querySelector('#vtopLoginForm, input#username, #loginForm, #vtopLogin, input[name="username"]'));
       if (!authId || isLoginScreen) return;
 
-      try {
-        const basePath = window.location.pathname.split('/')[1] || 'vtop';
-        const pingUrl = window.location.href || `/${basePath}/content`;
-        const urlWithParam = pingUrl.includes('?') 
-          ? `${pingUrl}&_vtop_ping=${Date.now()}` 
-          : `${pingUrl}?_vtop_ping=${Date.now()}`;
+      // 2. Pause keep-alive if device has been idle for >20 mins to prevent public session exposure
+      if (Date.now() - lastActivityTime > MAX_IDLE_KEEP_ALIVE_MS) {
+        console.debug('[VTOP++] User idle for >20m. Pausing keep-alive pings for terminal security.');
+        return;
+      }
 
-        await fetch(urlWithParam, {
+      try {
+        const basePath = DOM?.getBasePath ? DOM.getBasePath() : 'vtop';
+        const pingUrl = `${window.location.origin}/${basePath}/content`;
+
+        let res = await fetch(pingUrl, {
           method: 'GET',
           credentials: 'include',
           cache: 'no-store'
-        }).catch(() => {
-          return fetch(`/${basePath}/content?_vtop_ping=${Date.now()}`, {
+        }).catch(() => null);
+
+        if (!res || !res.ok) {
+          res = await fetch(`${window.location.origin}/${basePath}/`, {
             method: 'GET',
             credentials: 'include',
             cache: 'no-store'
-          });
-        });
-        this.lastPingTime = new Date().toLocaleTimeString();
-        console.debug(`[VTOP++] Session heartbeat sent at ${this.lastPingTime}`);
+          }).catch(() => null);
+        }
+
+        if (res && res.ok && !(res.url || '').includes('/vtop/login')) {
+          this.lastPingTime = new Date().toLocaleTimeString();
+          console.debug(`[VTOP++] Session heartbeat sent at ${this.lastPingTime}`);
+        }
       } catch (err) {
         // network offline or page navigating
       }
@@ -72,8 +93,18 @@
         this.timer = null;
       }
       if (this._onMessage) {
-        chrome.runtime.onMessage.removeListener(this._onMessage);
+        if (chrome?.runtime?.onMessage) {
+          chrome.runtime.onMessage.removeListener(this._onMessage);
+        }
         this._onMessage = null;
+      }
+      if (this._listenersAttached) {
+        window.removeEventListener('mousemove', markActivity);
+        window.removeEventListener('keydown', markActivity);
+        window.removeEventListener('scroll', markActivity);
+        window.removeEventListener('click', markActivity);
+        window.removeEventListener('touchstart', markActivity);
+        this._listenersAttached = false;
       }
     }
   };

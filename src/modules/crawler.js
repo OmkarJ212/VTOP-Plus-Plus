@@ -16,7 +16,6 @@
       id: 'course-page',
       title: 'Course Page',
       category: 'Academics',
-      icon: '📚',
       dataUrl: 'academics/common/StudentCoursePage',
       fallbackDataUrls: [
         'academics/common/CoursePage',
@@ -31,9 +30,8 @@
       id: 'marks-grades',
       title: 'Student Mark View',
       category: 'Examinations',
-      icon: '🎯',
       dataUrl: 'examinations/StudentMarkView',
-      fallbackDataUrls: ['examinations/examGradeView/StudentGradeHistory', 'examinations/StudentMarks'],
+      fallbackDataUrls: ['examinations/StudentMarks'],
       patterns: [/student\s*mark/i, /^marks$/i, /mark\s*view/i, /marks\s*&\s*grades/i],
       synonyms: ['marks', 'cat', 'fat', 'grades', 'score', 'results', 'mark', 'internals', 'assessment']
     },
@@ -41,7 +39,6 @@
       id: 'attendance',
       title: 'Class Attendance',
       category: 'Academics',
-      icon: '📊',
       dataUrl: 'academics/common/StudentAttendance',
       fallbackDataUrls: ['academics/common/Attendance', 'academics/common/StudentAttendanceDetail'],
       patterns: [/class\s*attendance/i, /^attendance$/i, /student\s*attendance/i],
@@ -51,7 +48,6 @@
       id: 'timetable',
       title: 'Class Time Table',
       category: 'Academics',
-      icon: '📅',
       dataUrl: 'academics/common/StudentTimeTable',
       fallbackDataUrls: ['academics/common/TimeTable', 'academics/common/StudentTimetable'],
       patterns: [/time\s*table/i, /class\s*time\s*table/i, /student\s*time\s*table/i],
@@ -61,7 +57,6 @@
       id: 'digital-assignments',
       title: 'Digital Assignment Upload',
       category: 'Examinations',
-      icon: '📝',
       dataUrl: 'examinations/StudentDA',
       fallbackDataUrls: ['examinations/StudentDAUpload', 'examinations/DigitalAssignment'],
       patterns: [/digital\s*assignment/i, /assignment\s*upload/i, /^da$/i],
@@ -71,7 +66,6 @@
       id: 'grade-history',
       title: 'Student Grade History',
       category: 'Examinations',
-      icon: '📜',
       dataUrl: 'examinations/examGradeView/StudentGradeHistory',
       fallbackDataUrls: ['examinations/StudentGradeHistory', 'examinations/GradeHistory'],
       patterns: [/grade\s*history/i, /exam\s*grade/i],
@@ -81,7 +75,6 @@
       id: 'exam-schedule',
       title: 'Exam Schedule',
       category: 'Examinations',
-      icon: '⏱️',
       dataUrl: 'examinations/ExamSchedule',
       fallbackDataUrls: ['examinations/StudentExamSchedule'],
       patterns: [/exam\s*schedule/i, /examination\s*schedule/i],
@@ -91,7 +84,6 @@
       id: 'hostel-leave',
       title: 'Hostel Leave Application',
       category: 'Hostels',
-      icon: '🏖️',
       dataUrl: 'hostels/StudentLeave',
       fallbackDataUrls: ['hostels/LeaveApplication', 'hostels/StudentLeaveApply'],
       patterns: [/hostel\s*leave/i, /leave\s*application/i, /^leave$/i],
@@ -101,7 +93,6 @@
       id: 'curriculum',
       title: 'Curriculum & Credit Distribution',
       category: 'Academics',
-      icon: '📋',
       dataUrl: 'academics/common/Curriculum',
       fallbackDataUrls: ['academics/common/StudentCurriculum'],
       patterns: [/curriculum/i, /credits/i],
@@ -111,7 +102,6 @@
       id: 'faculty-advisor',
       title: 'Faculty Advisor & Proctor Details',
       category: 'Academics',
-      icon: '👨‍🏫',
       dataUrl: 'academics/common/FacultyAdvisor',
       fallbackDataUrls: ['academics/common/StudentFacultyAdvisor', 'academics/common/ProctorDetails'],
       patterns: [/faculty\s*advisor/i, /proctor/i],
@@ -121,7 +111,6 @@
       id: 'academic-calendar',
       title: 'Academic Calendar',
       category: 'Academics',
-      icon: '🗓️',
       dataUrl: 'academics/common/AcademicCalendar',
       fallbackDataUrls: ['academics/common/Calendar'],
       patterns: [/academic\s*calendar/i, /calendar/i],
@@ -131,7 +120,6 @@
       id: 'biometric-log',
       title: 'Biometric Log',
       category: 'Hostels',
-      icon: '👆',
       dataUrl: 'hostels/BiometricLog',
       fallbackDataUrls: ['hostels/StudentBiometricLog'],
       patterns: [/biometric/i, /in\s*out\s*log/i],
@@ -158,7 +146,8 @@
     registration: ['ffcs', 'add drop', 'wishlist', 'course registration'],
     mooc: ['nptel', 'coursera', 'online courses'],
     pat: ['placement', 'cdc', 'internship', 'jobs', 'recruitment'],
-    calendar: ['holidays', 'academic calendar', 'schedule']
+    calendar: ['holidays', 'academic calendar', 'schedule'],
+    profile: ['student profile', 'personal', 'details', 'info', 'address']
   };
 
   function extractAcronym(str) {
@@ -193,11 +182,9 @@
       ...rawItem,
       lowerTitle,
       lowerCat,
-      lowerUrl,
       acronym,
       words,
-      synonyms,
-      searchTokens: `${lowerTitle} ${lowerCat} ${acronym} ${synonyms.join(' ')} ${lowerUrl}`
+      synonyms
     };
   }
 
@@ -247,8 +234,8 @@
 
         // Strict filtering against junk/branding/collapse buttons
         if (!rawText || rawText.length < 3 || rawText.length > 70) continue;
-        if (/^(vit|vtop|home|dashboard|logout|sign out|change password|profile|my profile|menu|navigation)$/i.test(rawText)) continue;
-        if (/logout|sign out|change password/i.test(rawText)) continue;
+        if (/^(vit|vtop|home|dashboard|logout|sign out|menu|navigation)$/i.test(rawText)) continue;
+        if (/logout|sign out/i.test(rawText)) continue;
         if (link.getAttribute('data-bs-toggle') === 'collapse' || link.getAttribute('data-toggle') === 'collapse') continue;
         if (href && href.startsWith('#MG')) continue;
         if (!dataUrl && (!href || href === '#' || href === 'javascript:void(0);') && !link.getAttribute('onclick')) continue;
@@ -260,6 +247,10 @@
         }
         if (!matchedCore) {
           for (const item of itemsMap.values()) {
+            // Do not overwrite an already-bound core page with a different data-url
+            if (item.element && dataUrl && item.dataUrl && item.dataUrl.toLowerCase() !== dataUrl.toLowerCase()) {
+              continue;
+            }
             if (item.patterns && item.patterns.some((p) => p.test(rawText))) {
               matchedCore = item;
               break;
@@ -276,6 +267,7 @@
           if (rawText && rawText.length >= 3) {
             matchedCore.title = rawText;
           }
+          Object.assign(matchedCore, enrichItemMetadata(matchedCore));
           continue;
         }
 
@@ -297,8 +289,7 @@
             category,
             dataUrl,
             element: link,
-            href: href !== '#' && href !== 'javascript:void(0);' ? href : null,
-            icon: category.includes('Exam') ? '📝' : category.includes('Hostel') ? '🏖️' : '📄'
+            href: href !== '#' && href !== 'javascript:void(0);' ? href : null
           });
           itemsMap.set(dedupeKey, newItem);
         }
@@ -320,7 +311,8 @@
           if (!item.element) {
             const urlsToTry = [item.dataUrl, ...(item.fallbackDataUrls || [])].filter(Boolean);
             for (const u of urlsToTry) {
-              const el = document.querySelector(`a[data-url="${u}"], button[data-url="${u}"], [data-url*="${u}"]`);
+              const esc = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(u) : u.replace(/["\\]/g, '\\$&');
+              const el = document.querySelector(`a[data-url="${esc}"], button[data-url="${esc}"], [data-url*="${esc}"]`);
               if (el) {
                 item.element = el;
                 item.dataUrl = el.getAttribute('data-url') || u;
@@ -332,7 +324,6 @@
           this.quickDockMap.set(id, {
             id: item.id,
             title: item.title,
-            icon: item.icon,
             dataUrl: item.dataUrl,
             targetItem: item,
             isFound: Boolean(item.element || item.dataUrl)
@@ -376,8 +367,9 @@
       // 2. Query document directly across primary and fallback data-urls
       const urlsToTry = [item.dataUrl, ...(item.fallbackDataUrls || [])].filter(Boolean);
       for (const u of urlsToTry) {
+        const esc = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(u) : u.replace(/["\\]/g, '\\$&');
         const found = document.querySelector(
-          `a[data-url="${u}"], button[data-url="${u}"], [data-url*="${u}"]`
+          `a[data-url="${esc}"], button[data-url="${esc}"], [data-url*="${esc}"]`
         );
         if (found) {
           item.element = found;

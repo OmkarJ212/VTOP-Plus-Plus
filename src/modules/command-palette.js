@@ -15,7 +15,6 @@
   class CommandPalette {
     constructor() {
       this.isOpen = false;
-      this.isInitialized = false;
       this.modal = null;
       this.input = null;
       this.resultsContainer = null;
@@ -26,13 +25,13 @@
       this.prevSelectedIndex = 0;
       this._keyboardListenerAttached = false;
       this._keydownHandler = null;
+      this.lastFocusedElement = null;
     }
 
     init() {
       if (window !== window.top) return; // Don't mount in nested sub-frames
       this.initKeyboardListener();
       this.createDOM();
-      this.isInitialized = true;
     }
 
     destroy() {
@@ -46,7 +45,12 @@
         this.modal.remove();
         this.modal = null;
       }
-      this.isInitialized = false;
+      this.input = null;
+      this.resultsContainer = null;
+      this.emptyState = null;
+      this.rowPool = [];
+      this.filteredItems = [];
+      this.lastFocusedElement = null;
     }
 
     initKeyboardListener() {
@@ -70,6 +74,7 @@
         this.modal = document.getElementById('vtop-plus-palette-overlay');
         this.input = document.getElementById('vtop-palette-input');
         this.resultsContainer = document.getElementById('vtop-palette-list');
+        this.emptyState = document.getElementById('vtop-palette-empty');
         return;
       }
 
@@ -81,12 +86,12 @@
       this.modal.innerHTML = `
         <div class="vtop-palette-dialog">
           <div class="vtop-palette-header">
-            <svg class="vtop-palette-search-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="vtop-palette-search-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--vtop-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="text" id="vtop-palette-input" class="vtop-palette-input"
-              placeholder="Search all VTOP pages (e.g. course page, marks, attendance, timetable, da, leave)..."
+              placeholder="Search VTOP pages"
               autocomplete="off" spellcheck="false" />
             <kbd class="vtop-palette-esc">ESC</kbd>
           </div>
@@ -94,12 +99,6 @@
             <div class="vtop-palette-empty" id="vtop-palette-empty" style="display:none;">
               <div>No matching VTOP pages found.</div>
             </div>
-          </div>
-          <div class="vtop-palette-footer">
-            <span class="vtop-palette-hint"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
-            <span class="vtop-palette-hint"><kbd>Enter</kbd> Select</span>
-            <span class="vtop-palette-hint"><kbd>Esc</kbd> Close</span>
-            <span style="margin-left:auto;font-weight:600;color:var(--vtop-primary,#0284c7);font-size:12px;">Search Pages</span>
           </div>
         </div>
       `;
@@ -137,12 +136,7 @@
         mainEl.appendChild(titleEl);
         mainEl.appendChild(subEl);
 
-        const actionEl = document.createElement('span');
-        actionEl.className = 'vtop-palette-item-action';
-        actionEl.textContent = 'Open →';
-
         row.appendChild(mainEl);
-        row.appendChild(actionEl);
 
         const poolEntry = { row, titleEl, subEl, item: null };
         row.addEventListener('click', () => {
@@ -165,6 +159,7 @@
         window.VTOP_PLUS.Crawler.scan();
       }
 
+      this.lastFocusedElement = document.activeElement;
       this.modal.style.display = 'flex';
       this.isOpen = true;
       this.selectedIndex = 0;
@@ -184,6 +179,10 @@
     close() {
       if (this.modal) this.modal.style.display = 'none';
       this.isOpen = false;
+      if (this.lastFocusedElement && this.lastFocusedElement.isConnected && typeof this.lastFocusedElement.focus === 'function') {
+        this.lastFocusedElement.focus();
+      }
+      this.lastFocusedElement = null;
     }
 
     toggle() {
@@ -331,7 +330,7 @@
         pool.row.className = `vtop-palette-item ${i === this.selectedIndex ? 'selected' : ''}`;
         
         this.updateHighlight(pool.titleEl, item.title, queryLower);
-        pool.subEl.textContent = item.subtitle || (item.category ? `VTOP → ${item.category}` : item.dataUrl || '');
+        pool.subEl.textContent = item.subtitle || item.category || item.dataUrl || '';
 
         pool.row.style.display = 'flex';
       }
@@ -344,6 +343,10 @@
     }
 
     handleKeyDown(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        return;
+      }
       if (!this.filteredItems.length) return;
 
       if (e.key === 'ArrowDown') {
@@ -386,9 +389,13 @@
     }
 
     dispatchNavigation(item) {
+      if (item.isAction && typeof item.action === 'function') {
+        item.action();
+        return;
+      }
       const qd = window.VTOP_PLUS?.QuickDock;
       if (qd && typeof qd.requestNavigation === 'function') {
-        qd.requestNavigation({ title: item.title, targetItem: item });
+        qd.requestNavigation({ id: item.id, title: item.title, targetItem: item });
       } else if (window.VTOP_PLUS.Crawler) {
         window.VTOP_PLUS.Crawler.navigate(item);
       } else if (item.element && typeof item.element.click === 'function') {

@@ -3,7 +3,7 @@
  * Fully ported & enhanced from vtop-course-filter.
  * 
  * Features:
- * 1. Segregates VTOP Course Page Consolidated by Semester (Recent First), Subject (with live search), and Faculty.
+ * 1. Segregates VTOP Course Page Consolidated by Semester (Recent First), Subject, and Faculty.
  * 2. Instant localStorage faculty cache per subject.
  * 3. Multi-page DataTables traversal to extract all professors across 15-25 pages.
  * 4. Real-time table filter by faculty across all pages (DataTables search hook).
@@ -23,7 +23,6 @@
   const CACHE_MAX = 80;
   const POLL_MS = 150;
   const STALE_MS = 3000;
-  const DT_GRACE_MS = 1500;
 
   const SELECTOR_DOWNLOAD_BTNS = 'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]';
 
@@ -31,9 +30,6 @@
     sem: '',
     subj: '',
     fac: 'ALL',
-    type: 'ALL',
-    subjQ: '',
-    facQ: '',
     topicQ: '',
     courses: {},
     sems: [],
@@ -42,12 +38,16 @@
     matCol: 2,
     courseCol: 1,
     native: null,
-    loadTs: 0,
     timer: null,
-    hooked: false,
-    hookTable: null,
-    pending: null,
-    crawling: false
+    waitObserver: null,
+    waitRaf: null,
+    finishTimer: null,
+    finishObserver: null,
+    bodyObserver: null,
+    bodyObserverTarget: null,
+    filterDebounceTimer: null,
+    lastDtQuery: '',
+    pending: null
   };
 
   let persist = { sem: '', fac: {} };
@@ -108,11 +108,21 @@
       if (!opt.value || text.includes('-- Registered Courses --')) continue;
       // Robust split supporting standard hyphen, en-dash (–), and em-dash (—)
       const parts = text.split(/\s*[-–—]\s*/);
-      if (parts.length < 2) continue;
+      if (parts.length < 2) {
+        // Fallback: If no hyphen, treat as Current Semester so courses are never lost
+        const sem = 'Current Semester';
+        if (!data[sem]) data[sem] = [];
+        data[sem].push({ value: opt.value, label: text });
+        if (opt.selected) {
+          selSem = sem;
+          selVal = opt.value;
+        }
+        continue;
+      }
       const sem = parts[0].trim();
       if (!data[sem]) data[sem] = [];
       const label = parts.slice(1).join(' - ').trim();
-      data[sem].push({ value: opt.value, label, labelLower: label.toLowerCase() });
+      data[sem].push({ value: opt.value, label });
       if (opt.selected) {
         selSem = sem;
         selVal = opt.value;
@@ -150,6 +160,22 @@
     destroy() {
       stopWaiting();
 
+      if (state.bodyObserver) {
+        state.bodyObserver.disconnect();
+        state.bodyObserver = null;
+      }
+      if (state.bodyObserverTarget) {
+        delete state.bodyObserverTarget.dataset.vtopFilterBound;
+        state.bodyObserverTarget = null;
+      }
+      if (state.filterDebounceTimer) {
+        clearTimeout(state.filterDebounceTimer);
+        state.filterDebounceTimer = null;
+      }
+
+      state.topicQ = '';
+      state.fac = 'ALL';
+
       // 1. Remove course dropdown UI
       const ui = document.getElementById(UI_ID);
       if (ui) ui.remove();
@@ -168,15 +194,31 @@
       const bar = document.getElementById(TABLE_BAR_ID);
       if (bar) bar.remove();
 
-      // 4. Reset table rows display
+      // 4. Reset table rows display and clear any DataTables query set by CourseFilter
       const table = this.findMaterialsTable();
       if (table) {
+        if (state.lastDtQuery) {
+          const wrap = table.closest('.dataTables_wrapper, .dt-container') || document;
+          const dtInput = wrap.querySelector('.dataTables_filter input, .dt-search input');
+          if (dtInput && dtInput.value === state.lastDtQuery) {
+            dtInput.value = '';
+            dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          state.lastDtQuery = '';
+        }
         const rows = table.querySelectorAll('tbody tr');
         rows.forEach((r) => (r.style.display = ''));
+      } else {
+        state.lastDtQuery = '';
       }
     },
 
     findCourseDropdown() {
+      // 1. O(1) direct selector on VTOP Course Page (select#courseId[name="courseId"])
+      const direct = document.getElementById('courseId') || document.querySelector('select[name="courseId"]');
+      if (direct) return direct;
+
+      // 2. Fallback scan
       const selects = document.getElementsByTagName('select');
       for (let i = 0; i < selects.length; i++) {
         const sel = selects[i];
@@ -190,6 +232,11 @@
     },
 
     findMaterialsTable() {
+      // 1. O(1) direct selector on VTOP Course Page (#materialTable)
+      const direct = document.getElementById('materialTable');
+      if (direct) return direct;
+
+      // 2. Fallback selectors
       const btn = document.querySelector(SELECTOR_DOWNLOAD_BTNS);
       if (btn) {
         const table = btn.closest('table');
@@ -205,12 +252,23 @@
           return t;
         }
       }
-      return document.querySelector('#materialTable, table[id*="material" i]');
+      return document.querySelector('table[id*="material" i]');
+    },
+
+    getOptionsSignature(sel) {
+      if (!sel || !sel.options) return '';
+      const len = sel.options.length;
+      const first = len > 1 ? sel.options[1].value : '';
+      const last = len > 0 ? sel.options[len - 1].value : '';
+      return `${len}:${first}:${last}`;
     },
 
     ensureCourseDropdownUI() {
       const ui = document.getElementById(UI_ID);
-      if (ui && state.native && state.native.isConnected) return;
+      if (ui && state.native && state.native.isConnected) {
+        const sig = this.getOptionsSignature(state.native);
+        if (state.optSig === sig) return;
+      }
       if (ui) ui.remove();
 
       const sel = this.findCourseDropdown();
@@ -219,6 +277,7 @@
 
     mountCourseDropdownUI(native) {
       state.native = native;
+      state.optSig = this.getOptionsSignature(native);
       const parsed = parseOptions(native);
       state.courses = parsed.data;
       state.sems = Object.keys(parsed.data).sort((a, b) => semWeight(b) - semWeight(a));
@@ -226,7 +285,6 @@
       if (parsed.selVal) {
         if (parsed.selVal !== state.subj) {
           state.fac = 'ALL';
-          state.facQ = '';
           state.faculty = [];
         }
         state.sem = parsed.selSem;
@@ -234,7 +292,6 @@
       } else {
         state.subj = '';
         state.fac = 'ALL';
-        state.facQ = '';
         state.faculty = [];
         if (!state.courses[state.sem]) state.sem = '';
       }
@@ -253,53 +310,42 @@
       box.id = UI_ID;
       box.className = 'vtop-plus-course-filter-panel';
       box.style.cssText =
-        'display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;padding:16px;' +
-        'background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;margin:12px 0 16px;width:100%;' +
-        'box-sizing:border-box;box-shadow:0 4px 14px rgba(0,0,0,0.06);font-family:inherit;';
+        'display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:10px 12px;' +
+        'background:var(--vtop-bg-surface);border:1px solid var(--vtop-border-strong);border-radius:0.375rem;margin:8px 0 12px;width:100%;max-width:100%;min-width:0;' +
+        'box-sizing:border-box;box-shadow:none;font-family:inherit;';
 
-      const selCss = 'width:100%;height:38px;padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;font-size:13px;color:#0f172a;';
-      const lblCss = 'font-weight:700;font-size:12px;color:#334155;margin-bottom:6px;display:block;';
-      const inCss = 'width:58%;padding:4px 8px;font-size:12px;border:1px solid #cbd5e1;border-radius:4px;outline:none;';
-      const headCss = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
+      const selCss = 'width:100%;min-width:0;height:34px;padding:4px 10px;border:1px solid var(--vtop-border-strong);border-radius:6px;background:var(--vtop-bg-input);font-size:12.5px;color:var(--vtop-text-primary);box-sizing:border-box;';
+      const lblCss = 'font-weight:700;font-size:11.5px;color:var(--vtop-text-secondary);margin-bottom:4px;display:block;';
 
       box.innerHTML = `
         <div style="display:flex;flex-direction:column;justify-content:flex-end;">
-          <label style="${lblCss}">1. Select Semester (Recent First)</label>
+          <label style="${lblCss}">Semester</label>
           <select id="vtop-sem-select" class="form-control" style="${selCss}">
-            <option value="">-- Choose Semester --</option>
+            <option value="">Select semester</option>
           </select>
         </div>
-        <div style="display:flex;flex-direction:column;">
-          <div style="${headCss}">
-            <label style="${lblCss};margin-bottom:0;">2. Select Subject</label>
-            <input type="text" id="vtop-subj-search" placeholder="Search code/title..." style="${inCss}" disabled />
-          </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+          <label style="${lblCss}">Subject</label>
           <select id="vtop-subj-select" class="form-control" style="${selCss}" disabled>
-            <option value="">-- Select Semester First --</option>
+            <option value="">Select subject</option>
           </select>
         </div>
-        <div style="display:flex;flex-direction:column;">
-          <div style="${headCss}">
-            <label style="${lblCss};margin-bottom:0;">3. Filter by Faculty</label>
-            <input type="text" id="vtop-fac-search" placeholder="Search faculty..." style="${inCss}" disabled />
-          </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+          <label style="${lblCss}">Faculty</label>
           <select id="vtop-fac-select" class="form-control" style="${selCss}" disabled>
-            <option value="ALL">-- Select Subject First --</option>
+            <option value="ALL">All faculty</option>
           </select>
         </div>
         <div id="vtop-busy" style="display:none;grid-column:1/-1;height:3px;border-radius:2px;
-          background:linear-gradient(90deg,transparent,#27ae60,transparent);background-size:40% 100%;
+          background:linear-gradient(90deg,transparent,var(--vtop-success-bright),transparent);background-size:40% 100%;
           background-repeat:no-repeat;animation:vtopSlide 1s linear infinite;"></div>
-        <style>@keyframes vtopSlide{0%{background-position:-40% 0}100%{background-position:140% 0}}</style>
       `;
 
       native.parentNode.insertBefore(box, native);
 
       const semSel = document.getElementById('vtop-sem-select');
       const subjSel = document.getElementById('vtop-subj-select');
-      const subjSearch = document.getElementById('vtop-subj-search');
       const facSel = document.getElementById('vtop-fac-select');
-      const facSearch = document.getElementById('vtop-fac-search');
 
       const frag = document.createDocumentFragment();
       state.sems.forEach((sem) => {
@@ -312,8 +358,6 @@
 
       if (state.sem && state.courses[state.sem]) {
         semSel.value = state.sem;
-        subjSearch.disabled = false;
-        subjSearch.value = state.subjQ;
         this.renderSubjects();
 
         if (state.subj) {
@@ -321,8 +365,6 @@
           if (c && c.length) {
             state.faculty = c;
             facSel.disabled = false;
-            facSearch.disabled = false;
-            facSearch.value = state.facQ;
             this.renderFaculty();
           } else {
             facSel.innerHTML = '<option value="ALL">Loading materials...</option>';
@@ -339,25 +381,14 @@
         }
         state.subj = '';
         state.fac = 'ALL';
-        state.subjQ = '';
-        state.facQ = '';
         state.faculty = [];
-        subjSearch.value = '';
-        facSearch.value = '';
-        this.facPlaceholder('-- Select Subject First --');
+        this.facPlaceholder('All faculty');
 
         if (!state.sem) {
-          subjSel.innerHTML = '<option value="">-- Select Semester First --</option>';
+          subjSel.innerHTML = '<option value="">Select subject</option>';
           subjSel.disabled = true;
-          subjSearch.disabled = true;
           return;
         }
-        subjSearch.disabled = false;
-        this.renderSubjects();
-      });
-
-      subjSearch.addEventListener('input', () => {
-        state.subjQ = subjSearch.value;
         this.renderSubjects();
       });
 
@@ -366,14 +397,11 @@
         if (!val) return;
         state.subj = val;
         state.fac = 'ALL';
-        state.facQ = '';
-        facSearch.value = '';
 
         const cached = cacheGet(val);
         if (cached) {
           state.faculty = cached;
           facSel.disabled = false;
-          facSearch.disabled = false;
           this.renderFaculty();
         } else {
           state.faculty = [];
@@ -381,7 +409,6 @@
         }
 
         const stale = this.findMaterialsTable();
-        state.loadTs = Date.now();
         native.value = val;
         waitForTable(stale, this);
         native.dispatchEvent(new Event('change', { bubbles: true }));
@@ -390,15 +417,6 @@
         window.VTOP_PLUS?.CourseDownloader?.resetCourse?.();
         if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
           window.VTOP_PLUS.CourseDownloader.selectFaculty('ALL');
-        }
-      });
-
-      facSearch.addEventListener('input', () => {
-        state.facQ = facSearch.value;
-        this.renderFaculty();
-        this.applyFilter();
-        if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
-          window.VTOP_PLUS.CourseDownloader.selectFaculty(state.fac);
         }
       });
 
@@ -413,37 +431,28 @@
 
     facPlaceholder(text) {
       const facSel = document.getElementById('vtop-fac-select');
-      const facSearch = document.getElementById('vtop-fac-search');
-      if (!facSel || !facSearch) return;
+      if (!facSel) return;
       facSel.innerHTML = '';
       const o = document.createElement('option');
       o.value = 'ALL';
       o.textContent = text;
       facSel.appendChild(o);
       facSel.disabled = true;
-      facSearch.disabled = true;
     },
 
     renderSubjects() {
       const sel = document.getElementById('vtop-subj-select');
       if (!sel) return;
       const list = state.courses[state.sem] || [];
-      const tokens = state.subjQ.toLowerCase().split(/\s+/).filter(Boolean);
-      const filtered = tokens.length
-        ? list.filter((c) => {
-            const l = c.labelLower || c.label.toLowerCase();
-            return tokens.every((t) => l.includes(t));
-          })
-        : list;
 
       const frag = document.createDocumentFragment();
       const def = document.createElement('option');
       def.value = '';
-      def.textContent = filtered.length
-        ? `-- Choose Subject (${filtered.length} shown) --`
-        : '-- No matching subjects --';
+      def.textContent = list.length
+        ? 'Select subject'
+        : 'No subjects found';
       frag.appendChild(def);
-      filtered.forEach((c) => {
+      list.forEach((c) => {
         const o = document.createElement('option');
         o.value = c.value;
         o.textContent = c.label;
@@ -451,25 +460,22 @@
       });
       sel.replaceChildren(frag);
       sel.disabled = false;
-      sel.value = filtered.some((c) => c.value === state.subj) ? state.subj : '';
+      sel.value = list.some((c) => c.value === state.subj) ? state.subj : '';
     },
 
     renderFaculty() {
       const sel = document.getElementById('vtop-fac-select');
       if (!sel) return;
-      const q = state.facQ.trim().toLowerCase();
-      const list = q
-        ? state.faculty.filter((f) => (f.nameLower || f.name.toLowerCase()).includes(q))
-        : state.faculty;
+      const list = state.faculty;
 
       if (!list.some((f) => f.name === state.fac)) {
-        state.fac = q && list.length ? list[0].name : 'ALL';
+        state.fac = 'ALL';
       }
 
       const frag = document.createDocumentFragment();
       const all = document.createElement('option');
       all.value = 'ALL';
-      all.textContent = `All Faculty (${list.length} of ${state.faculty.length} shown)`;
+      all.textContent = 'All Faculty';
       frag.appendChild(all);
       list.forEach((f) => {
         const o = document.createElement('option');
@@ -481,30 +487,6 @@
       sel.value = state.fac;
     },
 
-    autoExpandLength(table) {
-      const lengthSelect = document.querySelector('select[name="materialTable_length"], select[name$="_length"]');
-      if (lengthSelect && lengthSelect.value !== '100' && lengthSelect.value !== '-1') {
-        let targetOption = lengthSelect.querySelector('option[value="100"]') ||
-                           lengthSelect.querySelector('option[value="-1"]');
-        if (!targetOption) {
-          let maxVal = 0;
-          for (const opt of lengthSelect.options) {
-            const val = parseInt(opt.value, 10);
-            if (val > maxVal) {
-              maxVal = val;
-              targetOption = opt;
-            }
-          }
-        }
-        if (targetOption && lengthSelect.value !== targetOption.value) {
-          lengthSelect.value = targetOption.value;
-          lengthSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          return true;
-        }
-      }
-      return false;
-    },
-
     checkAndMountTableFilterBar() {
       const table = this.findMaterialsTable();
       if (!table) {
@@ -512,8 +494,6 @@
         if (existing) existing.remove();
         return;
       }
-
-      this.autoExpandLength(table);
 
       const existingBar = document.getElementById(TABLE_BAR_ID);
       const targetParent = table.closest('.dataTables_wrapper') || table.parentNode;
@@ -527,6 +507,14 @@
     },
 
     detectColumns(table) {
+      // Exact #materialTable layout: #(0) | Course Detail(1) | Material Detail(2) | Uploaded By(3) | Download(4)
+      if (table && table.id === 'materialTable') {
+        state.facCol = 3;
+        state.matCol = 2;
+        state.courseCol = 1;
+        return { facCol: 3, matCol: 2, courseCol: 1 };
+      }
+
       let facCol = 3;
       let matCol = 2;
       let courseCol = 1;
@@ -553,28 +541,21 @@
       container.id = TABLE_BAR_ID;
       container.className = 'vtop-plus-filter-container';
 
+      container.style.cssText = 'display:block;width:100%;box-sizing:border-box;background:var(--vtop-bg-surface) !important;background-color:var(--vtop-bg-surface) !important;border:1px solid var(--vtop-border) !important;border-radius:10px;padding:12px 16px;margin-bottom:12px;box-shadow:none !important;';
+
       container.innerHTML = `
-        <div class="vtop-filter-row">
-          <div class="vtop-filter-group" style="flex: 2;">
-            <span class="vtop-filter-icon">🔍</span>
-            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Quick filter by topic, module, keyword..." />
+        <div class="vtop-filter-row" style="display:flex;align-items:center;gap:12px;width:100%;">
+          <div class="vtop-filter-group" style="flex:1;display:flex;align-items:center;gap:8px;">
+            <span class="vtop-filter-icon" style="display:inline-flex;align-items:center;color:var(--vtop-text-muted);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+            <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Filter by topic or keyword..." style="width:100%;padding:8px 12px;border:1px solid var(--vtop-border-strong) !important;border-radius:6px;font-size:13px;outline:none;background:var(--vtop-bg-input) !important;background-color:var(--vtop-bg-input) !important;color:var(--vtop-text-primary) !important;box-sizing:border-box;" />
           </div>
-          <div class="vtop-filter-group" style="flex: 1;">
-            <label class="vtop-filter-label" for="vtop-table-filter-type">Type:</label>
-            <select id="vtop-table-filter-type" class="vtop-filter-select">
-              <option value="ALL">All Types</option>
-              <option value="THEORY">Theory (ETH/TH)</option>
-              <option value="LAB">Lab (ELA/LO)</option>
-            </select>
-          </div>
-          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters">Clear</button>
+          <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters" style="background:var(--vtop-bg-row-hover) !important;background-color:var(--vtop-bg-row-hover) !important;border:1px solid var(--vtop-border-strong) !important;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--vtop-text-body) !important;white-space:nowrap;">Clear</button>
         </div>
       `;
 
       targetParent.insertBefore(container, targetParent.firstChild);
 
       const searchInput = document.getElementById('vtop-table-filter-search');
-      const typeSelect = document.getElementById('vtop-table-filter-type');
       const resetBtn = document.getElementById('vtop-table-filter-reset');
 
       searchInput?.addEventListener('input', () => {
@@ -582,16 +563,9 @@
         this.applyFilter();
       });
 
-      typeSelect?.addEventListener('change', () => {
-        state.type = typeSelect.value;
-        this.applyFilter();
-      });
-
       resetBtn?.addEventListener('click', () => {
         if (searchInput) searchInput.value = '';
-        if (typeSelect) typeSelect.value = 'ALL';
         state.topicQ = '';
-        state.type = 'ALL';
         state.fac = 'ALL';
         const facSel = document.getElementById('vtop-fac-select');
         if (facSel) facSel.value = 'ALL';
@@ -600,6 +574,30 @@
           window.VTOP_PLUS.CourseDownloader.selectFaculty('ALL');
         }
       });
+
+      // Observe tbody so DataTables page changes automatically re-apply active filter
+      const tbody = table.querySelector('tbody');
+      if (tbody && !tbody.dataset.vtopFilterBound) {
+        if (state.bodyObserver) {
+          state.bodyObserver.disconnect();
+          state.bodyObserver = null;
+        }
+        if (state.bodyObserverTarget) {
+          delete state.bodyObserverTarget.dataset.vtopFilterBound;
+        }
+        tbody.dataset.vtopFilterBound = 'true';
+        state.bodyObserverTarget = tbody;
+        state.bodyObserver = new MutationObserver(() => {
+          if (state.topicQ || state.fac !== 'ALL') {
+            if (state.filterDebounceTimer) clearTimeout(state.filterDebounceTimer);
+            state.filterDebounceTimer = setTimeout(() => {
+              state.filterDebounceTimer = null;
+              this.applyFilter();
+            }, 40);
+          }
+        });
+        state.bodyObserver.observe(tbody, { childList: true });
+      }
     },
 
     applyFilter() {
@@ -609,16 +607,24 @@
       const cols = this.detectColumns(table);
       const query = (state.topicQ || '').toLowerCase().trim();
       const selectedFac = state.fac;
-      const selectedType = state.type;
 
       // 1. Try driving DataTables' own search box if faculty is selected and no custom topic query
       const wrap = table.closest('.dataTables_wrapper, .dt-container') || document;
       const dtInput = wrap.querySelector('.dataTables_filter input, .dt-search input');
       if (dtInput) {
         const desiredVal = (selectedFac !== 'ALL' && !query) ? selectedFac : '';
-        if (dtInput.value !== desiredVal && (desiredVal || dtInput.value)) {
-          dtInput.value = desiredVal;
+        if (desiredVal) {
+          if (dtInput.value !== desiredVal) {
+            dtInput.value = desiredVal;
+            state.lastDtQuery = desiredVal;
+            dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        } else if (state.lastDtQuery && dtInput.value === state.lastDtQuery) {
+          dtInput.value = '';
+          state.lastDtQuery = '';
           dtInput.dispatchEvent(new Event('input', { bubbles: true }));
+        } else if (!dtInput.value) {
+          state.lastDtQuery = '';
         }
       }
 
@@ -643,14 +649,7 @@
         const matchesTopic = !query || materialText.includes(query) || courseText.includes(query) || rowText.includes(query);
         const matchesFac = selectedFac === 'ALL' || teacherText.includes(selectedFac.toLowerCase());
 
-        let matchesType = true;
-        if (selectedType === 'THEORY') {
-          matchesType = !courseText.includes('ela') && !courseText.includes('lo') && !courseText.includes('lab');
-        } else if (selectedType === 'LAB') {
-          matchesType = courseText.includes('ela') || courseText.includes('lo') || courseText.includes('lab');
-        }
-
-        visibilityMap[i] = Boolean(matchesTopic && matchesFac && matchesType);
+        visibilityMap[i] = Boolean(matchesTopic && matchesFac);
       }
 
       // Pass B: Batch mutate DOM styles (no interleaved reads, locked 60 FPS)
@@ -692,6 +691,15 @@
         facSel.value = matchedValue;
         this.applyFilter();
       }
+    },
+
+    syncFacultyList(list) {
+      if (!Array.isArray(list) || !list.length) return;
+      state.faculty = list;
+      if (state.subj) cacheSet(state.subj, state.faculty);
+      const facSel = document.getElementById('vtop-fac-select');
+      if (facSel) facSel.disabled = false;
+      this.renderFaculty();
     }
   };
 
@@ -699,10 +707,36 @@
   /*  Table Observation & Faculty Extraction                            */
   /* ------------------------------------------------------------------ */
 
+  function getTableSignature(table) {
+    if (!table || !table.tBodies[0]) return '';
+    const rows = table.tBodies[0].rows;
+    const firstRow = rows[0];
+    const firstText = firstRow ? (firstRow.textContent || '').trim().slice(0, 80) : '';
+    return `${rows.length}|${firstText}`;
+  }
+
   function waitForTable(stale, filterInstance) {
-    clearInterval(state.timer);
-    state.pending = { stale, t0: Date.now(), foundAt: 0 };
+    stopWaiting();
+    state.pending = {
+      stale,
+      staleSig: getTableSignature(stale),
+      t0: Date.now()
+    };
     setBusy(true);
+
+    // React when #page_outline receives the AJAX-injected #materialTable (coalesced per frame)
+    const watchRoot = document.getElementById('page_outline') || document.body;
+    if (watchRoot) {
+      state.waitObserver = new MutationObserver(() => {
+        if (state.waitRaf) return;
+        state.waitRaf = requestAnimationFrame(() => {
+          state.waitRaf = null;
+          tryExtract(filterInstance);
+        });
+      });
+      state.waitObserver.observe(watchRoot, { childList: true, subtree: true });
+    }
+
     state.timer = setInterval(() => tryExtract(filterInstance), POLL_MS);
     tryExtract(filterInstance);
   }
@@ -710,6 +744,22 @@
   function stopWaiting() {
     clearInterval(state.timer);
     state.timer = null;
+    if (state.waitRaf) {
+      cancelAnimationFrame(state.waitRaf);
+      state.waitRaf = null;
+    }
+    if (state.waitObserver) {
+      state.waitObserver.disconnect();
+      state.waitObserver = null;
+    }
+    if (state.finishTimer) {
+      clearTimeout(state.finishTimer);
+      state.finishTimer = null;
+    }
+    if (state.finishObserver) {
+      state.finishObserver.disconnect();
+      state.finishObserver = null;
+    }
     state.pending = null;
     setBusy(false);
   }
@@ -720,69 +770,62 @@
     const now = Date.now();
     const table = filterInstance.findMaterialsTable();
 
-    if (table && (table !== p.stale || now - p.t0 >= STALE_MS)) {
-      if (!p.foundAt) p.foundAt = now;
-      if (now - p.foundAt >= 300) {
+    if (table) {
+      const sig = getTableSignature(table);
+      const isNewTableNode = table !== p.stale;
+      const isTableContentUpdated = Boolean(sig && sig !== p.staleSig);
+      const isStaleFallbackReached = now - p.t0 >= STALE_MS;
+
+      if (isNewTableNode || isTableContentUpdated || isStaleFallbackReached) {
         stopWaiting();
         finishExtraction(table, filterInstance);
+        return;
       }
-    } else if (now - p.t0 >= 15000) {
+    }
+
+    if (now - p.t0 >= 15000) {
       stopWaiting();
       filterInstance.facPlaceholder('Materials table timed out');
     }
   }
 
   function finishExtraction(table, filterInstance) {
-    const expanded = filterInstance.autoExpandLength(table);
+    const cols = filterInstance.detectColumns(table);
 
-    const extractRows = () => {
-      const cols = filterInstance.detectColumns(table);
+    const counts = new Map();
+    const rows = table.tBodies[0] ? table.tBodies[0].rows : [];
+    for (let i = 0; i < rows.length; i++) {
+      const c = rows[i].cells[cols.facCol];
+      if (!c) continue;
+      const f = cleanFaculty(c.innerHTML);
+      if (f) counts.set(f, (counts.get(f) || 0) + 1);
+    }
 
-      let counts = new Map();
-      const rows = table.tBodies[0] ? table.tBodies[0].rows : [];
-      for (let i = 0; i < rows.length; i++) {
-        const c = rows[i].cells[cols.facCol];
-        if (!c) continue;
-        const f = cleanFaculty(c.innerHTML);
-        if (f) counts.set(f, (counts.get(f) || 0) + 1);
-      }
+    state.faculty = Array.from(counts, ([name, count]) => ({
+      name,
+      count
+    })).sort((a, b) => a.name.localeCompare(b.name));
 
-      state.faculty = Array.from(counts, ([name, count]) => ({
-        name,
-        count,
-        nameLower: name.toLowerCase()
-      })).sort((a, b) => a.name.localeCompare(b.name));
+    if (state.subj) cacheSet(state.subj, state.faculty);
 
-      if (state.subj) cacheSet(state.subj, state.faculty);
+    const facSel = document.getElementById('vtop-fac-select');
+    if (!facSel) return;
 
-      const facSel = document.getElementById('vtop-fac-select');
-      const facSearch = document.getElementById('vtop-fac-search');
-      if (!facSel || !facSearch) return;
+    if (!state.faculty.length) {
+      filterInstance.facPlaceholder('No materials found');
+      return;
+    }
 
-      if (!state.faculty.length) {
-        filterInstance.facPlaceholder('No materials found');
-        return;
-      }
+    facSel.disabled = false;
+    if (state.fac !== 'ALL' && !state.faculty.some((f) => f.name === state.fac)) {
+      state.fac = 'ALL';
+    }
+    filterInstance.renderFaculty();
+    filterInstance.checkAndMountTableFilterBar();
 
-      facSel.disabled = false;
-      facSearch.disabled = false;
-      facSearch.value = state.facQ;
-      if (state.fac !== 'ALL' && !state.faculty.some((f) => f.name === state.fac)) {
-        state.fac = 'ALL';
-      }
-      filterInstance.renderFaculty();
-      filterInstance.checkAndMountTableFilterBar();
-
-      // Auto-sync Downloader to current state (starts at 'ALL')
-      if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
-        window.VTOP_PLUS.CourseDownloader.selectFaculty(state.fac);
-      }
-    };
-
-    if (expanded) {
-      setTimeout(extractRows, 350);
-    } else {
-      extractRows();
+    // Auto-sync Downloader to current state (starts at 'ALL')
+    if (window.VTOP_PLUS?.CourseDownloader?.selectFaculty) {
+      window.VTOP_PLUS.CourseDownloader.selectFaculty(state.fac);
     }
   }
 

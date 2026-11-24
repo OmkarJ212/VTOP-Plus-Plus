@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "VTOP++",
   "version": "1.0.0",
-  "description": "The Ultimate All-in-One God Extension for VIT Vellore VTOP. Fast Course Material Downloader, Course Filter, Attendance Bunk Calculator, FAT Exam Predictor, DA Tracker, Search Pages (Ctrl+K), and Smart Login Helper.",
+  "description": "Enhances VIT Vellore VTOP with batch course material downloads, faculty filtering, attendance calculator, FAT marks predictor, DA deadlines, quick page search (Ctrl+K), and auto-captcha.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -22,13 +22,34 @@
   "content_scripts": [
     {
       "matches": [
-        "*://vtop.vit.ac.in/*",
-        "*://vtop2.vit.ac.in/*"
+        "*://vtop.vit.ac.in/*"
+      ],
+      "css": [
+        "src/content/styles/themes.css",
+        "src/content/styles/privacy-and-navigation.css",
+        "src/content/styles/widgets.css",
+        "src/content/styles/dark-mode-core.css",
+        "src/content/styles/dark-mode-components.css",
+        "src/content/styles/dark-mode-widgets.css",
+        "src/content/styles/dashboard-and-layout.css",
+        "src/content/styles/curriculum-and-course.css",
+        "src/content/styles/legacy-pages.css"
+      ],
+      "js": [
+        "src/modules/dark-mode.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "*://vtop.vit.ac.in/*"
       ],
       "js": [
         "jszip.min.js",
         "src/utils/storage.js",
         "src/utils/dom.js",
+        "src/utils/vtop-api.js",
         "src/modules/auto-captcha.js",
         "src/modules/session-keeper.js",
         "src/modules/crawler.js",
@@ -38,37 +59,46 @@
         "src/modules/attendance-calculator.js",
         "src/modules/da-tracker.js",
         "src/modules/marks-fat-predictor.js",
+        "src/modules/timetable-calendar.js",
+        "src/modules/marks-notifier.js",
         "src/modules/quick-dock.js",
         "src/modules/command-palette.js",
         "src/modules/privacy-mode.js",
+        "src/modules/home-messages.js",
         "src/content/content.js"
       ],
-      "css": [
-        "src/content/content.css"
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "*://vtop.vit.ac.in/*"
       ],
+      "js": [
+        "src/content/main-world-patches.js"
+      ],
+      "world": "MAIN",
       "run_at": "document_idle",
       "all_frames": false
     }
   ],
   "permissions": [
     "storage",
-    "downloads",
     "activeTab",
-    "alarms"
+    "alarms",
+    "notifications"
   ],
   "host_permissions": [
     "*://vtop.vit.ac.in/*",
-    "*://vtop2.vit.ac.in/*"
+    "https://*.amazonaws.com/*"
   ],
   "web_accessible_resources": [
     {
       "resources": [
-        "models/velloreWeights.json",
-        "src/content/content.css"
+        "models/velloreWeights.json"
       ],
       "matches": [
-        "*://vtop.vit.ac.in/*",
-        "*://vtop2.vit.ac.in/*"
+        "*://vtop.vit.ac.in/*"
       ]
     }
   ]

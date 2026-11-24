@@ -1,0 +1,1565 @@
+/* VTOP++ - Universal Polish & Page-Specific Fixes for Remaining VTOP Pages */
+/* ==========================================================================
+   Universal Polish for Remaining VTOP Pages (Additive, Non-Regressing)
+   Guards: excludes Dashboard widgets, My Curriculum, Course Page, Login,
+   navigation drawer (.hmenubox), and extension widgets (.vtop-*).
+   ========================================================================== */
+
+/* 1. Legacy Containers (.box, .panel, .well) & Unstyled .card Containment */
+.box:not(.login-box):not(.hmenubox .box),
+.panel:not([class*="vtop-"]),
+.well,
+.card:not(.hmenubox .card):not(#course-data):not(#vtop-home-class-messages):not(#proctor-message):not(#digital-assignments):not(#edu-status):not(#last-five-feedbacks):not(.login-box):not(.card-login):not(#studentWiseCurriculum .card):not([class*="vtop-"]) {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+html:not(.vtop-dark-theme) .box:not(.login-box):not(.hmenubox .box),
+html:not(.vtop-dark-theme) .panel:not([class*="vtop-"]),
+html:not(.vtop-dark-theme) .well {
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.box.box-info,
+.box.box-primary,
+.panel.panel-info,
+.panel.panel-primary {
+  border-top: 3px solid var(--vtop-accent) !important;
+}
+
+.box-header:not(.hmenubox .box-header),
+.panel-heading:not([class*="vtop-"]) {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+html:not(.vtop-dark-theme) .box-header:not(.hmenubox .box-header),
+html:not(.vtop-dark-theme) .panel-heading:not([class*="vtop-"]) {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.box-header > .box-title,
+.box-header > h3,
+.box-header > h4,
+.panel-heading > .panel-title,
+.panel-heading > h3,
+.panel-heading > h4 {
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+.box-body,
+.panel-body {
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+.box-footer,
+.panel-footer,
+.card-footer:not(#course-data .card-footer):not(#vtop-home-class-messages .card-footer):not(#studentWiseCurriculum .card-footer) {
+  padding: 10px 16px !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+html:not(.vtop-dark-theme) .box-footer,
+html:not(.vtop-dark-theme) .panel-footer,
+html:not(.vtop-dark-theme) .card-footer:not(#course-data .card-footer):not(#vtop-home-class-messages .card-footer):not(#studentWiseCurriculum .card-footer) {
+  background-color: var(--vtop-bg-surface-alt) !important;
+}
+
+/* Prevent .row negative margins inside .card/.box/.panel from causing horizontal overflow */
+:is(.card, .box, .panel):not(.hmenubox *):not(#course-data):not(#vtop-home-class-messages):not(#studentWiseCurriculum) > :is(.card-body, .box-body, .panel-body) > .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.table-responsive {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* 2. Flush Tables & Legacy VTOP Tables (.fixedTableContainer, .customTable) */
+.fixedTableContainer {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  overflow-x: auto !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+html:not(.vtop-dark-theme) .fixedTableContainer {
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+table.customTable {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+
+html:not(.vtop-dark-theme) table.customTable tr.tableHeader > td,
+html:not(.vtop-dark-theme) table.customTable tr.tableHeader-level1 > td,
+html:not(.vtop-dark-theme) table.customTable thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+table.customTable tr.tableHeader > td,
+table.customTable tr.tableHeader-level1 > td,
+table.customTable thead th {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+}
+
+table.customTable tr.tableContent > td,
+table.customTable tr.tableContent-level1 > td {
+  padding: 9px 12px !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+  vertical-align: middle !important;
+}
+
+table.customTable tbody tr:last-child > td,
+.card:not(#course-data):not(#vtop-home-class-messages):not(#studentWiseCurriculum) > table.table tbody tr:last-child > td,
+.box > table.table tbody tr:last-child > td,
+.panel > table.table tbody tr:last-child > td {
+  border-bottom: none !important;
+}
+
+:is(.card-body, .box-body, .panel-body):not(#course-data *):not(#vtop-home-class-messages *):not(#studentWiseCurriculum *) > table.table:only-child,
+:is(.card-body, .box-body, .panel-body):not(#course-data *):not(#vtop-home-class-messages *):not(#studentWiseCurriculum *) > .table-responsive:only-child > table.table {
+  margin-bottom: 0 !important;
+}
+
+html:not(.vtop-dark-theme) :is(.card, .box, .panel):not(#course-data):not(#vtop-home-class-messages):not(#proctor-message):not(#digital-assignments):not(#edu-status):not(#last-five-feedbacks):not(#studentWiseCurriculum) table.table:not(#materialTable) thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+/* 3. Standardize Hardcoded Alert Banners (#dff0d8, #d9edf7, #fcf8e3) */
+[style*="#dff0d8" i],
+[style*="223, 240, 216"] {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-success-border) !important;
+  padding: 12px 16px !important;
+}
+
+html.vtop-dark-theme [style*="#dff0d8" i],
+html.vtop-dark-theme [style*="223, 240, 216"] {
+  background-color: var(--vtop-success-alert-bg) !important;
+  border-color: var(--vtop-success-alert-border) !important;
+  color: var(--vtop-success-text) !important;
+}
+
+[style*="#d9edf7" i],
+[style*="217, 237, 247"] {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  padding: 12px 16px !important;
+}
+
+html.vtop-dark-theme [style*="#d9edf7" i],
+html.vtop-dark-theme [style*="217, 237, 247"] {
+  background-color: var(--vtop-info-alert-bg) !important;
+  border-color: var(--vtop-info-alert-border) !important;
+  color: var(--vtop-info-alert-text) !important;
+}
+
+[style*="#fcf8e3" i],
+[style*="252, 248, 227"] {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-warn-border) !important;
+  padding: 12px 16px !important;
+}
+
+html.vtop-dark-theme [style*="#fcf8e3" i],
+html.vtop-dark-theme [style*="252, 248, 227"] {
+  background-color: var(--vtop-warn-alert-bg) !important;
+  border-color: var(--vtop-warn-alert-border) !important;
+  color: var(--vtop-warn-alert-text) !important;
+}
+
+/* 4. Bootstrap .alert & .modal-content Consistency */
+.alert {
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+}
+
+.modal-content {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.modal-header {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.modal-header,
+.modal-header.text-light,
+.modal-header.text-white,
+.modal-header .modal-title,
+.modal-header .text-light,
+.modal-header .text-white,
+.modal-header [style*="color: white" i],
+.modal-header [style*="color:white" i],
+.modal-header [style*="color:#fff" i],
+.modal-header [style*="color: #fff" i] {
+  color: var(--vtop-text-heading) !important;
+}
+
+html:not(.vtop-dark-theme) .modal-header .btn-close {
+  filter: none !important;
+  opacity: 0.75 !important;
+}
+
+html.vtop-dark-theme .modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(180%) !important;
+  opacity: 0.75 !important;
+}
+
+.modal-header .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.modal-footer {
+  padding: 10px 16px !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+html:not(.vtop-dark-theme) .modal-footer {
+  background-color: var(--vtop-bg-surface-alt) !important;
+}
+
+/* 5. DataTables Controls (Light + Dark) */
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  border: 1px solid var(--vtop-border-strong) !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  background-color: var(--vtop-bg-input) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .dataTables_wrapper .dataTables_info,
+html.vtop-dark-theme .dataTables_wrapper .dataTables_length label,
+html.vtop-dark-theme .dataTables_wrapper .dataTables_filter label {
+  color: var(--vtop-text-muted) !important;
+}
+
+/* 6. Hide VTOP Page-Transition Loading Box (#popup, .blockMsg, and #confirmBox spinner), keep page dimming (.blockOverlay) */
+#popup,
+.blockUI.blockMsg,
+.blockMsg,
+#confirmBox:has(#progressGIF:not(.d-none)) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 7. Academic Regulation (#regulationsForm & #embedder) — center button, hide broken white PDF box */
+#regulationsForm {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+.embed-responsive:has(#embedder),
+object#embedder {
+  display: none !important;
+}
+
+/* 8. Course Allocation Details & Registration Schedule (#RegistrationSchedule) Light + Dark Uniformity */
+.box-header + br {
+  display: none !important;
+}
+
+#RegistrationSchedule fieldset {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 16px !important;
+  margin: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  box-shadow: none !important;
+}
+
+fieldset,
+.feedback-form,
+.document-box,
+.document-box:hover,
+[style*="box-shadow" i]:not([class*="vtop-"]) {
+  box-shadow: none !important;
+}
+
+/* Normalize #f2dede (pink/red) & #ABA5BF/#aba6bf (purple) info tables (Faculty Info, Proctor Details, HOD & Dean Info) */
+td[style*="#f2dede" i],
+td[style*="242, 222, 222"],
+tr[style*="#f2dede" i],
+tr[style*="242, 222, 222"] {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: var(--vtop-border) !important;
+  border-radius: 0 !important;
+  padding: 9px 12px !important;
+}
+
+#employeeProfileForm table.table td,
+#employeeProfileForm table.table th {
+  --bs-table-bg: transparent !important;
+  --bs-table-accent-bg: transparent !important;
+  border-color: var(--vtop-border) !important;
+}
+
+td[style*="#aba5bf" i],
+td[style*="#aba6bf" i],
+td[style*="171, 165, 191"],
+td[style*="171, 166, 191"],
+tr[style*="#aba5bf" i],
+tr[style*="#aba6bf" i],
+tr[style*="171, 165, 191"],
+tr[style*="171, 166, 191"] {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+  border-radius: 0 !important;
+  padding: 9px 12px !important;
+}
+
+#employeeProfileForm table thead tr[style*="color: blue" i],
+#employeeProfileForm table thead tr[style*="color: blue" i] > th {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+img[style*="#f2dede" i],
+img[style*="242, 222, 222"] {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 6px !important;
+  padding: 0 !important;
+}
+
+/* Remove outer background/border on .modal-dialog wrapper (only .modal-content should be a box) */
+.modal-dialog,
+html.vtop-dark-theme .modal-dialog {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#RegistrationSchedule fieldset > legend {
+  float: none !important;
+  padding: 0 8px !important;
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-accent) !important;
+  background-color: transparent !important;
+}
+
+#RegistrationSchedule fieldset > legend:empty {
+  display: none !important;
+}
+
+#RegistrationSchedule fieldset > br,
+#RegistrationSchedule > br {
+  display: none !important;
+}
+
+#RegistrationSchedule .form.group,
+#RegistrationSchedule .form-group {
+  margin: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+#RegistrationSchedule span[style*="color: red" i] {
+  display: inline-block !important;
+  color: var(--vtop-danger-text) !important;
+  background-color: var(--vtop-danger-bg-soft) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 10px 18px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+}
+
+/* 9. FAQ Page (#falistfrag) — Clear Legacy Floats, Glyphicon Box, Colors & Collapse Layout */
+#falistfrag {
+  clear: both !important;
+  margin-top: 16px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#falistfrag > #falistfrag {
+  margin-top: 0 !important;
+  padding: 0 !important;
+}
+
+#faqPreview #getFaqProcessSec button[type="submit"] {
+  margin-left: 0 !important;
+}
+
+#falistfrag,
+#falistfrag .panel,
+#falistfrag .panel-heading,
+#falistfrag .panel-title,
+#falistfrag .panel-collapse,
+#falistfrag .panel-body,
+#falistfrag .faqcontent {
+  float: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#falistfrag .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#falistfrag .panel,
+#falistfrag .panel.panel-default {
+  margin-bottom: 10px !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+#falistfrag .panel-heading {
+  padding: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  background: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+}
+
+#falistfrag .panel-title,
+#falistfrag .panel-title:link,
+#falistfrag .panel-title:visited {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  text-decoration: none !important;
+  color: var(--vtop-text-heading) !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+#falistfrag .panel-title::after {
+  content: "" !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-right: 2px solid var(--vtop-text-muted) !important;
+  border-bottom: 2px solid var(--vtop-text-muted) !important;
+  transform: rotate(45deg) !important;
+  transition: transform 0.2s ease, border-color 0.15s ease !important;
+  flex-shrink: 0 !important;
+  margin-right: 4px !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"] {
+  background-color: var(--vtop-bg-active) !important;
+  color: var(--vtop-accent) !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"]::after {
+  transform: rotate(-135deg) !important;
+  border-color: var(--vtop-accent) !important;
+}
+
+#falistfrag .panel-title:hover {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"]:hover {
+  background-color: var(--vtop-bg-active) !important;
+}
+
+#falistfrag .panel-title:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px var(--vtop-accent-focus) !important;
+}
+
+#falistfrag .panel-title h4,
+#falistfrag .panel-title h4 span {
+  margin: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 0.925rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+  line-height: 1.4 !important;
+  display: block !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"] h4,
+#falistfrag .panel-title[aria-expanded="true"] h4 span {
+  color: var(--vtop-accent) !important;
+}
+
+#falistfrag .panel-title h4.glyphicon::before,
+#falistfrag .panel-title .glyphicon-hand-right::before {
+  display: none !important;
+  content: none !important;
+}
+
+#falistfrag .panel-collapse {
+  padding: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+#falistfrag .panel-body {
+  padding: 14px 16px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-body) !important;
+}
+
+#falistfrag .faqcontent {
+  padding: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  background-color: transparent !important;
+  color: var(--vtop-text-body) !important;
+  white-space: pre-line !important;
+  border: none !important;
+}
+
+#falistfrag table:not(:has(td, th)) {
+  display: none !important;
+}
+
+/* 10. Legacy Bootstrap 3 Pagination (Light + Dark) */
+ul.pagination:has(> li:not(.page-item)) {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 12px 0 !important;
+}
+
+ul.pagination > li:not(.page-item) > a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 6px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  text-decoration: none !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+}
+
+ul.pagination > li:not(.page-item) > a:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  border-color: var(--vtop-border-strong) !important;
+}
+
+ul.pagination > li.active:not(.page-item) > a {
+  background-color: var(--vtop-accent) !important;
+  border-color: var(--vtop-accent) !important;
+  color: var(--vtop-text-inverse) !important;
+  font-weight: 600 !important;
+}
+
+ul.pagination > li.disabled:not(.page-item) > a {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+/* 11. Bootstrap 3 .btn-default in Light Mode (Dark Mode already styled in dark-mode-core.css) */
+html:not(.vtop-dark-theme) .btn-default {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border-strong) !important;
+}
+
+html:not(.vtop-dark-theme) .btn-default:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+}
+
+/* 12. Grade History (37_grade-history.html) Inline Orange Box, Containment & Table Row */
+#studentGradeView .col-sm-12,
+#studentGradeView .col-md-12 {
+  float: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.box[style*="solid orange" i],
+#studentGradeView .box {
+  float: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-radius: 0.375rem !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+#studentGradeView .box > .box-body.table-responsive {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+#studentGradeView .box > .box-body.table-responsive > table.table {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+#studentGradeView .box > .box-body.table-responsive > table.table > thead > tr > td,
+#studentGradeView .box > .box-body.table-responsive > table.table > tbody > tr > td {
+  padding: 8px 6px !important;
+  font-size: 0.8rem !important;
+  text-align: center !important;
+  white-space: normal !important;
+  vertical-align: middle !important;
+}
+
+tr[style*="background-color: orange" i],
+tr[style*="background-color:orange" i],
+tr[style*="background-color: orange" i] > td,
+tr[style*="background-color:orange" i] > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme tr[style*="background-color: orange" i] > td,
+html.vtop-dark-theme tr[style*="background-color:orange" i] > td {
+  color: var(--vtop-accent) !important;
+}
+
+/* 13. Convocation / Registration (66_registration.html) Buttons & Oversized Text */
+.butn,
+.successBtn,
+.failBtn,
+.butnSbt {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border-strong) !important;
+  border-radius: 6px !important;
+  padding: 6px 14px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+}
+
+.successBtn,
+.butnSbt {
+  border-color: var(--vtop-success-border) !important;
+  color: var(--vtop-success) !important;
+}
+
+.successBtn:hover,
+.butnSbt:hover {
+  background-color: var(--vtop-success-bg-soft) !important;
+  color: var(--vtop-success) !important;
+}
+
+.failBtn {
+  border-color: var(--vtop-danger-border) !important;
+  color: var(--vtop-danger) !important;
+}
+
+.failBtn:hover {
+  background-color: var(--vtop-danger-bg-soft) !important;
+  color: var(--vtop-danger) !important;
+}
+
+#instContent {
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.ulList,
+.contentDiv {
+  font-size: 0.95rem !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+/* 14. Feedback Form (113_feedback-form.html / 115_feedback_form.html) & Legacy Custom Headers */
+body:has(#genericFeedbackApproval) {
+  background-color: var(--vtop-bg-canvas) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+.card:has(#genericFeedbackApproval) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+.card:has(#genericFeedbackApproval) > .card-header,
+.card:has(#genericFeedbackApproval) > .card-header.primaryBorderTop {
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.card:has(#genericFeedbackApproval) > .card-header .h3,
+.card:has(#genericFeedbackApproval) > .card-header strong {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .card:has(#genericFeedbackApproval) > .card-header .h3,
+html.vtop-dark-theme .card:has(#genericFeedbackApproval) > .card-header strong {
+  color: var(--vtop-accent) !important;
+}
+
+.card:has(#genericFeedbackApproval) > .col-12.text-center:has(> span:empty) {
+  display: none !important;
+}
+
+.card:has(#genericFeedbackApproval) > .col-12.text-center {
+  padding: 10px 16px 0 !important;
+  font-size: 0.9rem !important;
+}
+
+.card:has(#genericFeedbackApproval) > .col-12.text-center[style*="color: red" i] {
+  color: var(--vtop-danger-text) !important;
+}
+
+.card:has(#genericFeedbackApproval) > .col-12.text-center[style*="color: green" i] {
+  color: var(--vtop-success-text) !important;
+}
+
+.card:has(#genericFeedbackApproval) > .card-body {
+  padding: 16px !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#genericFeedbackApproval fieldset {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+}
+
+#genericFeedbackApproval .legend {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px 14px !important;
+  margin-bottom: 4px !important;
+  padding: 10px 14px !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-secondary) !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+}
+
+#genericFeedbackApproval .legend-box {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+#genericFeedbackApproval .legend-box.approved {
+  background-color: var(--vtop-success) !important;
+}
+
+#genericFeedbackApproval .legend-box.pending {
+  background-color: var(--vtop-warn) !important;
+}
+
+#genericFeedbackApproval .legend-box.upcoming {
+  background-color: var(--vtop-accent) !important;
+}
+
+#genericFeedbackApproval .legend-box.closed {
+  background-color: var(--vtop-danger) !important;
+}
+
+#genericFeedbackApproval .legend-box.partial {
+  background-color: var(--vtop-brown) !important;
+}
+
+html.vtop-dark-theme #genericFeedbackApproval .legend-box.approved {
+  background-color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme #genericFeedbackApproval .legend-box.pending {
+  background-color: var(--vtop-warn-bright) !important;
+}
+
+html.vtop-dark-theme #genericFeedbackApproval .legend-box.closed {
+  background-color: var(--vtop-danger-bright) !important;
+}
+
+/* DataTables wrapper & status table (#viewFeedbackSubmitTable) */
+#genericFeedbackApproval .table-responsive {
+  margin-top: 12px !important;
+}
+
+#viewFeedbackSubmitTable_wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#viewFeedbackSubmitTable_wrapper > #viewFeedbackSubmitTable {
+  flex: 1 0 100%;
+  width: 100% !important;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  overflow: hidden;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#viewFeedbackSubmitTable_length label,
+#viewFeedbackSubmitTable_filter label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 !important;
+  font-size: 0.84rem;
+  color: var(--vtop-text-body);
+}
+
+html.vtop-dark-theme #viewFeedbackSubmitTable_length label,
+html.vtop-dark-theme #viewFeedbackSubmitTable_filter label {
+  color: var(--vtop-text-muted) !important;
+}
+
+#viewFeedbackSubmitTable_info,
+#viewFeedbackSubmitTable_paginate {
+  font-size: 0.84rem;
+  color: var(--vtop-text-muted);
+  padding-top: 6px !important;
+}
+
+#viewFeedbackSubmitTable_paginate .paginate_button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 10px !important;
+  margin-left: 4px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--vtop-border) !important;
+  background: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+#viewFeedbackSubmitTable_paginate .paginate_button:hover:not(.disabled):not(.current) {
+  background: var(--vtop-bg-elevated-hover) !important;
+  border-color: var(--vtop-border-strong) !important;
+}
+
+#viewFeedbackSubmitTable_paginate .paginate_button.current {
+  background: var(--vtop-accent) !important;
+  border-color: var(--vtop-accent) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+#viewFeedbackSubmitTable_paginate .paginate_button.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+#viewFeedbackSubmitTable thead th {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+  border-top: none !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+#viewFeedbackSubmitTable tbody td {
+  padding: 10px 12px !important;
+  font-size: 0.875rem !important;
+  border-color: var(--vtop-border-subtle) !important;
+  color: var(--vtop-text-primary);
+}
+
+#viewFeedbackSubmitTable tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#viewFeedbackSubmitTable th:first-child,
+#viewFeedbackSubmitTable td:first-child {
+  border-left: none !important;
+}
+
+#viewFeedbackSubmitTable th:last-child,
+#viewFeedbackSubmitTable td:last-child {
+  border-right: none !important;
+}
+
+html:not(.vtop-dark-theme) #viewFeedbackSubmitTable tbody tr:nth-of-type(odd) td {
+  background-color: var(--vtop-bg-table-stripe) !important;
+}
+
+html:not(.vtop-dark-theme) #viewFeedbackSubmitTable tbody tr:hover td {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+#viewFeedbackSubmitTable td[style*="color: green" i],
+#viewFeedbackSubmitTable span.fa[style*="color: green" i] {
+  color: var(--vtop-success) !important;
+}
+
+#viewFeedbackSubmitTable td[style*="color: orange" i],
+#viewFeedbackSubmitTable span.fa[style*="color: orange" i] {
+  color: var(--vtop-warn) !important;
+}
+
+#viewFeedbackSubmitTable td[style*="color: blue" i],
+#viewFeedbackSubmitTable span.fa[style*="color: blue" i] {
+  color: var(--vtop-accent) !important;
+}
+
+#viewFeedbackSubmitTable td[style*="color: red" i],
+#viewFeedbackSubmitTable span.fa[style*="color: red" i] {
+  color: var(--vtop-danger) !important;
+}
+
+#viewFeedbackSubmitTable td[style*="color: brown" i],
+#viewFeedbackSubmitTable span.fa[style*="color: brown" i] {
+  color: var(--vtop-brown) !important;
+}
+
+html.vtop-dark-theme #viewFeedbackSubmitTable td[style*="color: green" i],
+html.vtop-dark-theme #viewFeedbackSubmitTable span.fa[style*="color: green" i] {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme #viewFeedbackSubmitTable td[style*="color: orange" i],
+html.vtop-dark-theme #viewFeedbackSubmitTable span.fa[style*="color: orange" i] {
+  color: var(--vtop-warn-bright) !important;
+}
+
+html.vtop-dark-theme #viewFeedbackSubmitTable td[style*="color: red" i],
+html.vtop-dark-theme #viewFeedbackSubmitTable span.fa[style*="color: red" i] {
+  color: var(--vtop-danger-bright) !important;
+}
+
+#viewFeedbackSubmitTable .details-control .btn-link {
+  padding: 2px 6px !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+/* Feedback Form Modals (#feedbackModal, #feedbackAnswerModal) & .feedback-form */
+.feedback-form {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-radius: 0.375rem !important;
+}
+
+#feedbackModal .modal-content,
+#feedbackAnswerModal .modal-content {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+#feedbackModal .modal-title,
+#feedbackAnswerModal .modal-title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #feedbackModal .modal-title,
+html.vtop-dark-theme #feedbackAnswerModal .modal-title {
+  color: var(--vtop-accent) !important;
+}
+
+#feedbackModal .modal-body,
+#feedbackAnswerModal .modal-body {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  padding: 16px 20px !important;
+}
+
+#feedbackForm.row,
+#feedbackFormAnswer.row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#feedbackForm.row > *,
+#feedbackFormAnswer.row > * {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#feedbackModal .form-label,
+#feedbackAnswerModal .form-label {
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.95rem !important;
+  font-weight: 500;
+}
+
+#feedbackForm > .form-label,
+#feedbackFormAnswer > .form-label,
+#feedbackForm > .form-label p,
+#feedbackFormAnswer > .form-label p,
+#feedbackForm > .form-label li,
+#feedbackFormAnswer > .form-label li {
+  color: var(--vtop-text-body) !important;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+#feedbackForm > .form-label strong,
+#feedbackForm > .form-label b,
+#feedbackFormAnswer > .form-label strong,
+#feedbackFormAnswer > .form-label b {
+  color: var(--vtop-text-heading) !important;
+}
+
+#feedbackModal .question-container,
+#feedbackAnswerModal .question-container {
+  padding: 14px 16px !important;
+  margin-bottom: 12px !important;
+}
+
+#feedbackModal .option-container,
+#feedbackAnswerModal .option-container {
+  padding-left: 16px !important;
+}
+
+#feedbackModal .star-rating,
+#feedbackAnswerModal .star-rating {
+  margin-bottom: 0 !important;
+}
+
+#feedbackModal .star-rating label,
+#feedbackAnswerModal .star-rating label {
+  color: var(--vtop-border-strong) !important;
+  transition: color 0.12s ease;
+}
+
+html.vtop-dark-theme #feedbackModal .star-rating label,
+html.vtop-dark-theme #feedbackAnswerModal .star-rating label {
+  color: var(--vtop-text-dim) !important;
+}
+
+#feedbackModal .star-rating input:checked ~ label,
+#feedbackModal .star-rating label:hover,
+#feedbackModal .star-rating label:hover ~ label,
+#feedbackAnswerModal .star-rating input:checked ~ label,
+html.vtop-dark-theme #feedbackModal .star-rating input:checked ~ label,
+html.vtop-dark-theme #feedbackModal .star-rating label:hover,
+html.vtop-dark-theme #feedbackModal .star-rating label:hover ~ label,
+html.vtop-dark-theme #feedbackAnswerModal .star-rating input:checked ~ label {
+  color: var(--vtop-warn-bright) !important;
+}
+
+#feedbackModal .form-check-input.is-invalid,
+#feedbackAnswerModal .form-check-input.is-invalid {
+  outline: 2px solid var(--vtop-danger) !important;
+  box-shadow: 0 0 0 0.25rem var(--vtop-danger-bg) !important;
+}
+
+html.vtop-dark-theme #feedbackModal .form-control[readonly],
+html.vtop-dark-theme #feedbackAnswerModal .form-control[readonly] {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-secondary) !important;
+}
+
+html.vtop-dark-theme #feedbackModal .btn-secondary,
+html.vtop-dark-theme #feedbackAnswerModal .btn-secondary {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme #feedbackModal .btn-secondary:hover,
+html.vtop-dark-theme #feedbackAnswerModal .btn-secondary:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme #feedbackModal .btn-outline-secondary,
+html.vtop-dark-theme #feedbackAnswerModal .btn-outline-secondary {
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme #feedbackModal .btn-outline-secondary:hover,
+html.vtop-dark-theme #feedbackAnswerModal .btn-outline-secondary:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-accent) !important;
+}
+
+fieldset > legend:empty {
+  display: none !important;
+}
+
+.panel-heading.panel-head-custom {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.box-header [style*="Times New Roman" i],
+.box-header [style*="ridge" i] {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+/* 15. Counselling Slot Details (110_know-your-rank.html) — Replace BS5 .table-success green wash with theme-consistent table & card tokens */
+.card:has(table.table-success) {
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.card:has(table.table-success) > .card-header {
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.card:has(table.table-success) > form.row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 16px !important;
+}
+
+.card:has(table.table-success) .container:has(> table.table-success) {
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+table.table.table-success {
+  --bs-table-bg: var(--vtop-bg-surface) !important;
+  --bs-table-color: var(--vtop-text-primary) !important;
+  --bs-table-border-color: var(--vtop-border) !important;
+  --bs-table-striped-bg: var(--vtop-bg-table-stripe) !important;
+  --bs-table-striped-color: var(--vtop-text-primary) !important;
+  --bs-table-hover-bg: var(--vtop-bg-row-hover) !important;
+  --bs-table-hover-color: var(--vtop-text-primary) !important;
+  --bs-table-active-bg: var(--vtop-bg-active) !important;
+  --bs-table-active-color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  overflow: hidden !important;
+  margin-bottom: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+table.table.table-success > :not(caption) > * > * {
+  box-shadow: none !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: var(--vtop-border) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  padding: 11px 16px !important;
+  vertical-align: middle !important;
+}
+
+table.table.table-success.table-striped > tbody > tr:nth-of-type(odd) > *,
+table.table.table-success.table-striped > tr:nth-of-type(odd) > * {
+  background-color: var(--vtop-bg-table-stripe) !important;
+}
+
+table.table.table-success > tbody > tr:hover > td,
+table.table.table-success > tr:hover > td,
+html.vtop-dark-theme table.table.table-success > tbody > tr:hover > td {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+table.table.table-success > tbody > tr:last-child > *,
+table.table.table-success > tr:last-child > * {
+  border-bottom: none !important;
+}
+
+table.table.table-success td:first-child {
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+  width: 45% !important;
+}
+
+/* 16. Health Center Feedback Form (100_health-center-feedback.html) — Override inline #f8f9fa / #007bff / #ccc */
+.card:has(#feedbackForm) {
+  background-color: var(--vtop-bg-surface) !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+.card:has(#feedbackForm) > .card-header,
+.card:has(#feedbackForm) > .card-header.warningBorderTop {
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.card:has(#feedbackForm) > .card-header strong,
+.card:has(#feedbackForm) > .card-header .text-secondary {
+  color: var(--vtop-text-heading) !important;
+}
+
+.card:has(#feedbackForm) > .card-body.scrollable-card-body {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+.question-container {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 6px !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .question-container {
+  background-color: var(--vtop-bg-elevated-alt) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+.question-container .question-text,
+.question-container .question-text p,
+.question-container .question-text .text-body {
+  color: var(--vtop-text-heading) !important;
+}
+
+.question-container .form-check-label {
+  color: var(--vtop-text-body) !important;
+}
+
+#feedbackForm .submit-btn {
+  background-color: var(--vtop-accent) !important;
+  color: var(--vtop-text-inverse) !important;
+  border: 1px solid var(--vtop-accent) !important;
+  border-radius: 6px !important;
+}
+
+#feedbackForm .submit-btn:hover {
+  background-color: var(--vtop-accent-hover) !important;
+  border-color: var(--vtop-accent-hover) !important;
+}
+
+#feedbackForm .invalid-feedback {
+  color: var(--vtop-danger) !important;
+}
+
+/* 17. Marks & Grade (#studentMarkView) & Nested customTable-level1 Consistency */
+.card:has(#studentMarkView) {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.card:has(#studentMarkView) > .card-header {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+#studentMarkView .col-md-12 {
+  float: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#studentMarkView > .col-md-12 > .row.p-2 {
+  align-items: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 8px 0 14px !important;
+}
+
+#studentMarkView label[for="acadYear"] {
+  float: none !important;
+  margin: 0 !important;
+  display: block;
+  text-align: right;
+  color: var(--vtop-text-secondary) !important;
+}
+
+@media (max-width: 767px) {
+  #studentMarkView label[for="acadYear"] {
+    text-align: left;
+    margin-bottom: 6px !important;
+  }
+}
+
+#studentMarkView table.customTable > tbody > tr.tableContent:not(:has(table.customTable-level1)) > td {
+  background-color: var(--vtop-bg-surface) !important;
+  font-weight: 500;
+}
+
+#studentMarkView table.customTable > tbody > tr.tableContent:has(> td > table.customTable-level1) > td {
+  padding: 10px 14px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+#studentMarkView table.customTable > tbody > tr.tableContent:has(> td > table.customTable-level1):hover > td {
+  background-color: var(--vtop-bg-surface-alt) !important;
+}
+
+table.customTable-level1 {
+  width: 100% !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+html:not(.vtop-dark-theme) table.customTable-level1 tr.tableHeader-level1 > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme table.customTable-level1 tr.tableHeader-level1 > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+table.customTable-level1 tr.tableHeader-level1 > td {
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  padding: 8px 10px !important;
+  text-align: center !important;
+}
+
+table.customTable-level1 tr.tableContent-level1 > td {
+  padding: 8px 10px !important;
+  font-size: 0.82rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+}
+
+table.customTable-level1 tr.tableContent-level1 > td:nth-child(2) {
+  text-align: left !important;
+  font-weight: 500;
+}
+
+table.customTable-level1 output {
+  display: inline !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+}
+
+/* 18. Class Messages Page (.box-info .box-body #accordion) Light + Dark Uniformity */
+.box-info .box-body #accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.box-info .box-body #accordion .panel,
+.box-info .box-body #accordion .panel.panel-default {
+  margin-bottom: 0 !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+.box-info .box-body #accordion .panel-heading {
+  padding: 0 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: none !important;
+}
+
+.box-info .box-body #accordion .panel-title.expand {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  border: none !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
+}
+
+.box-info .box-body #accordion .panel-title.expand:hover {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+.box-info .box-body #accordion .panel-title.expand .left-arrow {
+  float: none !important;
+  margin: 1px 0 0 0 !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  background-color: var(--vtop-accent-soft) !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  color: var(--vtop-accent) !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+.box-info .box-body #accordion .panel-title.expand > a {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: block !important;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.box-info .box-body #accordion .panel-title.expand h5 {
+  margin: 0 !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: var(--vtop-text-body) !important;
+}
+
+.box-info .box-body #accordion .panel-title.expand h5 b {
+  font-family: inherit !important;
+  font-weight: 700 !important;
+  color: var(--vtop-text-heading) !important;
+  margin-right: 4px;
+}
+
+.box-info .box-body #accordion .panel-title.expand h5 span {
+  font-family: inherit !important;
+  color: var(--vtop-text-primary) !important;
+  margin-right: 10px;
+}
+
+.box-info .box-body #accordion .panel-collapse {
+  border-top: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.box-info .box-body #accordion .panel-body {
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.box-info .box-body #accordion .panel-body table.table {
+  margin-bottom: 0 !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  overflow: hidden;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.box-info .box-body #accordion .panel-body table.table tbody tr td {
+  padding: 8px 12px !important;
+  font-size: 0.84rem !important;
+  border: none !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  vertical-align: middle !important;
+}
+
+.box-info .box-body #accordion .panel-body table.table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.box-info .box-body #accordion .panel-body table.table tbody tr td.vtop-class-msg-label,
+.box-info .box-body #accordion .panel-body table.table tbody tr td[style*="#d2d6de" i] {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  font-weight: 600 !important;
+  width: 165px !important;
+  border-right: 1px solid var(--vtop-border) !important;
+}
