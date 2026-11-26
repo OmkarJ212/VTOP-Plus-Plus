@@ -468,10 +468,10 @@ html.vtop-dark-theme .offcanvas-title {
 }
 
 /* 7.25 VTOP Custom Page Wrappers (Removes outer white box/border around cards in both Light & Dark modes) */
-.WhiteBackground:has(> .card, > .box, > .panel, > fieldset),
-.whiteBackground:has(> .card, > .box, > .panel, > fieldset),
-[class*="WhiteBackground" i]:has(> .card, > .box, > .panel, > fieldset),
-[class*="whiteBackground" i]:has(> .card, > .box, > .panel, > fieldset),
+.WhiteBackground:not(.hmenubox):not([id^="MG0"]):has(> .card, > .box, > .panel, > fieldset),
+.whiteBackground:not(.hmenubox):not([id^="MG0"]):has(> .card, > .box, > .panel, > fieldset),
+[class*="WhiteBackground" i]:not(.hmenubox):not([id^="MG0"]):has(> .card, > .box, > .panel, > fieldset),
+[class*="whiteBackground" i]:not(.hmenubox):not([id^="MG0"]):has(> .card, > .box, > .panel, > fieldset),
 .col-12.WhiteBackground,
 .col-12.whiteBackground,
 .col-12[class*="WhiteBackground" i],

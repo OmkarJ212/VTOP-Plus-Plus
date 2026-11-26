@@ -1,9 +1,7 @@
 /**
- * VTOP++ - Timetable .ics / Google Calendar Export & Today's Schedule Widget
- * 1. Resolves the true active semester via StudentDA's first option (avoiding upcoming next-semester shells).
- * 2. Parses VTOP's #timeTableStyle grid + Course Summary table (handling rowspan/colspan & Dark Mode).
- * 3. Renders a compact "Today's Schedule" card at the top of the Home right column.
- * 4. Generates RFC 5545 .ics calendar files & Google Calendar recurring event links.
+ * VTOP++ - Timetable Parser & RFC 5545 .ics Calendar Exporter
+ * Parses VTOP's #timeTableStyle grid + Course Summary table and builds
+ * RFC 5545 .ics calendar files & Google Calendar export modal.
  */
 
 (function () {
@@ -11,20 +9,17 @@
 
   window.VTOP_PLUS = window.VTOP_PLUS || {};
 
-  const WIDGET_ID = 'vtop-home-today-schedule';
-  const PAGE_BAR_ID = 'vtop-tt-page-toolbar';
   const MODAL_ID = 'vtop-tt-export-modal';
-  const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours (timetable rarely changes)
+  const REMINDER_PREF_KEY = 'vtop_tt_reminder_mins';
 
   const DAY_ORDER = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   const DAY_SHORT = { MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu', FRI: 'Fri', SAT: 'Sat', SUN: 'Sun' };
   const DAY_BYDAY = { MON: 'MO', TUE: 'TU', WED: 'WE', THU: 'TH', FRI: 'FR', SAT: 'SA', SUN: 'SU' };
   const JS_DAY_TO_KEY = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-
   const REGEX_COURSE_CODE = /\b([A-Z]{2,5}\d{3,4}[A-Z]?)\b/;
 
-  const escapeHtml = (str) => window.VTOP_PLUS.DOM.escapeHtml(str);
   const cleanText = (el) => window.VTOP_PLUS.DOM.cleanText(el);
+  const toIsoDate = (d) => window.VTOP_PLUS.DOM.toIsoDate(d);
 
   function parseTimeToMinutes(raw, afterLunch = false) {
     if (!raw) return null;
@@ -45,28 +40,6 @@
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-  }
-
-  function getIstNowParts() {
-    const now = new Date();
-    try {
-      const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Kolkata',
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }).formatToParts(now);
-      const map = Object.fromEntries(parts.map((p) => [p.type, p.value]));
-      const wk = String(map.weekday || '').toUpperCase().slice(0, 3);
-      const dayKey = DAY_ORDER.includes(wk) ? wk : JS_DAY_TO_KEY[now.getDay()];
-      const hh = parseInt(map.hour, 10) % 24;
-      const mm = parseInt(map.minute, 10);
-      if (!isNaN(hh) && !isNaN(mm)) {
-        return { now, dayKey, mins: hh * 60 + mm };
-      }
-    } catch (_) {}
-    return { now, dayKey: JS_DAY_TO_KEY[now.getDay()], mins: now.getHours() * 60 + now.getMinutes() };
   }
 
   /**
@@ -384,7 +357,7 @@
   }
 
   // ===========================================================================
-  // RFC 5545 .ics GENERATOR & GOOGLE CALENDAR LINKS
+  // RFC 5545 .ics GENERATOR
   // ===========================================================================
 
   function escapeIcsText(str) {
@@ -552,48 +525,25 @@
     return lines.map(foldIcsLine).join('\r\n') + '\r\n';
   }
 
-  function toIsoDate(d) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
-
-  function downloadIcsFile(content, filename) {
-    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    (document.body || document.documentElement).appendChild(a);
-    a.click();
-    setTimeout(() => {
-      a.remove();
-      URL.revokeObjectURL(url);
-    }, 10000);
-  }
-
-  // ===========================================================================
-  // MODULE CONTROLLER
-  // ===========================================================================
-
-  const REMINDER_PREF_KEY = 'vtop_tt_reminder_mins';
-
-  const TimetableCalendar = {
+  const TimetableIcs = {
+    MODAL_ID,
+    DAY_ORDER,
+    DAY_SHORT,
+    parseTimeToMinutes,
+    formatMinutes24,
     parseTimeTableFromRoot,
+    countIcsEvents,
     generateIcsContent,
-    _isFetching: false,
-    _selectedDay: null,
-    _liveTickTimer: null,
-    _cachedData: null,
     _reminderMinutes: 10,
     _reminderPrefLoaded: false,
 
     async loadReminderPreference() {
       if (this._reminderPrefLoaded) return this._reminderMinutes;
       this._reminderPrefLoaded = true;
-      const VtopApi = window.VTOP_PLUS?.VtopApi;
-      if (!VtopApi?.storageGet) return this._reminderMinutes;
+      const Storage = window.VTOP_PLUS?.Storage;
+      if (!Storage) return this._reminderMinutes;
       try {
-        const stored = await VtopApi.storageGet([REMINDER_PREF_KEY]);
+        const stored = await Storage.get([REMINDER_PREF_KEY]);
         if (stored && stored[REMINDER_PREF_KEY] !== undefined) {
           this._reminderMinutes = normalizeReminderMinutes(stored[REMINDER_PREF_KEY], 10);
         }
@@ -605,539 +555,14 @@
       const normalized = normalizeReminderMinutes(mins, 10);
       this._reminderMinutes = normalized;
       this._reminderPrefLoaded = true;
-      const VtopApi = window.VTOP_PLUS?.VtopApi;
-      if (VtopApi?.storageSet) {
-        await VtopApi.storageSet({ [REMINDER_PREF_KEY]: normalized }).catch(() => {});
+      const Storage = window.VTOP_PLUS?.Storage;
+      if (Storage) {
+        await Storage.set({ [REMINDER_PREF_KEY]: normalized }).catch(() => {});
       }
       return normalized;
     },
 
-    init() {
-      const VtopApi = window.VTOP_PLUS?.VtopApi;
-      if (!VtopApi?.isAuthenticated()) {
-        this.destroy();
-        return;
-      }
-      this.loadReminderPreference();
-
-      // 1. Timetable Page: auto-select true active semester & inject export toolbar
-      if (document.getElementById('studentTimeTable')) {
-        this.handleTimetablePage();
-      }
-
-      // 1b. Attendance Page: passively capture registered semesters list & reset dropdown after table loads
-      if (document.getElementById('viewStudentAttendance')) {
-        this.handleAttendancePage(VtopApi);
-      }
-
-      // 2. Home Dashboard: mount Today's Schedule widget at top of right column (col-md-4)
-      const rightCol = this.findHomeRightColumn();
-      if (rightCol) {
-        this.mountHomeWidget(rightCol);
-      } else {
-        this.destroyHomeWidget();
-      }
-    },
-
-    destroy() {
-      this.destroyHomeWidget();
-      document.getElementById(PAGE_BAR_ID)?.remove();
-      document.getElementById(MODAL_ID)?.remove();
-    },
-
-    destroyHomeWidget() {
-      if (this._liveTickTimer) {
-        clearInterval(this._liveTickTimer);
-        this._liveTickTimer = null;
-      }
-      document.getElementById(WIDGET_ID)?.remove();
-    },
-
-    findHomeRightColumn() {
-      const anchor =
-        document.getElementById('proctor-message')?.closest('.card') ||
-        document.getElementById('edu-status')?.closest('.card');
-      if (!anchor) return null;
-      return anchor.closest('.col-md-4') || anchor.parentElement;
-    },
-
-    getCacheKey() {
-      const authId = window.VTOP_PLUS?.DOM?.getAuthId ? window.VTOP_PLUS.DOM.getAuthId() : 'anon';
-      return `vtop_timetable_cache_v1_${authId}`;
-    },
-
-    async readCache() {
-      const VtopApi = window.VTOP_PLUS?.VtopApi;
-      if (!VtopApi) return null;
-      const key = this.getCacheKey();
-      const stored = await VtopApi.storageGet([key]);
-      const data = stored?.[key];
-      if (!data || !data.timetable) return null;
-
-      // Invalidate if Home badge clearly indicates a different semester
-      const badge = VtopApi.getHomeSemesterBadgeText();
-      if (badge && data.badgeText && badge !== data.badgeText) return null;
-
-      return data;
-    },
-
-    async writeCache(payload) {
-      const VtopApi = window.VTOP_PLUS?.VtopApi;
-      if (!VtopApi || !payload) return;
-      this._cachedData = payload;
-      await VtopApi.storageSet({ [this.getCacheKey()]: payload });
-    },
-
-    handleAttendancePage(VtopApi) {
-      const semSelect = document.querySelector('#viewStudentAttendance #semesterSubId');
-      if (!semSelect) return;
-
-      const attOpts = VtopApi.extractSelectOptions(document, 'semesterSubId');
-      if (attOpts.length > 0) {
-        VtopApi.saveRegisteredSemesters(attOpts);
-      }
-
-      if (!semSelect.dataset.vtopAttChangeBound) {
-        semSelect.dataset.vtopAttChangeBound = '1';
-        semSelect.addEventListener('change', () => {
-          const tbl = document.querySelector('#viewStudentAttendance ~ #loadMyFragment table, #loadMyFragment table');
-          if (tbl) delete tbl.dataset.vtopAttResetDone;
-        });
-      }
-
-      if (document.querySelector('.blockUI, .blockOverlay')) return;
-      const attTable = document.querySelector('#AttendanceDetailDataTable, #loadMyFragment table');
-      if (attTable && !attTable.dataset.vtopAttResetDone && semSelect.value !== '') {
-        attTable.dataset.vtopAttResetDone = '1';
-        window.VTOP_PLUS?.DOM?.resetSelectToDefault?.(semSelect);
-      }
-    },
-
-    async handleTimetablePage() {
-      const semSelect = document.getElementById('semesterSubId');
-      const VtopApi = window.VTOP_PLUS?.VtopApi;
-      if (!semSelect || !VtopApi) return;
-
-      const options = Array.from(semSelect.options)
-        .map((o) => ({ value: o.value.trim(), label: cleanText(o) }))
-        .filter((o) => o.value);
-      if (options.length > 0) {
-        VtopApi.saveRegisteredSemesters(options);
-      }
-
-      if (!semSelect.dataset.vtopTtChangeBound) {
-        semSelect.dataset.vtopTtChangeBound = '1';
-        semSelect.addEventListener('change', () => {
-          const existingGrid = document.getElementById('timeTableStyle');
-          if (existingGrid) delete existingGrid.dataset.vtopTtCollected;
-        });
-      }
-
-      // Auto-select active semester (resolved from StudentDA first option) once if empty
-      if (semSelect.value === '' && !semSelect.dataset.vtopTtAutoSem) {
-        semSelect.dataset.vtopTtAutoSem = '1';
-
-        const active = await VtopApi.resolveActiveSemesterId();
-        let targetOpt = active?.semesterSubId
-          ? options.find((o) => o.value === active.semesterSubId)
-          : null;
-
-        if (!targetOpt) {
-          const badge = VtopApi.getHomeSemesterBadgeText();
-          targetOpt = VtopApi.matchOptionByBadge(options, badge) || options[0];
-        }
-
-        if (targetOpt) {
-          const DOM = window.VTOP_PLUS?.DOM;
-          if (DOM?.waitForBlockUIClear) {
-            await DOM.waitForBlockUIClear();
-          }
-          if (!semSelect.isConnected || semSelect.value !== '') return;
-          semSelect.value = targetOpt.value;
-          semSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          return;
-        }
-      }
-
-      // If #timeTableStyle is currently rendered, parse, cache, inject toolbar, then reset dropdown
-      if (document.querySelector('.blockUI, .blockOverlay')) return;
-      const grid = document.getElementById('timeTableStyle');
-      const fragment = document.getElementById('loadMyFragment');
-      if (!grid || !fragment) return;
-
-      const semId = (semSelect.value || semSelect.dataset.vtopLastSem || '').trim();
-      const matchedOpt = options.find((o) => o.value === semId);
-      const semLabel = matchedOpt?.label || semSelect.dataset.vtopLastSemLabel || '';
-
-      if (!grid.dataset.vtopTtCollected) {
-        const parsed = parseTimeTableFromRoot(document);
-        if (!parsed) return;
-        grid.dataset.vtopTtCollected = semId || '1';
-
-        // Passively cache if it matches active semester (or if cache is empty)
-        const active = await VtopApi.resolveActiveSemesterId().catch(() => null);
-        if (!active || active.semesterSubId === semId) {
-          await this.writeCache({
-            semesterSubId: semId,
-            semesterLabel: semLabel,
-            badgeText: VtopApi.getHomeSemesterBadgeText(),
-            updatedAt: Date.now(),
-            timetable: parsed
-          });
-        }
-
-        this.mountTimetablePageToolbar(fragment, parsed, semId, semLabel);
-      }
-
-      if (semSelect.value !== '') {
-        window.VTOP_PLUS?.DOM?.resetSelectToDefault?.(semSelect);
-      }
-    },
-
-    mountTimetablePageToolbar(fragment, parsed, semId, semLabel) {
-      let bar = document.getElementById(PAGE_BAR_ID);
-      if (bar && bar.dataset.semId === semId && fragment.contains(bar)) return;
-      if (bar) bar.remove();
-
-      bar = document.createElement('div');
-      bar.id = PAGE_BAR_ID;
-      bar.dataset.semId = semId;
-      bar.className = 'vtop-plus-card vtop-tt-page-bar';
-      bar.innerHTML = `
-        <div class="vtop-tt-page-bar-info">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span><strong>${escapeHtml(semLabel || semId)}</strong> &middot; ${parsed.totalClasses} classes</span>
-        </div>
-        <div class="vtop-tt-page-bar-actions">
-          <button type="button" class="vtop-tt-btn vtop-tt-btn-primary" data-tt-action="export-modal">
-            Export .ics
-          </button>
-        </div>
-      `;
-
-      const exportBtn = bar.querySelector('[data-tt-action="export-modal"]');
-      exportBtn?.addEventListener('click', () => {
-        if (!parsed.totalClasses) {
-          exportBtn.textContent = 'No classes found';
-          setTimeout(() => { exportBtn.textContent = 'Export .ics'; }, 2000);
-          return;
-        }
-        this.openExportModal(parsed, semId, semLabel);
-      });
-
-      fragment.insertAdjacentElement('afterbegin', bar);
-    },
-
-    mountHomeWidget(rightCol) {
-      let card = document.getElementById(WIDGET_ID);
-      const firstAnchor = rightCol.firstElementChild;
-
-      if (card) {
-        if (firstAnchor && firstAnchor !== card) {
-          rightCol.insertAdjacentElement('afterbegin', card);
-        }
-        return;
-      }
-
-      card = document.createElement('div');
-      card.id = WIDGET_ID;
-      card.className = 'card border-0 mb-3 vtop-tt-widget';
-      card.innerHTML = `
-        <div class="card-header d-flex primaryBorderTop vtop-tt-header">
-          <div class="vtop-tt-title-wrap">
-            <span class="fs-6 fontcolor3 fw-bold vtop-tt-title">Today's Schedule</span>
-          </div>
-          <div class="vtop-tt-header-actions">
-            <button type="button" class="vtop-msg-icon-btn" id="vtop-tt-export-btn" title="Export .ics / Google Calendar" aria-label="Export Timetable">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-            </button>
-            <button type="button" class="vtop-msg-icon-btn" id="vtop-tt-refresh-btn" title="Refresh Timetable" aria-label="Refresh Timetable">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-              </svg>
-            </button>
-            <button type="button" class="vtop-msg-icon-btn" id="vtop-tt-open-btn" title="Open Full Timetable" aria-label="Open Full Timetable">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="vtop-tt-days-bar" id="vtop-tt-days-bar"></div>
-        <div class="card-body vtop-tt-body" id="vtop-tt-body">
-          <div class="vtop-tt-state">Loading schedule...</div>
-        </div>
-      `;
-
-      rightCol.insertAdjacentElement('afterbegin', card);
-
-      card.querySelector('#vtop-tt-refresh-btn')?.addEventListener('click', () => {
-        this.loadHomeSchedule(true);
-      });
-      card.querySelector('#vtop-tt-open-btn')?.addEventListener('click', () => {
-        this.openFullTimetablePage();
-      });
-      card.querySelector('#vtop-tt-export-btn')?.addEventListener('click', () => {
-        if (this._cachedData?.timetable) {
-          this.openExportModal(
-            this._cachedData.timetable,
-            this._cachedData.semesterSubId,
-            this._cachedData.semesterLabel
-          );
-        } else {
-          this.openFullTimetablePage();
-        }
-      });
-
-      this.loadHomeSchedule(false);
-
-      if (this._liveTickTimer) clearInterval(this._liveTickTimer);
-      this._liveTickTimer = setInterval(() => {
-        if (document.getElementById(WIDGET_ID) && this._cachedData) {
-          this.renderWidgetBody(this._cachedData);
-        }
-      }, 60000);
-    },
-
-    openFullTimetablePage() {
-      const crawler = window.VTOP_PLUS?.Crawler;
-      if (
-        crawler?.navigate({
-          dataUrl: 'academics/common/StudentTimeTable',
-          fallbackDataUrls: ['academics/common/TimeTable', 'academics/common/StudentTimetable'],
-          title: 'Class Time Table'
-        })
-      ) {
-        return;
-      }
-      const link = document.querySelector('a[data-url*="StudentTimeTable" i]');
-      if (link) link.click();
-    },
-
-    async loadHomeSchedule(forceRefresh = false) {
-      if (this._isFetching) return;
-      const widget = document.getElementById(WIDGET_ID);
-      if (!widget) return;
-
-      if (!forceRefresh) {
-        const badge = window.VTOP_PLUS?.VtopApi?.getHomeSemesterBadgeText?.() || '';
-        const mem = this._cachedData;
-        if (
-          mem &&
-          mem.timetable &&
-          (!badge || !mem.badgeText || mem.badgeText === badge) &&
-          Date.now() - (mem.updatedAt || 0) < CACHE_TTL_MS
-        ) {
-          this.renderWidgetBody(mem);
-          return;
-        }
-        const cached = await this.readCache();
-        if (cached) {
-          this._cachedData = cached;
-          this.renderWidgetBody(cached);
-          if (Date.now() - (cached.updatedAt || 0) < CACHE_TTL_MS) {
-            return;
-          }
-        }
-      }
-
-      this._isFetching = true;
-      const refreshBtn = document.getElementById('vtop-tt-refresh-btn');
-      if (refreshBtn) refreshBtn.classList.add('vtop-msg-spinning');
-
-      try {
-        const VtopApi = window.VTOP_PLUS?.VtopApi;
-        if (!VtopApi) return;
-
-        // Step 1: Resolve authoritative current semester (from StudentDA first option)
-        const active = await VtopApi.resolveActiveSemesterId({ forceRefresh });
-
-        // Step 2: Fetch StudentTimeTable shell to extract dropdown + form CSRF
-        const pageRes = await VtopApi.postHtml('academics/common/StudentTimeTable', {
-          verifyMenu: 'true',
-          nocache: `@(${new Date().toUTCString()})`
-        });
-        if (!pageRes.ok || !pageRes.html) {
-          if (!this._cachedData) this.renderError('Could not load timetable.');
-          return;
-        }
-
-        const pageDoc = new DOMParser().parseFromString(pageRes.html, 'text/html');
-        const options = VtopApi.extractSelectOptions(pageDoc, 'semesterSubId');
-        if (options.length > 0) {
-          await VtopApi.saveRegisteredSemesters(options);
-        }
-        const formCsrf = pageDoc.querySelector('#studentTimeTable input[name="_csrf"]')?.value;
-        const formAuthId = pageDoc.querySelector('#studentTimeTable #authorizedID')?.value;
-
-        let targetOpt = active?.semesterSubId
-          ? options.find((o) => o.value === active.semesterSubId)
-          : null;
-        if (!targetOpt) {
-          targetOpt = VtopApi.matchOptionByBadge(options, VtopApi.getHomeSemesterBadgeText()) || options[0];
-        }
-        if (!targetOpt) {
-          this.renderError('No registered semester found.');
-          return;
-        }
-
-        // Step 3: Replay processViewTimeTable (relative to <base href="/vtop/">)
-        const ttRes = await VtopApi.postHtml('processViewTimeTable', {
-          _csrf: formCsrf,
-          authorizedID: formAuthId,
-          semesterSubId: targetOpt.value,
-          x: new Date().toUTCString()
-        });
-        if (!ttRes.ok || !ttRes.html) {
-          if (!this._cachedData) this.renderError('Timetable unavailable.');
-          return;
-        }
-
-        const ttDoc = new DOMParser().parseFromString(ttRes.html, 'text/html');
-        const parsed = parseTimeTableFromRoot(ttDoc);
-        if (!parsed) {
-          if (!this._cachedData) this.renderError('No classes scheduled.');
-          return;
-        }
-
-        const payload = {
-          semesterSubId: targetOpt.value,
-          semesterLabel: targetOpt.label,
-          badgeText: VtopApi.getHomeSemesterBadgeText(),
-          updatedAt: Date.now(),
-          timetable: parsed
-        };
-        await this.writeCache(payload);
-        this.renderWidgetBody(payload);
-      } catch (err) {
-        console.warn('[VTOP++] Timetable fetch error:', err);
-        if (!this._cachedData) this.renderError('Failed to fetch schedule.');
-      } finally {
-        this._isFetching = false;
-        document.getElementById('vtop-tt-refresh-btn')?.classList.remove('vtop-msg-spinning');
-      }
-    },
-
-    renderError(msg) {
-      const body = document.getElementById('vtop-tt-body');
-      if (body) {
-        body.innerHTML = `<div class="vtop-tt-state">${escapeHtml(msg)}</div>`;
-      }
-    },
-
-    renderWidgetBody(payload) {
-      const widget = document.getElementById(WIDGET_ID);
-      if (!widget) return;
-
-      const { dayKey: todayKey, mins: nowMins } = getIstNowParts();
-      if (!this._selectedDay) {
-        const hasToday = (payload.timetable.mergedSlotsByDay[todayKey] || []).length > 0;
-        this._selectedDay = hasToday ? todayKey : 'MON';
-      }
-
-      const activeDay = this._selectedDay;
-      const classes = payload.timetable.mergedSlotsByDay[activeDay] || [];
-
-      // Render weekday tabs (MON-SAT, plus SUN only if classes exist)
-      const daysBar = document.getElementById('vtop-tt-days-bar');
-      if (daysBar) {
-        const visibleDays = DAY_ORDER.filter(
-          (d) => d !== 'SUN' || (payload.timetable.mergedSlotsByDay.SUN || []).length > 0
-        );
-        daysBar.innerHTML = visibleDays
-          .map((d) => {
-            const isToday = d === todayKey;
-            const isActive = d === activeDay;
-            return `
-              <button type="button" class="vtop-tt-day-tab ${isActive ? 'is-active' : ''} ${isToday ? 'is-today' : ''}" data-tt-day="${d}">
-                <span>${DAY_SHORT[d]}</span>
-              </button>
-            `;
-          })
-          .join('');
-
-        daysBar.querySelectorAll('.vtop-tt-day-tab').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            this._selectedDay = btn.dataset.ttDay;
-            this.renderWidgetBody(payload);
-          });
-        });
-      }
-
-      const body = document.getElementById('vtop-tt-body');
-      if (!body) return;
-
-      if (classes.length === 0) {
-        body.innerHTML = `
-          <div class="vtop-dashboard-empty vtop-tt-empty">
-            <div class="vtop-dashboard-empty-title">No classes on ${DAY_SHORT[activeDay]}</div>
-          </div>
-        `;
-        return;
-      }
-
-      let nextMarked = false;
-      const listHtml = classes
-        .map((item, idx) => {
-          let stateCls = '';
-          let statusPill = '';
-
-          if (activeDay === todayKey) {
-            if (nowMins >= item.startMin && nowMins < item.endMin) {
-              const rem = item.endMin - nowMins;
-              stateCls = 'is-live';
-              statusPill = `<span class="vtop-tt-status vtop-tt-status-live">Now &middot; ${rem}m left</span>`;
-            } else if (nowMins >= item.endMin) {
-              stateCls = 'is-done';
-              statusPill = `<span class="vtop-tt-status vtop-tt-status-done">Done</span>`;
-            } else if (!nextMarked) {
-              nextMarked = true;
-              const wait = item.startMin - nowMins;
-              const waitLabel = wait >= 60 ? `In ${Math.floor(wait / 60)}h ${wait % 60}m` : `In ${wait}m`;
-              stateCls = 'is-next';
-              statusPill = `<span class="vtop-tt-status vtop-tt-status-next">${waitLabel}</span>`;
-            }
-          }
-
-          return `
-            <div class="vtop-tt-item ${stateCls}" data-tt-idx="${idx}">
-              <div class="vtop-tt-info">
-                <div class="vtop-tt-course-row">
-                  <span class="vtop-tt-code">${escapeHtml(item.title || item.code)}</span>
-                  <span class="vtop-tt-type">${escapeHtml(item.type)}</span>
-                </div>
-                <div class="vtop-tt-meta">
-                  ${item.venue ? `<span class="vtop-tt-venue">${escapeHtml(item.venue)}</span>` : ''}
-                  ${item.slot ? `<span class="vtop-tt-slot">${escapeHtml(item.slot)}</span>` : ''}
-                </div>
-              </div>
-              <div class="vtop-tt-right">
-                <span class="vtop-tt-time-range">${formatMinutes24(item.startMin)} - ${formatMinutes24(item.endMin)}</span>
-                ${statusPill}
-              </div>
-            </div>
-          `;
-        })
-        .join('');
-
-      body.innerHTML = `<div class="vtop-tt-list">${listHtml}</div>`;
-    },
-
-    async openExportModal(timetable, semId, semLabel) {
+    async openExportModal(timetable, semId) {
       document.getElementById(MODAL_ID)?.remove();
 
       const today = new Date();
@@ -1216,7 +641,7 @@
           authId: window.VTOP_PLUS?.DOM?.getAuthId?.() || 'VTOP'
         });
 
-        downloadIcsFile(ics, `VTOP_${sanitizeUidPart(semId || 'Timetable')}.ics`);
+        window.VTOP_PLUS?.DOM?.triggerBlobDownload(ics, `VTOP_${sanitizeUidPart(semId || 'Timetable')}.ics`, 'text/calendar;charset=utf-8');
         if (openGcal) {
           window.open('https://calendar.google.com/calendar/u/0/r/settings/export', '_blank', 'noopener');
         }
@@ -1228,5 +653,5 @@
     }
   };
 
-  window.VTOP_PLUS.TimetableCalendar = TimetableCalendar;
+  window.VTOP_PLUS.TimetableIcs = TimetableIcs;
 })();

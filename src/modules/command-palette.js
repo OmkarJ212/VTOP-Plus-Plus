@@ -86,10 +86,7 @@
       this.modal.innerHTML = `
         <div class="vtop-palette-dialog">
           <div class="vtop-palette-header">
-            <svg class="vtop-palette-search-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--vtop-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            ${window.VTOP_PLUS?.UI?.icon('search', 18, { className: 'vtop-palette-search-svg', stroke: 'var(--vtop-text-muted)' }) || ''}
             <input type="text" id="vtop-palette-input" class="vtop-palette-input"
               placeholder="Search VTOP pages"
               autocomplete="off" spellcheck="false" />
@@ -330,7 +327,7 @@
         pool.row.className = `vtop-palette-item ${i === this.selectedIndex ? 'selected' : ''}`;
         
         this.updateHighlight(pool.titleEl, item.title, queryLower);
-        pool.subEl.textContent = item.subtitle || item.category || item.dataUrl || '';
+        pool.subEl.textContent = item.subtitle || item.category || '';
 
         pool.row.style.display = 'flex';
       }

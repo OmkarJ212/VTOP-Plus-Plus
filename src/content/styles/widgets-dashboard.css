@@ -1,0 +1,591 @@
+/* VTOP++ - Dashboard Widgets (Today's Schedule, Timetable .ics Modal & Marks Notifier) */
+
+/* ==========================================================================
+   Today's Schedule Home Widget & Timetable .ics Export
+   ========================================================================== */
+.vtop-tt-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.vtop-tt-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vtop-tt-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vtop-tt-days-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 41px;
+  padding: 8px 10px;
+  background-color: #f1f5f9;
+  border-bottom: 1px solid var(--vtop-border-strong);
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.vtop-tt-day-tab {
+  appearance: none;
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #d5dde7;
+  background-color: var(--vtop-bg-surface);
+  color: var(--vtop-text-heading);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+
+.vtop-tt-day-tab:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+  color: var(--vtop-text-primary);
+}
+
+.vtop-tt-day-tab.is-today:not(.is-active) {
+  border-color: var(--vtop-brand-blue);
+  background-color: #eff6ff;
+  color: var(--vtop-brand);
+}
+
+.vtop-tt-day-tab.is-active {
+  background-color: var(--vtop-brand-blue);
+  border-color: #155d96;
+  color: var(--vtop-text-inverse);
+}
+
+.vtop-tt-exam-range-pill {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--vtop-text-muted);
+  white-space: nowrap;
+  padding: 0 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.vtop-tt-body {
+  padding: 0 !important;
+  height: 320px;
+  min-height: 320px;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: var(--vtop-bg-surface);
+}
+
+.vtop-tt-state {
+  padding: 18px 14px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--vtop-text-secondary);
+}
+
+.vtop-tt-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.vtop-tt-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: var(--vtop-bg-surface);
+  border-bottom: 1px solid #cbd5e1;
+  transition: background-color 0.14s ease;
+}
+
+.vtop-tt-item:last-child {
+  border-bottom: none;
+}
+
+.vtop-tt-item:hover {
+  background-color: #f1f5f9;
+}
+
+.vtop-tt-item.is-live {
+  background-color: #eff6ff;
+  border-left: 3px solid var(--vtop-brand-blue);
+  padding-left: 11px;
+}
+
+.vtop-tt-item.is-next {
+  background-color: #f0fdf4;
+  border-left: 3px solid var(--vtop-success);
+  padding-left: 11px;
+}
+
+.vtop-tt-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.vtop-tt-time-range {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vtop-text-heading);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.vtop-tt-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vtop-tt-course-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.vtop-tt-code {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--vtop-text-primary);
+}
+
+.vtop-tt-type {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background-color: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  color: var(--vtop-text-primary);
+}
+
+.vtop-tt-status {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.vtop-tt-status-live {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.vtop-tt-status-next {
+  background-color: #dcfce7;
+  color: #14532d;
+  border: 1px solid #86efac;
+}
+
+.vtop-tt-status-done {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border: 1px solid #94a3b8;
+}
+
+.vtop-tt-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  font-size: 0.72rem;
+  color: var(--vtop-text-secondary);
+}
+
+.vtop-tt-venue {
+  font-weight: 700;
+  color: var(--vtop-brand);
+}
+
+.vtop-tt-slot {
+  opacity: 1;
+  font-weight: 600;
+  color: var(--vtop-text-secondary);
+}
+
+/* Timetable Page Export Bar & Export Modal */
+.vtop-tt-page-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface-alt);
+}
+
+.vtop-tt-page-bar-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--vtop-text-secondary);
+}
+
+.vtop-tt-page-bar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vtop-tt-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--vtop-border-strong);
+  background-color: var(--vtop-bg-surface);
+  color: var(--vtop-text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.vtop-tt-btn:hover:not(:disabled) {
+  background-color: var(--vtop-bg-row-hover);
+  border-color: var(--vtop-text-dim);
+}
+
+.vtop-tt-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vtop-tt-btn-primary {
+  background-color: #3c8dbc;
+  border-color: #357ca5;
+  color: var(--vtop-text-inverse);
+}
+
+.vtop-tt-btn-primary:hover:not(:disabled) {
+  background-color: #367fa9;
+  border-color: #2e6da4;
+}
+
+.vtop-tt-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: var(--vtop-overlay-backdrop);
+  backdrop-filter: blur(2px);
+}
+
+.vtop-tt-modal {
+  width: 100%;
+  max-width: 440px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface);
+  color: var(--vtop-text-primary);
+  overflow: hidden;
+}
+
+.vtop-tt-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface-alt);
+}
+
+.vtop-tt-modal-head h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--vtop-text-heading);
+}
+
+.vtop-tt-modal-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vtop-tt-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.vtop-tt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--vtop-text-secondary);
+}
+
+.vtop-tt-field input {
+  padding: 6px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--vtop-border-strong);
+  background-color: var(--vtop-bg-input);
+  color: var(--vtop-text-primary);
+  font-size: 0.8rem;
+}
+
+.vtop-tt-notify-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--vtop-text-secondary);
+}
+
+.vtop-tt-notify-row label {
+  margin: 0;
+  color: var(--vtop-text-secondary);
+}
+
+.vtop-tt-notify-row input {
+  width: 68px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--vtop-border-strong);
+  background-color: var(--vtop-bg-input);
+  color: var(--vtop-text-primary);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.vtop-tt-notify-suffix {
+  margin-left: 2px;
+  font-weight: 500;
+  color: var(--vtop-text-muted);
+}
+
+.vtop-tt-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface-alt);
+}
+
+/* ==========================================================================
+   Marks Changed / Uploaded Notifier
+   ========================================================================== */
+.vtop-marks-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--vtop-success-bright);
+  flex-shrink: 0;
+}
+
+.vtop-marks-status-dot.is-checking {
+  background-color: var(--vtop-accent);
+}
+
+.vtop-marks-status-dot.is-idle {
+  background-color: var(--vtop-text-dim);
+}
+
+.vtop-marks-home-body {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.vtop-marks-home-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--vtop-border);
+  background-color: var(--vtop-bg-surface-alt);
+  font-size: 0.74rem;
+  color: var(--vtop-text-muted);
+}
+
+.vtop-marks-home-footer-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vtop-marks-home-item {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  border: none;
+  border-bottom: 1px solid var(--vtop-border-subtle);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.14s ease;
+}
+
+.vtop-marks-home-item:last-child {
+  border-bottom: none;
+}
+
+.vtop-marks-home-item:hover {
+  background-color: var(--vtop-bg-hover);
+}
+
+.vtop-marks-home-item-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vtop-marks-home-code {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--vtop-text-heading);
+}
+
+.vtop-marks-home-score {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--vtop-accent-hover);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.vtop-marks-home-sub {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--vtop-text-muted);
+}
+
+.vtop-marks-diff-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  margin-left: 6px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background-color: var(--vtop-success-bg);
+  color: var(--vtop-success-text);
+  border: 1px solid var(--vtop-success-border-soft);
+  flex-shrink: 0;
+}
+
+tr.vtop-marks-row-changed > td {
+  background-color: var(--vtop-success-bg-soft) !important;
+}
+
+.vtop-marks-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 74px;
+  z-index: 999990;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 380px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--vtop-accent-border);
+  border-left: 3px solid var(--vtop-accent);
+  background-color: var(--vtop-bg-surface);
+  color: var(--vtop-text-primary);
+}
+
+.vtop-marks-toast-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vtop-marks-toast-copy strong {
+  font-size: 0.82rem;
+  color: var(--vtop-text-heading);
+}
+
+.vtop-marks-toast-copy span {
+  font-size: 0.74rem;
+  color: var(--vtop-text-muted);
+}
+
+.vtop-marks-toast-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vtop-dock-unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  margin-left: 5px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  background-color: var(--vtop-danger-bright);
+  color: #ffffff;
+}
+
+.vtop-tt-modal-err {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--vtop-danger-text);
+  background: var(--vtop-danger-bg-soft);
+  border: 1px solid var(--vtop-danger-border);
+  border-radius: 6px;
+  padding: 7px 10px;
+}
+
+@keyframes vtopSlide {
+  0% { background-position: -40% 0; }
+  100% { background-position: 140% 0; }
+}

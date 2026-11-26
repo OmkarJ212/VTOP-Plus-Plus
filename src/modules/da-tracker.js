@@ -18,67 +18,7 @@
   window.VTOP_PLUS = window.VTOP_PLUS || {};
 
   function parseIndianDate(str) {
-    if (!str) return null;
-    str = str.trim();
-
-    // Extract optional time component (e.g. 11:59:00 PM, 23:59, 11:59 PM)
-    let hours = 23;
-    let minutes = 59;
-    let seconds = 59;
-    const timeMatch = str.match(/\b(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?\b/);
-    if (timeMatch) {
-      let h = parseInt(timeMatch[1], 10);
-      const m = parseInt(timeMatch[2], 10);
-      const s = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
-      const meridiem = timeMatch[4] ? timeMatch[4].toUpperCase() : null;
-
-      if (meridiem === 'PM' && h < 12) h += 12;
-      if (meridiem === 'AM' && h === 12) h = 0;
-      hours = h;
-      minutes = m;
-      seconds = s;
-    }
-
-    // 1. YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY, or DD.MM.YYYY
-    const numMatch = str.match(/\b(\d{1,4})[-\/.](\d{1,2})[-\/.](\d{1,4})\b/);
-    if (numMatch) {
-      let d, m, y;
-      if (numMatch[1].length === 4) {
-        y = parseInt(numMatch[1], 10);
-        m = parseInt(numMatch[2], 10) - 1;
-        d = parseInt(numMatch[3], 10);
-      } else {
-        d = parseInt(numMatch[1], 10);
-        m = parseInt(numMatch[2], 10) - 1;
-        y = parseInt(numMatch[3], 10);
-        if (y < 100) y += 2000;
-      }
-      const dt = new Date(y, m, d, hours, minutes, seconds);
-      if (isNaN(dt.getTime()) || dt.getFullYear() !== y || dt.getMonth() !== m || dt.getDate() !== d) {
-        return null;
-      }
-      return dt;
-    }
-
-    // 2. DD-MMM-YYYY or DD MMM YYYY (e.g. 25-Nov-2026, 22 Oct 2026, 05-Jan-2025)
-    const alphaMatch = str.match(/\b(\d{1,2})[-\/\s]([A-Za-z]{3,})[-\/\s](\d{2,4})\b/);
-    if (alphaMatch) {
-      const months = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
-      const d = parseInt(alphaMatch[1], 10);
-      const mKey = alphaMatch[2].substring(0, 3).toLowerCase();
-      const m = months[mKey];
-      let y = parseInt(alphaMatch[3], 10);
-      if (y < 100) y += 2000;
-      if (m !== undefined) {
-        const dt = new Date(y, m, d, hours, minutes, seconds);
-        if (isNaN(dt.getTime()) || dt.getFullYear() !== y || dt.getMonth() !== m || dt.getDate() !== d) {
-          return null;
-        }
-        return dt;
-      }
-    }
-
-    return null;
+    return window.VTOP_PLUS?.DOM?.parseIndianDate?.(str) || null;
   }
 
   function getRemainingTime(targetDate) {
@@ -163,8 +103,6 @@
     isScanning: false,
     _scanToken: 0,
     _rescanPending: false,
-    _pendingTarget: null,
-    _homeCoursesPromise: null,
 
     init() {
       this.checkAndTrack();
@@ -173,7 +111,7 @@
     destroy() {
       this._scanToken++;
       this._rescanPending = false;
-      this._pendingTarget = null;
+      window.VTOP_PLUS?.DaHomeCard?.clearPendingTarget?.();
       document.querySelectorAll('.vtop-th-da-status, .vtop-td-da-status, .vtop-da-home-col, .vtop-da-home-cell').forEach((el) => el.remove());
       document.querySelectorAll('.vtop-da-cell-augmented').forEach((el) => {
         el.classList.remove('vtop-da-cell-augmented');
@@ -186,14 +124,7 @@
     },
 
     clearCache() {
-      try {
-        for (let i = sessionStorage.length - 1; i >= 0; i--) {
-          const key = sessionStorage.key(i);
-          if (key && key.startsWith('vtop_da_status_')) {
-            sessionStorage.removeItem(key);
-          }
-        }
-      } catch (_) {}
+      window.VTOP_PLUS?.Storage?.removeWebCacheByPrefix?.('vtop_da_status_', 'session');
     },
 
     checkAndTrack() {
@@ -203,7 +134,7 @@
       // 0. Home page Forthcoming Digital Assignments card (#digital-assignments)
       const homeDaContainer = document.getElementById('digital-assignments');
       if (homeDaContainer) {
-        this.augmentHomeDaCard(homeDaContainer);
+        window.VTOP_PLUS?.DaHomeCard?.augmentHomeDaCard?.(homeDaContainer);
       }
 
       // 0b. Handle auto-select semester & direct course jump on StudentDA page
@@ -234,198 +165,17 @@
       }
     },
 
-    // =========================================================================
-    // 0. HOME PAGE FORTHCOMING DA CARD & BACKGROUND COURSE DASHBOARD FETCHER
-    // =========================================================================
+    async handleStudentDaAutoFlow() {
+      const homeCard = window.VTOP_PLUS?.DaHomeCard;
+      const target = homeCard?.getPendingTarget ? homeCard.getPendingTarget() : null;
 
-    async fetchLatestSemesterCourses() {
-      const DOM = window.VTOP_PLUS?.DOM;
-      const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
-      const cacheKey = `vtop_da_home_courses_v1_${authId || 'anon'}`;
-
-      try {
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && Date.now() - parsed.timestamp < 20 * 60 * 1000 && Array.isArray(parsed.courses)) {
-            return parsed.courses;
-          }
-        }
-      } catch (_) {}
-
-      if (this._homeCoursesPromise) return this._homeCoursesPromise;
-
-      this._homeCoursesPromise = (async () => {
-        try {
-          const VtopApi = window.VTOP_PLUS?.VtopApi;
-          const csrf = DOM?.getCsrfToken ? DOM.getCsrfToken() : '';
-
-          const postHtml = async (relUrl, extra = {}) => {
-            const res = await VtopApi.postHtml(relUrl, extra);
-            return res.ok ? res.html : '';
-          };
-
-          // Step 1: Load StudentDA markup silently and choose first non-empty semester
-          const pageHtml = await postHtml('examinations/StudentDA', {
-            verifyMenu: 'true',
-            nocache: `@(${new Date().toUTCString()})`
-          });
-          if (!pageHtml) return [];
-
-          const pageDoc = new DOMParser().parseFromString(pageHtml, 'text/html');
-          const semSelect = pageDoc.getElementById('semesterSubId');
-          const firstSemOpt = semSelect?.querySelector('option[value]:not([value=""])');
-          if (!firstSemOpt) return [];
-
-          const semesterSubId = firstSemOpt.value;
-          const semesterLabel = (firstSemOpt.textContent || '').replace(/\s+/g, ' ').trim();
-          if (VtopApi?.saveActiveSemesterId) {
-            VtopApi.saveActiveSemesterId(semesterSubId, semesterLabel);
-          }
-          const formCsrf = pageDoc.querySelector('#digitalAssignment input[name="_csrf"]')?.value || csrf;
-          const formAuthId = pageDoc.querySelector('#digitalAssignment #authorizedID')?.value || authId;
-
-          // Step 2: Fetch resulting course table for that first semester (same as dAOnChange)
-          const tableHtml = await postHtml('examinations/doDigitalAssignment', {
-            _csrf: formCsrf,
-            authorizedID: formAuthId,
-            semesterSubId
-          });
-          if (!tableHtml) return [];
-
-          const tableDoc = new DOMParser().parseFromString(tableHtml, 'text/html');
-          const rows = Array.from(tableDoc.querySelectorAll('#fixedTableContainer table.customTable tr.tableContent, table tr'));
-          const courses = [];
-
-          for (const row of rows) {
-            if (row.classList.contains('tableHeader') || row.closest('thead') || row.querySelector('th')) continue;
-            const cells = row.querySelectorAll('td');
-            if (cells.length < 4) continue;
-
-            const btn = row.querySelector('button[onclick*="myFunction"], a[onclick*="myFunction"], button, a');
-            const onclick = btn?.getAttribute('onclick') || '';
-            const match = onclick.match(/myFunction\s*\(\s*['"]?([a-zA-Z0-9_-]+)['"]?\s*\)/i);
-            const classId =
-              btn?.dataset?.classid ||
-              (match ? match[1] : '') ||
-              (cells[1]?.textContent || '').trim();
-
-            if (!btn || !classId) continue;
-
-            courses.push({
-              semesterSubId,
-              classId,
-              courseCode: (cells[2]?.textContent || '').trim(),
-              courseTitle: (cells[3]?.textContent || '').trim(),
-              courseType: (cells[4]?.textContent || '').trim()
-            });
-          }
-
-          if (courses.length > 0) {
-            try {
-              sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), courses }));
-            } catch (_) {}
-          }
-          return courses;
-        } catch (err) {
-          console.warn('[VTOP++] Failed to prefetch latest DA courses:', err);
-          return [];
-        } finally {
-          this._homeCoursesPromise = null;
-        }
-      })();
-
-      return this._homeCoursesPromise;
-    },
-
-    matchHomeCourse(courseText, courses) {
-      if (!courseText || !Array.isArray(courses) || courses.length === 0) return null;
-      const codeMatch = courseText.match(/\b([A-Z]{3,4}\d{3,4}[A-Z]?)\b/i);
-      if (codeMatch) {
-        const code = codeMatch[1].toUpperCase();
-        const byCode = courses.find((c) => (c.courseCode || '').toUpperCase() === code);
-        if (byCode) return byCode;
-      }
-
-      const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-      const target = norm(courseText);
-      if (!target) return null;
-
-      const wantsLab = /\b(lab|ela)\b/i.test(courseText);
-      const wantsTheory = /\b(theory|eth|th)\b/i.test(courseText);
-
-      const candidates = courses.filter((c) => {
-        const title = norm(c.courseTitle);
-        return title && (target.includes(title) || title.includes(target));
-      });
-      if (candidates.length === 0) return null;
-      if (candidates.length === 1) return candidates[0];
-
-      if (wantsLab) {
-        const labMatch = candidates.find((c) => /lab/i.test(c.courseType || ''));
-        if (labMatch) return labMatch;
-      }
-      if (wantsTheory) {
-        const thMatch = candidates.find((c) => /theory/i.test(c.courseType || ''));
-        if (thMatch) return thMatch;
-      }
-      return candidates[0];
-    },
-
-    navigateToCourseDa(semesterSubId = '', classId = '') {
-      this._pendingTarget = {
-        semesterSubId: semesterSubId || '',
-        classId: classId || '',
-        expiresAt: Date.now() + 15000
-      };
-
-      const crawler = window.VTOP_PLUS?.Crawler;
-      if (
-        crawler &&
-        crawler.navigate({
-          dataUrl: 'examinations/StudentDA',
-          fallbackDataUrls: ['examinations/StudentDAUpload', 'examinations/DigitalAssignment'],
-          title: 'Digital Assignment Upload'
-        })
-      ) {
-        return;
-      }
-
-      const menuLink = document.querySelector('a[data-url*="StudentDA" i], [data-url*="DigitalAssignment" i]');
-      if (menuLink) {
-        window.VTOP_PLUS?.DOM?.simulateNativeClick?.(menuLink) || menuLink.click();
-      }
-    },
-
-    handleStudentDaAutoFlow() {
-      const target = this._pendingTarget;
-      if (target && Date.now() > target.expiresAt) {
-        this._pendingTarget = null;
-        return;
-      }
-
-      const semSelect = document.getElementById('semesterSubId');
-      if (semSelect && semSelect.value === '' && !semSelect.dataset.vtopDaAutoSem) {
-        const desiredOpt =
-          (target?.semesterSubId &&
-            Array.from(semSelect.options).find((o) => o.value === target.semesterSubId)) ||
-          semSelect.querySelector('option[value]:not([value=""])');
-
-        if (desiredOpt) {
-          semSelect.dataset.vtopDaAutoSem = '1';
-          const DOM = window.VTOP_PLUS?.DOM;
-          const applyChoice = () => {
-            if (!semSelect.isConnected || semSelect.value !== '') return;
-            semSelect.value = desiredOpt.value;
-            semSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          };
-          if (DOM?.waitForBlockUIClear) {
-            DOM.waitForBlockUIClear().then(applyChoice);
-          } else {
-            applyChoice();
-          }
-          return;
-        }
+      const VtopApi = window.VTOP_PLUS?.VtopApi;
+      if (VtopApi?.autoSelectSemesterOnPage) {
+        const didTrigger = await VtopApi.autoSelectSemesterOnPage({
+          autoFlag: 'vtopDaAutoSem',
+          targetSemesterId: target?.semesterSubId || ''
+        });
+        if (didTrigger) return;
       }
 
       if (target?.classId) {
@@ -445,80 +195,12 @@
             (row.querySelectorAll('td')[1]?.textContent || '').trim();
 
           if (btn && rowCid === cid) {
-            this._pendingTarget = null;
+            homeCard?.clearPendingTarget?.();
             window.VTOP_PLUS?.DOM?.simulateNativeClick?.(btn) || btn.click();
             break;
           }
         }
       }
-    },
-
-    openCourseDaUploadDirectly(classId) {
-      const DOM = window.VTOP_PLUS?.DOM;
-      const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
-      const csrf = DOM?.getCsrfToken ? DOM.getCsrfToken() : '';
-
-      document.dispatchEvent(
-        new CustomEvent('vtop-plus-open-da-upload', {
-          detail: { classId, authId, csrf }
-        })
-      );
-    },
-
-    async augmentHomeDaCard(container) {
-      const table = container.querySelector('table');
-      const tbody = table?.querySelector('tbody');
-      if (!table || !tbody) return;
-
-      const dataRows = Array.from(tbody.querySelectorAll('tr')).filter((tr) => tr.textContent.trim().length > 0);
-      if (dataRows.length === 0) return;
-
-      const theadRow = table.querySelector('thead tr');
-      if (theadRow && !theadRow.querySelector('.vtop-da-home-col')) {
-        const th = document.createElement('th');
-        th.scope = 'col';
-        th.className = 'vtop-da-home-col text-center';
-        th.textContent = 'Upload Now';
-        theadRow.appendChild(th);
-      }
-
-      const courses = await this.fetchLatestSemesterCourses();
-      if (!document.body.contains(container)) return;
-
-      dataRows.forEach((row) => {
-        if (row.querySelector('.vtop-da-home-cell')) return;
-        const cells = row.querySelectorAll('td');
-        const courseNameText = (cells[1]?.textContent || cells[0]?.textContent || '').replace(/\s+/g, ' ').trim();
-        const matched = this.matchHomeCourse(courseNameText, courses);
-
-        const td = document.createElement('td');
-        td.className = 'vtop-da-home-cell text-center';
-
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'vtop-da-home-upload-btn';
-        btn.textContent = 'Upload Now';
-        btn.title = matched
-          ? `Open DA Upload for ${matched.courseCode || matched.courseTitle}`
-          : 'Open Digital Assignment Upload';
-        btn.addEventListener('click', async () => {
-          let targetCourse = matched;
-          if (!targetCourse?.classId) {
-            btn.disabled = true;
-            const latest = await this.fetchLatestSemesterCourses();
-            targetCourse = this.matchHomeCourse(courseNameText, latest);
-            btn.disabled = false;
-          }
-          if (targetCourse?.classId) {
-            this.openCourseDaUploadDirectly(targetCourse.classId);
-          } else {
-            this.navigateToCourseDa(targetCourse?.semesterSubId || '', '');
-          }
-        });
-
-        td.appendChild(btn);
-        row.appendChild(td);
-      });
     },
 
     // =========================================================================
@@ -743,7 +425,7 @@
         if (!cell) {
           cell = document.createElement('td');
           cell.className = 'vtop-td-da-status tableContent';
-          cell.innerHTML = '<span class="vtop-da-badge vtop-da-badge-loading">Checking...</span>';
+          cell.innerHTML = '<span class="vtop-da-badge vtop-da-badge-loading">--</span>';
           row.appendChild(cell);
         }
       });
@@ -796,18 +478,11 @@
           return false;
         }
 
+        const Storage = window.VTOP_PLUS?.Storage;
         const cacheKey = `vtop_da_status_${authId || 'anon'}_${classId}`;
-        let status = null;
+        const cachedStatus = Storage?.getWebCache(cacheKey, { area: 'session', ttlMs: 20 * 60 * 1000 });
+        let status = cachedStatus ? cachedStatus.data : null;
         let didFetch = false;
-        try {
-          const cached = sessionStorage.getItem(cacheKey);
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            if (Date.now() - parsed.timestamp < 20 * 60 * 1000) {
-              status = parsed.data;
-            }
-          }
-        } catch (_) {}
 
         if (!status) {
           didFetch = true;
@@ -815,9 +490,7 @@
             status = await this.fetchCourseStatus(classId, authId, csrf);
             if (myToken !== this._scanToken) return false;
             if (status && status.type !== 'error') {
-              try {
-                sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: status }));
-              } catch (_) {}
+              Storage?.setWebCache(cacheKey, { data: status }, { area: 'session' });
             }
           } catch (err) {
             console.warn(`[VTOP++] DA check error for ${classId}:`, err);
@@ -994,7 +667,6 @@
         const span = document.createElement('span');
         span.className = 'vtop-da-badge vtop-da-badge-loading';
         span.textContent = '--';
-        if (status.text) span.title = status.text;
         cell.replaceChildren(span);
         return;
       }

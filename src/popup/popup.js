@@ -44,24 +44,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn('[VTOP++] Popup tab error:', err);
   }
 
-  if (chrome?.storage?.local) {
-    chrome.storage.local.get(['enableSessionKeeper', 'enableDarkMode'], (items) => {
-      if (chrome.runtime.lastError || !items) return;
+  const Storage = window.VTOP_PLUS?.Storage;
+  if (Storage) {
+    Storage.get(['enableSessionKeeper', 'enableDarkMode']).then((items) => {
+      if (!items) return;
       const enabled = items.enableSessionKeeper !== undefined ? Boolean(items.enableSessionKeeper) : true;
       if (sessionToggle) sessionToggle.checked = enabled;
       renderSessionMeta(enabled);
       applyPopupTheme(Boolean(items.enableDarkMode));
     });
-  }
 
-  if (chrome?.storage?.onChanged) {
-    chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== 'local') return;
-      if (changes.enableDarkMode !== undefined) {
-        applyPopupTheme(Boolean(changes.enableDarkMode.newValue));
+    Storage.onKeysChanged(['enableDarkMode', 'enableSessionKeeper'], (matched) => {
+      if (matched.enableDarkMode !== undefined) {
+        applyPopupTheme(Boolean(matched.enableDarkMode));
       }
-      if (changes.enableSessionKeeper !== undefined) {
-        const enabled = Boolean(changes.enableSessionKeeper.newValue);
+      if (matched.enableSessionKeeper !== undefined) {
+        const enabled = Boolean(matched.enableSessionKeeper);
         if (sessionToggle) sessionToggle.checked = enabled;
         renderSessionMeta(enabled);
       }
@@ -72,9 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const enabled = sessionToggle.checked;
     renderSessionMeta(enabled);
 
-    if (chrome?.storage?.local) {
-      chrome.storage.local.set({ enableSessionKeeper: enabled });
-    }
+    window.VTOP_PLUS?.Storage?.set({ enableSessionKeeper: enabled });
 
     if (activeTab?.id && chrome?.tabs?.sendMessage) {
       chrome.tabs.sendMessage(

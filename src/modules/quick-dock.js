@@ -205,31 +205,22 @@
     }
 
     getDockIconSvg(id) {
-      switch (id) {
-        case 'course-page':
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`;
-        case 'attendance':
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`;
-        case 'timetable':
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
-        case 'digital-assignments':
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
-        case 'marks-grades':
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`;
-        case 'search':
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
-        case 'downloader':
-          return `<svg class="vtop-dock-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-        case 'privacy':
-          return `<svg class="vtop-dock-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
-        case 'dark-mode':
-        case 'moon':
-          return `<svg class="vtop-dock-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
-        case 'sun':
-          return `<svg class="vtop-dock-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
-        default:
-          return `<svg class="vtop-dock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>`;
-      }
+      const UI = window.VTOP_PLUS?.UI;
+      const iconMap = {
+        'course-page': ['book', 14],
+        'attendance': ['chart', 14],
+        'timetable': ['calendar', 14],
+        'digital-assignments': ['file-text', 14],
+        'marks-grades': ['target', 14],
+        'search': ['search', 14],
+        'downloader': ['download', 15],
+        'privacy': ['lock', 15],
+        'dark-mode': ['moon', 15],
+        'moon': ['moon', 15],
+        'sun': ['sun', 15]
+      };
+      const [name, size] = iconMap[id] || ['circle-dot', 14];
+      return UI ? UI.icon(name, size, { className: 'vtop-dock-icon' }) : '';
     }
 
     getShortTitle(id, originalTitle) {
@@ -244,6 +235,13 @@
     }
 
     isMountedInDom() {
+      const navControl = document.getElementById('vtopHeaderBarControl');
+      if (navControl) {
+        return Boolean(
+          navControl.querySelector('[data-vtop-nav-item="true"]') &&
+          navControl.classList.contains('vtop-navbar-has-items')
+        );
+      }
       if (document.getElementById(this.dockId)) return true;
       if (document.querySelector('[data-vtop-nav-item="true"]')) return true;
       return this.mountedElements.length > 0 && this.mountedElements.some((el) => document.body.contains(el));
@@ -262,6 +260,12 @@
     mount() {
       if (!this.isAuthenticated()) return;
       if (this.isMountedInDom()) return;
+
+      // Clean up any stale/orphaned items before re-mounting cleanly
+      document.querySelectorAll('[data-vtop-nav-item="true"]').forEach((el) => el.remove());
+      document.getElementById(this.dockId)?.remove();
+      this.mountedElements = [];
+      this.container = null;
 
       // 1. Permanently remove unused Campus Etiquette button
       const etiquetteBtn = document.getElementById('campusEtiquetteBtn');
@@ -295,7 +299,7 @@
       dockItems.forEach((dockItem) => {
         const pill = document.createElement('button');
         pill.className = `vtop-nav-item vtop-dock-pill ${!dockItem.isFound ? 'vtop-pill-unmapped' : ''}`;
-        pill.title = dockItem.isFound ? `Open ${dockItem.title}` : `Searching for "${dockItem.title}"`;
+        pill.title = `Open ${dockItem.title}`;
         pill.type = 'button';
 
         const iconSvg = this.getDockIconSvg(dockItem.id);

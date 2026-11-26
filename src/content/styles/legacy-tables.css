@@ -1,0 +1,602 @@
+/* VTOP++ - Legacy Containers, Flush Tables, Alerts, Modals, DataTables, FAQ & Pagination */
+/* ==========================================================================
+   Universal Polish for Remaining VTOP Pages (Additive, Non-Regressing)
+   Guards: excludes Dashboard widgets, My Curriculum, Course Page, Login,
+   navigation drawer (.hmenubox), and extension widgets (.vtop-*).
+   ========================================================================== */
+
+/* 1. Legacy Containers (.box, .panel, .well) & Unstyled .card Containment */
+.box:not(.login-box):not(.hmenubox .box),
+.panel:not([class*="vtop-"]),
+.well,
+.card:not(.hmenubox .card):not(#course-data):not(#vtop-home-class-messages):not(#proctor-message):not(#digital-assignments):not(#edu-status):not(#last-five-feedbacks):not(.login-box):not(.card-login):not(#studentWiseCurriculum .card):not([class*="vtop-"]) {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+html:not(.vtop-dark-theme) .box:not(.login-box):not(.hmenubox .box),
+html:not(.vtop-dark-theme) .panel:not([class*="vtop-"]),
+html:not(.vtop-dark-theme) .well {
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.box.box-info,
+.box.box-primary,
+.panel.panel-info,
+.panel.panel-primary {
+  border-top: 3px solid var(--vtop-accent) !important;
+}
+
+.box-header:not(.hmenubox .box-header),
+.panel-heading:not([class*="vtop-"]) {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+html:not(.vtop-dark-theme) .box-header:not(.hmenubox .box-header),
+html:not(.vtop-dark-theme) .panel-heading:not([class*="vtop-"]) {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.box-header > .box-title,
+.box-header > h3,
+.box-header > h4,
+.panel-heading > .panel-title,
+.panel-heading > h3,
+.panel-heading > h4 {
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+.box-body,
+.panel-body {
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+.box-footer,
+.panel-footer,
+.card-footer:not(#course-data .card-footer):not(#vtop-home-class-messages .card-footer):not(#studentWiseCurriculum .card-footer) {
+  padding: 10px 16px !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+html:not(.vtop-dark-theme) .box-footer,
+html:not(.vtop-dark-theme) .panel-footer,
+html:not(.vtop-dark-theme) .card-footer:not(#course-data .card-footer):not(#vtop-home-class-messages .card-footer):not(#studentWiseCurriculum .card-footer) {
+  background-color: var(--vtop-bg-surface-alt) !important;
+}
+
+/* Prevent .row negative margins inside .card/.box/.panel from causing horizontal overflow */
+:is(.card, .box, .panel):not(.hmenubox *):not(#course-data):not(#vtop-home-class-messages):not(#studentWiseCurriculum) > :is(.card-body, .box-body, .panel-body) > .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.table-responsive {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* 2. Flush Tables & Legacy VTOP Tables (.fixedTableContainer, .customTable) */
+.fixedTableContainer {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  overflow-x: auto !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+html:not(.vtop-dark-theme) .fixedTableContainer {
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+table.customTable {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+  border-collapse: collapse !important;
+}
+
+html:not(.vtop-dark-theme) table.customTable tr.tableHeader > td,
+html:not(.vtop-dark-theme) table.customTable tr.tableHeader-level1 > td,
+html:not(.vtop-dark-theme) table.customTable thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+table.customTable tr.tableHeader > td,
+table.customTable tr.tableHeader-level1 > td,
+table.customTable thead th {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  padding: 10px 12px !important;
+}
+
+table.customTable tr.tableContent > td,
+table.customTable tr.tableContent-level1 > td {
+  padding: 9px 12px !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+  vertical-align: middle !important;
+}
+
+table.customTable tbody tr:last-child > td,
+.card:not(#course-data):not(#vtop-home-class-messages):not(#studentWiseCurriculum) > table.table tbody tr:last-child > td,
+.box > table.table tbody tr:last-child > td,
+.panel > table.table tbody tr:last-child > td {
+  border-bottom: none !important;
+}
+
+:is(.card-body, .box-body, .panel-body):not(#course-data *):not(#vtop-home-class-messages *):not(#studentWiseCurriculum *) > table.table:only-child,
+:is(.card-body, .box-body, .panel-body):not(#course-data *):not(#vtop-home-class-messages *):not(#studentWiseCurriculum *) > .table-responsive:only-child > table.table {
+  margin-bottom: 0 !important;
+}
+
+html:not(.vtop-dark-theme) :is(.card, .box, .panel):not(#course-data):not(#vtop-home-class-messages):not(#proctor-message):not(#digital-assignments):not(#edu-status):not(#last-five-feedbacks):not(#studentWiseCurriculum) table.table:not(#materialTable) thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+/* 3. Standardize Hardcoded Alert Banners (#dff0d8, #d9edf7, #fcf8e3) */
+[style*="#dff0d8" i],
+[style*="223, 240, 216"] {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-success-border) !important;
+  padding: 12px 16px !important;
+}
+
+html.vtop-dark-theme [style*="#dff0d8" i],
+html.vtop-dark-theme [style*="223, 240, 216"] {
+  background-color: var(--vtop-success-alert-bg) !important;
+  border-color: var(--vtop-success-alert-border) !important;
+  color: var(--vtop-success-text) !important;
+}
+
+[style*="#d9edf7" i],
+[style*="217, 237, 247"] {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  padding: 12px 16px !important;
+}
+
+html.vtop-dark-theme [style*="#d9edf7" i],
+html.vtop-dark-theme [style*="217, 237, 247"] {
+  background-color: var(--vtop-info-alert-bg) !important;
+  border-color: var(--vtop-info-alert-border) !important;
+  color: var(--vtop-info-alert-text) !important;
+}
+
+[style*="#fcf8e3" i],
+[style*="252, 248, 227"] {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-warn-border) !important;
+  padding: 12px 16px !important;
+}
+
+html.vtop-dark-theme [style*="#fcf8e3" i],
+html.vtop-dark-theme [style*="252, 248, 227"] {
+  background-color: var(--vtop-warn-alert-bg) !important;
+  border-color: var(--vtop-warn-alert-border) !important;
+  color: var(--vtop-warn-alert-text) !important;
+}
+
+/* 4. Bootstrap .alert & .modal-content Consistency */
+.alert {
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+}
+
+.modal-content {
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.modal-header {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.modal-header,
+.modal-header.text-light,
+.modal-header.text-white,
+.modal-header .modal-title,
+.modal-header .text-light,
+.modal-header .text-white,
+.modal-header [style*="color: white" i],
+.modal-header [style*="color:white" i],
+.modal-header [style*="color:#fff" i],
+.modal-header [style*="color: #fff" i] {
+  color: var(--vtop-text-heading) !important;
+}
+
+html:not(.vtop-dark-theme) .modal-header .btn-close {
+  filter: none !important;
+  opacity: 0.75 !important;
+}
+
+html.vtop-dark-theme .modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(180%) !important;
+  opacity: 0.75 !important;
+}
+
+.modal-header .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.modal-footer {
+  padding: 10px 16px !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+html:not(.vtop-dark-theme) .modal-footer {
+  background-color: var(--vtop-bg-surface-alt) !important;
+}
+
+/* 5. DataTables Controls (Light + Dark) */
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  border: 1px solid var(--vtop-border-strong) !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  background-color: var(--vtop-bg-input) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .dataTables_wrapper .dataTables_info,
+html.vtop-dark-theme .dataTables_wrapper .dataTables_length label,
+html.vtop-dark-theme .dataTables_wrapper .dataTables_filter label {
+  color: var(--vtop-text-muted) !important;
+}
+
+/* 6. Hide VTOP Page-Transition Loading Box (#popup, .blockMsg, and #confirmBox spinner), keep page dimming (.blockOverlay) */
+#popup,
+.blockUI.blockMsg,
+.blockMsg,
+#confirmBox:has(#progressGIF:not(.d-none)) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 7. Academic Regulation (#regulationsForm & #embedder) — center button, hide broken white PDF box */
+#regulationsForm {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+.embed-responsive:has(#embedder),
+object#embedder {
+  display: none !important;
+}
+
+/* 8. Course Allocation Details & Registration Schedule (#RegistrationSchedule) Light + Dark Uniformity */
+.box-header + br {
+  display: none !important;
+}
+
+#RegistrationSchedule fieldset {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 16px !important;
+  margin: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  box-shadow: none !important;
+}
+
+fieldset,
+.feedback-form,
+.document-box,
+.document-box:hover,
+[style*="box-shadow" i]:not([class*="vtop-"]) {
+  box-shadow: none !important;
+}
+
+/* Normalize #f2dede (pink/red) & #ABA5BF/#aba6bf (purple) info tables (Faculty Info, Proctor Details, HOD & Dean Info) */
+td[style*="#f2dede" i],
+td[style*="242, 222, 222"],
+tr[style*="#f2dede" i],
+tr[style*="242, 222, 222"] {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: var(--vtop-border) !important;
+  border-radius: 0 !important;
+  padding: 9px 12px !important;
+}
+
+#employeeProfileForm table.table td,
+#employeeProfileForm table.table th {
+  --bs-table-bg: transparent !important;
+  --bs-table-accent-bg: transparent !important;
+  border-color: var(--vtop-border) !important;
+}
+
+td[style*="#aba5bf" i],
+td[style*="#aba6bf" i],
+td[style*="171, 165, 191"],
+td[style*="171, 166, 191"],
+tr[style*="#aba5bf" i],
+tr[style*="#aba6bf" i],
+tr[style*="171, 165, 191"],
+tr[style*="171, 166, 191"] {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+  border-radius: 0 !important;
+  padding: 9px 12px !important;
+}
+
+#employeeProfileForm table thead tr[style*="color: blue" i],
+#employeeProfileForm table thead tr[style*="color: blue" i] > th {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+img[style*="#f2dede" i],
+img[style*="242, 222, 222"] {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 6px !important;
+  padding: 0 !important;
+}
+
+/* Remove outer background/border on .modal-dialog wrapper (only .modal-content should be a box) */
+.modal-dialog,
+html.vtop-dark-theme .modal-dialog {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#RegistrationSchedule fieldset > legend {
+  float: none !important;
+  padding: 0 8px !important;
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-accent) !important;
+  background-color: transparent !important;
+}
+
+#RegistrationSchedule fieldset > legend:empty {
+  display: none !important;
+}
+
+#RegistrationSchedule fieldset > br,
+#RegistrationSchedule > br {
+  display: none !important;
+}
+
+#RegistrationSchedule .form.group,
+#RegistrationSchedule .form-group {
+  margin: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+#RegistrationSchedule span[style*="color: red" i] {
+  display: inline-block !important;
+  color: var(--vtop-danger-text) !important;
+  background-color: var(--vtop-danger-bg-soft) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 10px 18px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+}
+
+/* 9. FAQ Page (#falistfrag) — Clear Legacy Floats, Glyphicon Box, Colors & Collapse Layout */
+#falistfrag {
+  clear: both !important;
+  margin-top: 16px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+#falistfrag > #falistfrag {
+  margin-top: 0 !important;
+  padding: 0 !important;
+}
+
+#faqPreview #getFaqProcessSec button[type="submit"] {
+  margin-left: 0 !important;
+}
+
+#falistfrag,
+#falistfrag .panel,
+#falistfrag .panel-heading,
+#falistfrag .panel-title,
+#falistfrag .panel-collapse,
+#falistfrag .panel-body,
+#falistfrag .faqcontent {
+  float: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#falistfrag .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+#falistfrag .panel,
+#falistfrag .panel.panel-default {
+  margin-bottom: 10px !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+#falistfrag .panel-heading {
+  padding: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  background: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+}
+
+#falistfrag .panel-title,
+#falistfrag .panel-title:link,
+#falistfrag .panel-title:visited {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  text-decoration: none !important;
+  color: var(--vtop-text-heading) !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+#falistfrag .panel-title::after {
+  content: "" !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-right: 2px solid var(--vtop-text-muted) !important;
+  border-bottom: 2px solid var(--vtop-text-muted) !important;
+  transform: rotate(45deg) !important;
+  transition: transform 0.2s ease, border-color 0.15s ease !important;
+  flex-shrink: 0 !important;
+  margin-right: 4px !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"] {
+  background-color: var(--vtop-bg-active) !important;
+  color: var(--vtop-accent) !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"]::after {
+  transform: rotate(-135deg) !important;
+  border-color: var(--vtop-accent) !important;
+}
+
+#falistfrag .panel-title:hover {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"]:hover {
+  background-color: var(--vtop-bg-active) !important;
+}
+
+#falistfrag .panel-title:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px var(--vtop-accent-focus) !important;
+}
+
+#falistfrag .panel-title h4,
+#falistfrag .panel-title h4 span {
+  margin: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 0.925rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+  line-height: 1.4 !important;
+  display: block !important;
+}
+
+#falistfrag .panel-title[aria-expanded="true"] h4,
+#falistfrag .panel-title[aria-expanded="true"] h4 span {
+  color: var(--vtop-accent) !important;
+}
+
+#falistfrag .panel-title h4.glyphicon::before,
+#falistfrag .panel-title .glyphicon-hand-right::before {
+  display: none !important;
+  content: none !important;
+}
+
+#falistfrag .panel-collapse {
+  padding: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+#falistfrag .panel-body {
+  padding: 14px 16px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-body) !important;
+}
+
+#falistfrag .faqcontent {
+  padding: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  background-color: transparent !important;
+  color: var(--vtop-text-body) !important;
+  white-space: pre-line !important;
+  border: none !important;
+}
+
+#falistfrag table:not(:has(td, th)) {
+  display: none !important;
+}
+
+/* 10. Legacy Bootstrap 3 Pagination (Light + Dark) */
+ul.pagination:has(> li:not(.page-item)) {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 12px 0 !important;
+}
+
+ul.pagination > li:not(.page-item) > a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 6px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  text-decoration: none !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+}
+
+ul.pagination > li:not(.page-item) > a:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  border-color: var(--vtop-border-strong) !important;
+}
+
+ul.pagination > li.active:not(.page-item) > a {
+  background-color: var(--vtop-accent) !important;
+  border-color: var(--vtop-accent) !important;
+  color: var(--vtop-text-inverse) !important;
+  font-weight: 600 !important;
+}
+
+ul.pagination > li.disabled:not(.page-item) > a {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}

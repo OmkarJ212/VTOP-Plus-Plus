@@ -1,0 +1,456 @@
+/* VTOP++ - Navigation Menu Bar (#top-hmenu-bar) & Mega-Menu Drawer (.hmenubox / #MG0*) */
+
+/* ==========================================================================
+   VTOP Navigation Menu Bar (#top-hmenu-bar) & Mega-Menu Drawer (.hmenubox)
+   Unified pill geometry, full-width drawer grid, clean section headers & links
+   ========================================================================== */
+html:not(.vtop-dark-theme) #top-hmenu-bar {
+  background-color: var(--vtop-bg-surface) !important;
+  background-image: none !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+#top-hmenu-bar {
+  padding: 6px 16px !important;
+}
+
+#top-hmenu-bar > div {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  gap: 4px;
+  align-items: center;
+}
+
+#top-hmenu-bar .navbar-brand {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  margin: 0 4px 0 0 !important;
+  border-radius: 6px !important;
+  font-size: 15px !important;
+  line-height: 1;
+  color: var(--vtop-text-heading) !important;
+  text-decoration: none !important;
+  transition: background-color 0.14s ease, color 0.14s ease;
+}
+
+#top-hmenu-bar .navbar-brand:hover {
+  background-color: var(--vtop-bg-hover-light) !important;
+}
+
+html.vtop-dark-theme #top-hmenu-bar .navbar-brand {
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme #top-hmenu-bar .navbar-brand:hover {
+  background-color: var(--vtop-bg-hover-dark) !important;
+}
+
+.hmenuItem,
+.hmenuItem.btn,
+.hmenuItem.btn-outline,
+.btn-outline.hmenuItem,
+.hmenu .btn,
+.hmenu .btn-outline,
+.hmenu a,
+#top-hmenu-bar .btn,
+#top-hmenu-bar .btn-outline,
+#top-hmenu-bar a.hmenuItem,
+.hmenubox .btn,
+.hmenubox .btn-outline,
+.sidebar .btn,
+.sidebar .btn-outline,
+.sidebar-menu .btn,
+.sidebar-menu .btn-outline,
+.main-sidebar .btn,
+.main-sidebar .btn-outline,
+nav .hmenuItem,
+nav .btn-outline,
+.navbar-nav .btn-outline,
+div[id^="MG0"] .btn,
+div[id^="MG0"] .btn-outline,
+div[id^="MG0"] a,
+a[data-bs-toggle="collapse"].hmenuItem,
+button[data-bs-toggle="collapse"].hmenuItem,
+a[data-bs-toggle="collapse"].btn-outline,
+button[data-bs-toggle="collapse"].btn-outline,
+a[href^="#MG0"].btn,
+a[href^="#MG0"].btn-outline,
+.systemB5BtnMenu,
+.systemBtnMenu {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  --bs-btn-border-color: transparent !important;
+  --bs-btn-border-width: 0 !important;
+  --bs-btn-focus-box-shadow: none !important;
+  --bs-btn-active-shadow: none !important;
+}
+
+#top-hmenu-bar .hmenuItem,
+#top-hmenu-bar a.hmenuItem {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  color: var(--vtop-text-heading) !important;
+  transition: background-color 0.14s ease, color 0.14s ease !important;
+}
+
+.hmenuItem:hover,
+.hmenuItem.btn:hover,
+.hmenuItem.btn-outline:hover,
+.btn-outline.hmenuItem:hover,
+.hmenu .btn:hover,
+.hmenu .btn-outline:hover,
+#top-hmenu-bar .btn:hover,
+#top-hmenu-bar .btn-outline:hover,
+.sidebar .btn:hover,
+.sidebar-menu .btn:hover,
+.main-sidebar .btn:hover,
+div[id^="MG0"] .btn:hover,
+a[data-bs-toggle="collapse"].hmenuItem:hover,
+a[href^="#MG0"].btn:hover,
+.systemB5BtnMenu:hover,
+.systemBtnMenu:hover {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-bg-hover-light) !important;
+}
+
+html.vtop-dark-theme .hmenuItem:hover,
+html.vtop-dark-theme .hmenuItem.btn:hover,
+html.vtop-dark-theme .hmenuItem.btn-outline:hover,
+html.vtop-dark-theme .btn-outline.hmenuItem:hover,
+html.vtop-dark-theme .hmenu .btn:hover,
+html.vtop-dark-theme .hmenu .btn-outline:hover,
+html.vtop-dark-theme #top-hmenu-bar .btn:hover,
+html.vtop-dark-theme #top-hmenu-bar .btn-outline:hover,
+html.vtop-dark-theme .sidebar .btn:hover,
+html.vtop-dark-theme .sidebar-menu .btn:hover,
+html.vtop-dark-theme .main-sidebar .btn:hover,
+html.vtop-dark-theme div[id^="MG0"] .btn:hover,
+html.vtop-dark-theme a[data-bs-toggle="collapse"].hmenuItem:hover,
+html.vtop-dark-theme a[href^="#MG0"].btn:hover,
+html.vtop-dark-theme .systemB5BtnMenu:hover,
+html.vtop-dark-theme .systemBtnMenu:hover {
+  background-color: var(--vtop-bg-hover-dark) !important;
+}
+
+.hmenuItem:focus,
+.hmenuItem:active,
+.hmenuItem:focus-visible,
+.hmenuItem[aria-expanded="true"],
+a[href^="#MG0"]:focus,
+a[href^="#MG0"]:active,
+a[href^="#MG0"][aria-expanded="true"] {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-accent-soft-light) !important;
+}
+
+html.vtop-dark-theme .hmenuItem:focus,
+html.vtop-dark-theme .hmenuItem:active,
+html.vtop-dark-theme .hmenuItem:focus-visible,
+html.vtop-dark-theme .hmenuItem[aria-expanded="true"],
+html.vtop-dark-theme a[href^="#MG0"]:focus,
+html.vtop-dark-theme a[href^="#MG0"]:active,
+html.vtop-dark-theme a[href^="#MG0"][aria-expanded="true"] {
+  background-color: var(--vtop-accent-soft) !important;
+}
+
+/* Uniform category icon + caret styling (overrides stale Bootstrap text-danger/text-primary) */
+#top-hmenu-bar .hmenuItem .primaryColor1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit !important;
+}
+
+#top-hmenu-bar .hmenuItem .primaryColor1 i {
+  font-size: 13.5px !important;
+  color: var(--vtop-text-secondary) !important;
+}
+
+#top-hmenu-bar .hmenuItem .rotate-caret,
+#top-hmenu-bar .hmenuItem i.bi-chevron-right {
+  font-size: 11px !important;
+  margin-right: 0 !important;
+  color: var(--vtop-text-muted) !important;
+  transition: transform 0.15s ease, color 0.14s ease !important;
+}
+
+#top-hmenu-bar .hmenuItem[aria-expanded="false"] .rotate-caret {
+  transform: rotate(0deg) !important;
+}
+
+#top-hmenu-bar .hmenuItem[aria-expanded="true"] .rotate-caret {
+  transform: rotate(90deg) !important;
+  color: var(--vtop-accent) !important;
+}
+
+#top-hmenu-bar .hmenuItem[aria-expanded="true"] .primaryColor1,
+#top-hmenu-bar .hmenuItem[aria-expanded="true"] .primaryColor1 i {
+  color: var(--vtop-accent) !important;
+}
+
+/* Dark mode nav pill text & icons */
+html.vtop-dark-theme .hmenuItem .primaryColor1,
+html.vtop-dark-theme .hmenuItem .primaryColor1 *,
+html.vtop-dark-theme .hmenuItem span,
+html.vtop-dark-theme .hmenuItem i:not(.rotate-caret),
+html.vtop-dark-theme #top-hmenu-bar span,
+html.vtop-dark-theme .sidebar-menu span,
+html.vtop-dark-theme div[id^="MG0"] span {
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme #top-hmenu-bar .hmenuItem .primaryColor1 i {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme #top-hmenu-bar .hmenuItem[aria-expanded="true"] .primaryColor1,
+html.vtop-dark-theme #top-hmenu-bar .hmenuItem[aria-expanded="true"] .primaryColor1 i,
+html.vtop-dark-theme #top-hmenu-bar .hmenuItem[aria-expanded="true"] span {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .hmenuItem:hover .primaryColor1,
+html.vtop-dark-theme .hmenuItem:hover span,
+html.vtop-dark-theme .hmenuItem:hover i:not(.rotate-caret) {
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .hmenuItem .rotate-caret,
+html.vtop-dark-theme .hmenuItem .text-primary,
+html.vtop-dark-theme .hmenuItem i.bi-chevron-right {
+  color: var(--vtop-text-muted) !important;
+}
+
+html.vtop-dark-theme #top-hmenu-bar .hmenuItem[aria-expanded="true"] .rotate-caret {
+  color: var(--vtop-accent) !important;
+}
+
+/* Mega-Menu Drawer (.hmenubox / #MG0001, #MG0002, etc.) */
+html div[id^="MG0"],
+html .hmenubox,
+html .hmenubox.WhiteBackground,
+html.vtop-dark-theme div[id^="MG0"],
+html.vtop-dark-theme .hmenubox,
+html.vtop-dark-theme .hmenubox.WhiteBackground {
+  margin-top: 0 !important;
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: var(--vtop-bg-surface) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border: none !important;
+  border-top: 1px solid var(--vtop-border) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-radius: 0 0 12px 12px !important;
+  box-shadow: none !important;
+  max-height: min(76vh, 580px) !important;
+  overflow-y: auto !important;
+  z-index: 1035 !important;
+}
+
+html .hmenubox > .card,
+html.vtop-dark-theme .hmenubox > .card {
+  background: var(--vtop-bg-surface) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+html .hmenubox .card-body,
+html.vtop-dark-theme .hmenubox .card-body {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.hmenubox .card-body {
+  padding: 16px 52px 16px 20px !important;
+}
+
+.hmenubox .col-md-2 > div {
+  background-color: transparent !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center;
+  padding: 18px 20px !important;
+}
+
+.hmenubox .col-md-2 .h5 {
+  margin: 0 !important;
+  font-size: 0.98rem !important;
+  font-weight: 700 !important;
+  color: var(--vtop-text-heading) !important;
+  letter-spacing: -0.01em;
+}
+
+html.vtop-dark-theme .hmenubox .col-md-2 .h5 {
+  color: var(--vtop-accent) !important;
+}
+
+@media (min-width: 768px) {
+  .hmenubox .row > .col-md-2 {
+    width: 180px !important;
+    flex: 0 0 180px !important;
+    background-color: var(--vtop-bg-surface-alt) !important;
+    border-right: 1px solid var(--vtop-border) !important;
+    border-width: 0 1px 0 0 !important;
+  }
+
+  .hmenubox .row > .col-md-8 {
+    flex: 1 1 0% !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0;
+  }
+
+  .hmenubox .card-body > .d-flex {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    gap: 16px !important;
+  }
+}
+
+.hmenubox .list-group {
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Section headings inside drawer ("General", "PAT", "Proctor", etc.) */
+html .hmenubox .list-group-item.card-title,
+html.vtop-dark-theme .hmenubox .list-group-item.card-title {
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--vtop-border-subtle) !important;
+  border-radius: 0 !important;
+  padding: 6px 10px 5px !important;
+  margin: 10px 0 4px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--vtop-text-muted) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+html .hmenubox .list-group-item.card-title:first-child {
+  margin-top: 0 !important;
+}
+
+html .hmenubox .list-group-item.card-title span,
+html.vtop-dark-theme .hmenubox .list-group-item.card-title span {
+  color: var(--vtop-text-muted) !important;
+}
+
+html .hmenubox .list-group-item.card-title i,
+html.vtop-dark-theme .hmenubox .list-group-item.card-title i {
+  color: var(--vtop-accent) !important;
+  opacity: 0.85 !important;
+  font-size: 12px !important;
+  margin-right: 2px !important;
+}
+
+/* Menu links inside drawer */
+div[id^="MG0"] a,
+div[id^="MG0"] a.list-group-item-action,
+div[id^="MG0"] button,
+div[id^="MG0"] .menuFontStyle,
+div[id^="MG0"] .quickMainMenu {
+  border: none !important;
+  outline: none !important;
+  background-color: transparent !important;
+}
+
+html .hmenubox a.list-group-item-action,
+html div[id^="MG0"] a.list-group-item-action {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 6px 10px !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+  color: var(--vtop-text-secondary) !important;
+  transition: background-color 0.12s ease, color 0.12s ease !important;
+}
+
+html .hmenubox a.list-group-item-action span,
+html div[id^="MG0"] a.list-group-item-action span {
+  font-weight: 500 !important;
+  color: inherit !important;
+}
+
+html .hmenubox a.list-group-item-action i.bi-forward,
+html div[id^="MG0"] a.list-group-item-action i.bi-forward {
+  font-size: 11px !important;
+  color: var(--vtop-text-dim) !important;
+  flex-shrink: 0;
+  transition: transform 0.12s ease, color 0.12s ease;
+}
+
+html.vtop-dark-theme div[id^="MG0"] a,
+html.vtop-dark-theme div[id^="MG0"] a.list-group-item-action,
+html.vtop-dark-theme .hmenubox a.list-group-item-action,
+html.vtop-dark-theme div[id^="MG0"] button,
+html.vtop-dark-theme div[id^="MG0"] .menuFontStyle,
+html.vtop-dark-theme div[id^="MG0"] .quickMainMenu {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--vtop-text-secondary) !important;
+}
+
+html div[id^="MG0"] a:hover,
+html div[id^="MG0"] a.list-group-item-action:hover,
+html div[id^="MG0"] button:hover {
+  border: none !important;
+  outline: none !important;
+  background-color: var(--vtop-accent-soft-light) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html div[id^="MG0"] a.list-group-item-action:hover i.bi-forward {
+  color: var(--vtop-accent) !important;
+  transform: translateX(2px);
+}
+
+html.vtop-dark-theme div[id^="MG0"] a:hover,
+html.vtop-dark-theme div[id^="MG0"] a.list-group-item-action:hover,
+html.vtop-dark-theme div[id^="MG0"] button:hover {
+  background-color: var(--vtop-accent-soft) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme div[id^="MG0"] a.list-group-item-action:hover span {
+  color: var(--vtop-accent) !important;
+}

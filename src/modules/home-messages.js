@@ -209,28 +209,7 @@
     },
 
     toggleEmptyState(container, isEmpty, title, note) {
-      const existing = container.querySelector(':scope > .vtop-dashboard-empty');
-      if (!isEmpty) {
-        if (existing) existing.remove();
-        return;
-      }
-      if (existing) return;
-
-      const emptyEl = document.createElement('div');
-      emptyEl.className = 'vtop-dashboard-empty';
-
-      const titleEl = document.createElement('div');
-      titleEl.className = 'vtop-dashboard-empty-title';
-      titleEl.textContent = title;
-
-      emptyEl.appendChild(titleEl);
-      if (note) {
-        const noteEl = document.createElement('div');
-        noteEl.className = 'vtop-dashboard-empty-note';
-        noteEl.textContent = note;
-        emptyEl.appendChild(noteEl);
-      }
-      container.appendChild(emptyEl);
+      window.VTOP_PLUS?.UI?.toggleEmptyState?.(container, isEmpty, title, note);
     },
 
     destroy() {
@@ -239,37 +218,30 @@
     },
 
     createCard() {
-      const card = document.createElement('div');
-      card.id = CARD_ID;
-      card.className = 'card border-0 mb-3 vtop-msg-card';
-
-      card.innerHTML = `
-        <div class="card-header d-flex flex-column flex-md-row primaryBorderTop vtop-msg-header">
-          <span class="fs-6 fontcolor3 flex-fill text-nowrap fw-bold vtop-msg-title">
-            Class messages sent by faculty
-          </span>
-          <div class="vtop-msg-header-actions">
-            <span class="vtop-msg-badge vtop-msg-badge-muted">Checking...</span>
-            <button type="button" class="vtop-msg-icon-btn vtop-msg-refresh-btn" title="Refresh Class Messages" aria-label="Refresh Class Messages">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-              </svg>
-            </button>
-            <button type="button" class="vtop-msg-icon-btn vtop-msg-open-btn" title="Open Class Messages Page" aria-label="Open Class Messages Page">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="card-body small vtop-msg-body">
-          <div class="vtop-msg-state vtop-msg-loading">Loading class messages...</div>
-        </div>
-      `;
+      const UI = window.VTOP_PLUS?.UI;
+      const card = UI
+        ? UI.createHomeCard({
+            id: CARD_ID,
+            className: 'card border-0 mb-3 vtop-msg-card',
+            headerClass: 'card-header d-flex flex-column flex-md-row primaryBorderTop vtop-msg-header',
+            headerHtml: `
+              <span class="fs-6 fontcolor3 flex-fill text-nowrap fw-bold vtop-msg-title">
+                Class messages sent by faculty
+              </span>
+              <div class="vtop-msg-header-actions">
+                <span class="vtop-msg-badge vtop-msg-badge-muted">Checking...</span>
+                <button type="button" class="vtop-msg-icon-btn vtop-msg-refresh-btn" title="Refresh Class Messages" aria-label="Refresh Class Messages">
+                  ${UI.icon('refresh', 14)}
+                </button>
+                <button type="button" class="vtop-msg-icon-btn vtop-msg-open-btn" title="Open Class Messages Page" aria-label="Open Class Messages Page">
+                  ${UI.icon('external-link', 14)}
+                </button>
+              </div>
+            `,
+            bodyClass: 'card-body small vtop-msg-body',
+            bodyHtml: '<div class="vtop-msg-state vtop-msg-loading">Loading class messages...</div>'
+          })
+        : document.createElement('div');
 
       card.querySelector('.vtop-msg-refresh-btn')?.addEventListener('click', () => {
         this.load(true);
@@ -343,21 +315,16 @@
     },
 
     readCache() {
-      try {
-        const raw = sessionStorage.getItem(CACHE_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (parsed && Date.now() - parsed.timestamp < CACHE_TTL_MS && parsed.data) {
-          return parsed.data;
-        }
-      } catch (_) {}
-      return null;
+      const entry = window.VTOP_PLUS?.Storage?.getWebCache(CACHE_KEY, {
+        area: 'session',
+        ttlMs: CACHE_TTL_MS,
+        validate: (p) => Boolean(p.data)
+      });
+      return entry ? entry.data : null;
     },
 
     writeCache(data) {
-      try {
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }));
-      } catch (_) {}
+      window.VTOP_PLUS?.Storage?.setWebCache(CACHE_KEY, { data }, { area: 'session' });
     },
 
     async fetchMessagesHtml() {
@@ -506,11 +473,7 @@
           badge.className = 'vtop-msg-badge vtop-msg-badge-muted';
           badge.textContent = '0 Messages';
         }
-        body.innerHTML = `
-          <div class="vtop-dashboard-empty">
-            <div class="vtop-dashboard-empty-title">No messages sent by faculty</div>
-          </div>
-        `;
+        body.innerHTML = window.VTOP_PLUS?.UI?.emptyState('No messages sent by faculty') || '';
         return;
       }
 
@@ -552,9 +515,7 @@
                   ${
                     details.length > 0
                       ? `<span class="vtop-msg-chevron" aria-hidden="true">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                          </svg>
+                          ${window.VTOP_PLUS?.UI?.icon('chevron-down', 14) || ''}
                         </span>`
                       : ''
                   }

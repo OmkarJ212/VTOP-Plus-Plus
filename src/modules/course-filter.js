@@ -50,16 +50,19 @@
     pending: null
   };
 
+  const Storage = window.VTOP_PLUS?.Storage;
   let persist = { sem: '', fac: {} };
-  try {
-    const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
-    if (o && typeof o === 'object') persist = { sem: o.sem || '', fac: o.fac || {} };
-  } catch (_) {}
+  const storedPersist = Storage?.getWebCache
+    ? Storage.getWebCache(LS_KEY, { area: 'local' })
+    : null;
+  if (storedPersist && typeof storedPersist === 'object') {
+    persist = { sem: storedPersist.sem || '', fac: storedPersist.fac || {} };
+  }
 
   function savePersist() {
-    try {
-      localStorage.setItem(LS_KEY, JSON.stringify(persist));
-    } catch (_) {}
+    if (window.VTOP_PLUS?.Storage?.setWebCache) {
+      window.VTOP_PLUS.Storage.setWebCache(LS_KEY, persist, { area: 'local', addTimestamp: false });
+    }
   }
 
   function cacheGet(subj) {
@@ -153,11 +156,13 @@
 
   const CourseFilter = {
     init() {
+      document.documentElement?.classList.add('vtop-course-filter-enabled');
       this.ensureCourseDropdownUI();
       this.checkAndMountTableFilterBar();
     },
 
     destroy() {
+      document.documentElement?.classList.remove('vtop-course-filter-enabled');
       stopWaiting();
 
       if (state.bodyObserver) {
@@ -265,14 +270,35 @@
 
     ensureCourseDropdownUI() {
       const ui = document.getElementById(UI_ID);
-      if (ui && state.native && state.native.isConnected) {
-        const sig = this.getOptionsSignature(state.native);
-        if (state.optSig === sig) return;
-      }
-      if (ui) ui.remove();
-
       const sel = this.findCourseDropdown();
-      if (sel) this.mountCourseDropdownUI(sel);
+
+      if (!sel) {
+        if (ui && (!state.native || !state.native.isConnected)) {
+          ui.remove();
+        }
+        return;
+      }
+
+      const sig = this.getOptionsSignature(sel);
+      if (
+        ui &&
+        state.native === sel &&
+        sel.isConnected &&
+        ui.parentNode === sel.parentNode &&
+        state.optSig === sig
+      ) {
+        if (sel.style.display !== 'none') {
+          sel.style.display = 'none';
+        }
+        const sib = sel.nextElementSibling;
+        if (sib && /select2|chosen|bootstrap-select|ms-parent/.test(sib.className || '') && sib.style.display !== 'none') {
+          sib.style.display = 'none';
+        }
+        return;
+      }
+
+      if (ui) ui.remove();
+      this.mountCourseDropdownUI(sel);
     },
 
     mountCourseDropdownUI(native) {
@@ -546,7 +572,7 @@
       container.innerHTML = `
         <div class="vtop-filter-row" style="display:flex;align-items:center;gap:12px;width:100%;">
           <div class="vtop-filter-group" style="flex:1;display:flex;align-items:center;gap:8px;">
-            <span class="vtop-filter-icon" style="display:inline-flex;align-items:center;color:var(--vtop-text-muted);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+            <span class="vtop-filter-icon" style="display:inline-flex;align-items:center;color:var(--vtop-text-muted);">${window.VTOP_PLUS?.UI?.icon('search', 15, { ariaHidden: true }) || ''}</span>
             <input type="text" id="vtop-table-filter-search" class="vtop-filter-input" placeholder="Filter by topic or keyword..." style="width:100%;padding:8px 12px;border:1px solid var(--vtop-border-strong) !important;border-radius:6px;font-size:13px;outline:none;background:var(--vtop-bg-input) !important;background-color:var(--vtop-bg-input) !important;color:var(--vtop-text-primary) !important;box-sizing:border-box;" />
           </div>
           <button id="vtop-table-filter-reset" class="vtop-filter-btn" title="Reset Filters" style="background:var(--vtop-bg-row-hover) !important;background-color:var(--vtop-bg-row-hover) !important;border:1px solid var(--vtop-border-strong) !important;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--vtop-text-body) !important;white-space:nowrap;">Clear</button>

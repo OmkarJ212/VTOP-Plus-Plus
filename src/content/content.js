@@ -36,14 +36,25 @@
 
   init();
 
-  async function init() {
-    currentSettings = await Storage.getSettings();
+  function init() {
+    currentSettings = Storage.getCachedSettingsSync
+      ? Storage.getCachedSettingsSync()
+      : { ...Storage.DEFAULT_SETTINGS };
 
     setupMessageListener();
     setupMutationObserver();
     setupWatchdog();
 
     bootModules();
+
+    Storage.getSettings().then((stored) => {
+      if (!stored) return;
+      const changed = Object.keys(stored).some((k) => stored[k] !== currentSettings[k]);
+      currentSettings = stored;
+      if (changed) {
+        applyModuleStates();
+      }
+    });
   }
 
   function bootModules() {
@@ -75,13 +86,13 @@
       QuickDock.init();
     }
 
+    document.documentElement?.classList.toggle('vtop-course-filter-enabled', currentSettings.enableCourseFilter !== false);
+
     // Run contextual page scanners
     runPageScanners();
   }
 
   function runPageScanners() {
-    if (CourseDownloader?.isBusy?.()) return;
-
     // Permanently remove Campus Etiquette button if re-injected by VTOP
     document.getElementById('campusEtiquetteBtn')?.remove();
 
@@ -296,10 +307,41 @@
       });
       if (isInternal) return;
 
-      if (window.__vtop_plus_scan_t) clearTimeout(window.__vtop_plus_scan_t);
-      window.__vtop_plus_scan_t = setTimeout(() => {
-        runPageScanners();
-      }, 100);
+      // Immediately tag newly added DOM nodes when PrivacyMode is active
+      if (PrivacyMode?.isActive && PrivacyMode.handleMutations) {
+        PrivacyMode.handleMutations(mutations);
+      }
+
+      // Immediately mount/refresh CourseFilter if VTOP injected or populated #courseId so native dropdown never flashes
+      if (currentSettings.enableCourseFilter !== false && CourseFilter) {
+        const hasNewCourseSelect = mutations.some((m) => {
+          if (m.target?.nodeType === 1 && m.target.matches?.('select#courseId, select[name="courseId"]')) {
+            return true;
+          }
+          return Array.from(m.addedNodes).some(
+            (n) =>
+              n.nodeType === 1 &&
+              (n.matches?.('select#courseId, select[name="courseId"]') ||
+                Boolean(n.querySelector?.('select#courseId, select[name="courseId"]')))
+          );
+        });
+        if (hasNewCourseSelect) {
+          CourseFilter.init();
+        }
+      }
+
+      if (!window.__vtop_plus_scan_pending) {
+        window.__vtop_plus_scan_pending = true;
+        const flushScan = () => {
+          window.__vtop_plus_scan_pending = false;
+          runPageScanners();
+        };
+        if (typeof requestAnimationFrame === 'function' && document.visibilityState !== 'hidden') {
+          requestAnimationFrame(flushScan);
+        } else {
+          setTimeout(flushScan, 16);
+        }
+      }
     });
 
     observer.observe(document.body || document.documentElement, {
@@ -309,7 +351,7 @@
   }
 
   /**
-   * Safety watchdog to catch tables loaded via slow AJAX requests or dynamic tab switches
+   * Safety watchdog to catch tables loaded via slow AJAX requests, Dashboard switches, or dynamic tab changes
    */
   let lastKnownPageType = '';
   function setupWatchdog() {
@@ -317,6 +359,58 @@
       const currentPageType = DOM?.detectPageType ? DOM.detectPageType() : '';
       if (currentPageType !== lastKnownPageType) {
         lastKnownPageType = currentPageType;
+        runPageScanners();
+        return;
+      }
+
+      const needsCourseFilter =
+        currentSettings.enableCourseFilter !== false &&
+        ((Boolean(document.querySelector('select#courseId, select[name="courseId"]')) &&
+          !document.getElementById('vtop-custom-course-filter')) ||
+          (Boolean(document.getElementById('materialTable')) &&
+            !document.getElementById('vtop-plus-table-filter-bar')));
+
+      const hasHomeRightAnchor = Boolean(document.getElementById('proctor-message') || document.getElementById('edu-status'));
+      const hasUnaugmentedHomeDa =
+        currentSettings.enableDaTracker !== false &&
+        Array.from(document.querySelectorAll('#digital-assignments table tbody tr')).some(
+          (tr) => tr.textContent.trim().length > 0 && !tr.querySelector('.vtop-da-home-cell')
+        );
+
+      const needsDashboard =
+        (Boolean(document.getElementById('course-data')) && !document.getElementById('vtop-home-class-messages')) ||
+        (currentSettings.enableScheduleWidget !== false &&
+          hasHomeRightAnchor &&
+          !document.getElementById('vtop-home-today-schedule')) ||
+        (currentSettings.enableMarksNotifier !== false &&
+          hasHomeRightAnchor &&
+          !document.getElementById('vtop-home-marks-updates')) ||
+        hasUnaugmentedHomeDa;
+
+      const needsQuickDock =
+        currentSettings.enableQuickDock !== false &&
+        Boolean(QuickDock?.isAuthenticated?.()) &&
+        !QuickDock.isMountedInDom();
+
+      const needsAttendance =
+        currentSettings.enableAttendanceCalc !== false &&
+        Boolean(document.getElementById('AttendanceDetailDataTable')) &&
+        !document.getElementById('vtop-attendance-summary-card');
+
+      const markForm = document.getElementById('studentMarkView');
+      const marksTableExists = Boolean(document.querySelector('#fixedTableContainer table.customTable-level1'));
+      const hasCgpaHostCard = Boolean(
+        markForm?.closest('.card') ||
+          (marksTableExists &&
+            !document.getElementById('studentGradeView') &&
+            document.querySelector('#fixedTableContainer')?.closest('.card'))
+      );
+      const needsFatPredictor =
+        currentSettings.enableFatPredictor !== false &&
+        ((marksTableExists && !document.querySelector('.vtop-fat-inline-tfoot')) ||
+          (hasCgpaHostCard && !document.getElementById('vtop-cgpa-calculator')));
+
+      if (needsCourseFilter || needsDashboard || needsQuickDock || needsAttendance || needsFatPredictor) {
         runPageScanners();
         return;
       }
@@ -330,25 +424,30 @@
             : document.querySelector('button#downloadmat[data-fileid], button[data-fileid], .download-btn[data-fileid]')
         );
         const panel = document.getElementById('vtop-zip-panel');
-        if (hasDownloadBtn && !panel) {
+        if (hasDownloadBtn && (!panel || panel.style.display === 'none')) {
           CourseDownloader.init();
         }
       }
 
       // Check DA Tracker if on DA view but status column/cell badges are not yet mounted
-      if (currentSettings.enableDaTracker !== false && currentPageType === 'DIGITAL_ASSIGNMENT' && DaTracker) {
+      if (
+        currentSettings.enableDaTracker !== false &&
+        (currentPageType === 'DIGITAL_ASSIGNMENT' || Boolean(document.getElementById('digitalAssignment'))) &&
+        DaTracker
+      ) {
         const hasOverviewAugment = Boolean(document.querySelector('.vtop-th-da-status'));
         const hasCellAugment = Boolean(document.querySelector('.vtop-da-cell-augmented'));
         if (!hasOverviewAugment && !hasCellAugment) {
           DaTracker.init();
         }
       }
-    }, 2000);
+    }, 1500);
   }
 
   function applyModuleStates() {
+    document.documentElement?.classList.toggle('vtop-course-filter-enabled', currentSettings.enableCourseFilter !== false);
     if (DarkMode && typeof currentSettings.enableDarkMode === 'boolean') {
-      DarkMode.set(currentSettings.enableDarkMode);
+      DarkMode.set(currentSettings.enableDarkMode, false, false);
     }
     if (PrivacyMode && typeof currentSettings.enablePrivacyMode === 'boolean') {
       PrivacyMode.set(currentSettings.enablePrivacyMode);

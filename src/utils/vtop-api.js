@@ -22,30 +22,16 @@
   let memoryRateLimitUntil = 0;
   let pendingActiveSemPromise = null;
 
+  function getStorage() {
+    return window.VTOP_PLUS?.Storage;
+  }
+
   function storageGet(keys) {
-    return new Promise((resolve) => {
-      if (!chrome?.storage?.local) {
-        resolve({});
-        return;
-      }
-      chrome.storage.local.get(keys, (items) => {
-        if (chrome.runtime.lastError) {
-          resolve({});
-          return;
-        }
-        resolve(items || {});
-      });
-    });
+    return getStorage()?.get ? getStorage().get(keys) : Promise.resolve({});
   }
 
   function storageSet(obj) {
-    return new Promise((resolve) => {
-      if (!chrome?.storage?.local) {
-        resolve();
-        return;
-      }
-      chrome.storage.local.set(obj, () => resolve());
-    });
+    return getStorage()?.set ? getStorage().set(obj) : Promise.resolve();
   }
 
   function isLoginScreen() {
@@ -373,6 +359,222 @@
         return rec.options;
       }
       return null;
+    },
+
+    /**
+     * Fetches a VTOP page shell (e.g. StudentDA, StudentTimeTable, StudentMarkView)
+     * and extracts its semester options and form tokens (_csrf, authorizedID).
+     */
+    async fetchSemesterShell({
+      pageUrl,
+      formSelector = 'form',
+      selectId = 'semesterSubId',
+      saveRegistered = false
+    } = {}) {
+      const res = await this.postHtml(pageUrl, {
+        verifyMenu: 'true',
+        nocache: `@(${new Date().toUTCString()})`
+      });
+      if (!res.ok || !res.html) {
+        return {
+          ok: false,
+          rateLimited: Boolean(res.rateLimited),
+          expired: Boolean(res.expired),
+          status: res.status || 0,
+          doc: null,
+          options: [],
+          csrf: '',
+          authId: '',
+          selectedVal: ''
+        };
+      }
+
+      const doc = new DOMParser().parseFromString(res.html, 'text/html');
+      const options = extractSelectOptions(doc, selectId);
+      if (saveRegistered && options.length > 0) {
+        await this.saveRegisteredSemesters(options);
+      }
+
+      const csrf =
+        doc.querySelector(`${formSelector} input[name="_csrf"]`)?.value ||
+        doc.querySelector('input[name="_csrf"]')?.value ||
+        '';
+      const authId =
+        doc.querySelector(`${formSelector} #authorizedID`)?.value ||
+        doc.querySelector('#authorizedID')?.value ||
+        '';
+      const selectedVal =
+        doc.querySelector(`${formSelector} #${selectId} option[selected]`)?.value?.trim() || '';
+
+      return {
+        ok: true,
+        rateLimited: false,
+        expired: false,
+        status: res.status || 200,
+        doc,
+        options,
+        csrf,
+        authId,
+        selectedVal
+      };
+    },
+
+    /**
+     * Performs the standard 2-step VTOP semester data fetch:
+     * 1) fetchSemesterShell(pageUrl) -> extract tokens & options
+     * 2) resolve target semester -> postHtml(dataUrl)
+     */
+    async fetchSemesterData({
+      pageUrl,
+      formSelector = 'form',
+      selectId = 'semesterSubId',
+      dataUrl,
+      semesterSubId = '',
+      active = null,
+      saveRegistered = false,
+      useFirstOptionOnly = false,
+      useSelectedOptionFallback = false,
+      extraParams = {}
+    } = {}) {
+      const shell = await this.fetchSemesterShell({
+        pageUrl,
+        formSelector,
+        selectId,
+        saveRegistered
+      });
+      if (!shell.ok) {
+        return {
+          ok: false,
+          rateLimited: shell.rateLimited,
+          expired: shell.expired,
+          status: shell.status,
+          html: '',
+          semesterSubId: '',
+          semesterLabel: '',
+          shell
+        };
+      }
+
+      const { options } = shell;
+      let targetOpt = null;
+      if (semesterSubId) {
+        targetOpt = options.find((o) => o.value === semesterSubId) || { value: semesterSubId, label: '' };
+      } else if (useFirstOptionOnly) {
+        targetOpt = options[0] || null;
+      } else {
+        targetOpt = active?.semesterSubId
+          ? options.find((o) => o.value === active.semesterSubId) || null
+          : null;
+        if (!targetOpt) {
+          targetOpt = this.matchOptionByBadge(options, this.getHomeSemesterBadgeText());
+        }
+        if (!targetOpt && useSelectedOptionFallback && shell.selectedVal) {
+          targetOpt = options.find((o) => o.value === shell.selectedVal) || null;
+        }
+        if (!targetOpt) {
+          targetOpt = options[0] || null;
+        }
+      }
+
+      if (!targetOpt) {
+        return {
+          ok: false,
+          rateLimited: false,
+          expired: false,
+          status: 0,
+          html: '',
+          semesterSubId: '',
+          semesterLabel: '',
+          shell
+        };
+      }
+
+      const dataRes = await this.postHtml(dataUrl, {
+        ...(shell.csrf ? { _csrf: shell.csrf } : {}),
+        ...(shell.authId ? { authorizedID: shell.authId } : {}),
+        semesterSubId: targetOpt.value,
+        ...extraParams
+      });
+
+      return {
+        ok: Boolean(dataRes.ok && dataRes.html),
+        rateLimited: Boolean(dataRes.rateLimited),
+        expired: Boolean(dataRes.expired),
+        status: dataRes.status || 0,
+        html: dataRes.html || '',
+        semesterSubId: targetOpt.value,
+        semesterLabel: targetOpt.label || '',
+        shell
+      };
+    },
+
+    /**
+     * Waits for jQuery BlockUI to clear and auto-selects a semester option on a VTOP page,
+     * dispatching a bubbling change event so VTOP loads the semester fragment.
+     * Returns true if a selection change was triggered.
+     */
+    async autoSelectSemesterOnPage({
+      formSelector = '',
+      selectId = 'semesterSubId',
+      autoFlag = 'vtopAutoSem',
+      targetSemesterId = '',
+      resolveActive = false,
+      saveRegistered = false,
+      forceWhenNonEmpty = false
+    } = {}) {
+      const semSelect = formSelector
+        ? document.querySelector(`${formSelector} #${selectId}`)
+        : document.getElementById(selectId);
+      if (!semSelect) return false;
+
+      const options = Array.from(semSelect.options || [])
+        .map((o) => ({ value: (o.value || '').trim(), label: (o.textContent || '').replace(/\s+/g, ' ').trim() }))
+        .filter((o) => o.value);
+
+      if (saveRegistered && options.length > 0) {
+        this.saveRegisteredSemesters(options);
+      }
+
+      const shouldPick =
+        forceWhenNonEmpty
+          ? Boolean(targetSemesterId && semSelect.value !== targetSemesterId)
+          : semSelect.value === '' && !semSelect.dataset[autoFlag];
+
+      if (!shouldPick || options.length === 0) return false;
+
+      let targetOpt = targetSemesterId
+        ? options.find((o) => o.value === targetSemesterId) || null
+        : null;
+
+      if (!targetOpt && !forceWhenNonEmpty) {
+        if (resolveActive) {
+          const active = await this.resolveActiveSemesterId();
+          if (active?.semesterSubId) {
+            targetOpt = options.find((o) => o.value === active.semesterSubId) || null;
+          }
+        }
+        if (!targetOpt) {
+          targetOpt = this.matchOptionByBadge(options, this.getHomeSemesterBadgeText()) || options[0];
+        }
+      }
+
+      if (!targetOpt) return false;
+
+      if (autoFlag) {
+        semSelect.dataset[autoFlag] = '1';
+      }
+
+      const DOM = window.VTOP_PLUS?.DOM;
+      if (DOM?.waitForBlockUIClear) {
+        await DOM.waitForBlockUIClear();
+      }
+      if (!semSelect.isConnected) return false;
+      if (!forceWhenNonEmpty && semSelect.value !== '') return false;
+      if (forceWhenNonEmpty && semSelect.value === targetOpt.value) return false;
+
+      semSelect.value = targetOpt.value;
+      semSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      return true;
     }
   };
 

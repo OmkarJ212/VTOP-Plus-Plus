@@ -1,26 +1,36 @@
 # VTOP++
 
-**VTOP++** is a browser extension made specifically for **VIT Vellore** students using VTOP (`vtop.vit.ac.in`). It makes VTOP cleaner, easier to navigate, and saves you time on everyday tasks like downloading notes, checking attendance, and tracking marks.
+**VTOP++** is a browser extension for **VIT Vellore** students using VTOP (`vtop.vit.ac.in`). It makes VTOP cleaner, faster to get around, and easier for everyday tasks like downloading notes, checking attendance, and tracking marks and deadlines.
 
 > **Note:** Built only for the **VIT Vellore** portal. It does not support Chennai, Bhopal, or AP campuses.
 
 ---
 
-## What It Does
+## Features
 
-- **1-Click Course Material Downloads:** Download all notes, slides, and syllabus files for a course together in a single `.zip` file instead of clicking them one by one.
-- **Easy Course & Material Filtering:** Organize courses by semester, subject, and faculty, search topics directly inside the table, and filter between **Theory** and **Lab** materials.
-- **Attendance Bunk Calculator:** Shows right next to each subject how many classes you can safely miss—or how many you must attend—based on your chosen target percentage (defaults to `75%`).
-- **Marks Summary & CGPA Calculator:** Adds up your total marks scored per subject and gives you a simple **Potential CGPA Calculator** where you can pick expected grades (`S`, `A`, `B`, etc.) to preview your new GPA and CGPA.
-- **New Marks Notifications:** Automatically checks for newly uploaded or updated marks (for both your current and previous semester) and alerts you on the Home page and through browser notifications.
-- **Assignment Deadline Reminders:** Highlights Digital Assignment due dates with color-coded countdowns (purple if due today, red if due soon, green if safe or submitted) and puts upcoming deadlines right on your Home page.
-- **Today's Schedule & Calendar Export:** Displays today's classes on the Home page showing which class is happening now or coming up next, and lets you export your full timetable to **Google Calendar** or a calendar file (`.ics`) with reminders.
-- **Class Messages on Home:** Shows faculty class messages directly on your Home dashboard so you don't have to hunt for them.
-- **Auto-Captcha Login:** Automatically reads and fills in the login captcha for faster sign-in.
-- **Stay Logged In:** Keeps your VTOP session active while you're working so you don't get logged out every 15 minutes. You can toggle this on or off anytime from the extension icon.
-- **Quick Page Search (`Ctrl + K` / `Cmd + K`):** Press `Ctrl + K` (or `Cmd + K` on Mac) from anywhere in VTOP to search and jump straight to any page, or use the quick shortcut buttons added to the top bar.
-- **Light & Dark Mode:** Switch between clean Light and Dark themes across VTOP pages, tables, forms, and popups with one click.
-- **Privacy Blur:** One click in the top bar blurs your photo, registration number, name, and CGPA when you're in public (hover over anything blurred to peek at it).
+### Course Materials & Downloads
+- **1-Click `.zip` Material Downloads:** Download all notes, slides, and materials for a course (or a single professor) together in one `.zip` file, with an option to separate files into folders by faculty and cancel downloads anytime.
+- **Course & Topic Filtering:** Browse courses cleanly by **Semester**, **Subject**, and **Faculty**, and search inside the materials table by topic or keyword.
+
+### Home Dashboard
+- **Today's Schedule & Exam Mode:** Shows today's classes right on your Home page with live status for your current and upcoming classes, day tabs to check the rest of the week, and an automatic **Exam Schedule** view during exam periods (`CAT`, `FAT`, etc.) with timings, venues, and seat details.
+- **Calendar Export (`.ics` & Google Calendar):** Export your full weekly timetable to **Google Calendar** or download a `.ics` file with custom semester dates and reminders.
+- **Marks Notifier:** Automatically checks for newly uploaded or updated marks across your current and previous semester, shows them in a **Marks Notifier** card on Home, and sends browser notifications so you can jump straight to that semester's marks.
+- **Class Messages on Home:** Displays faculty class messages right on your Home page with quick refresh and page links.
+- **1-Click Assignment Uploads:** Adds **Upload Now** buttons directly next to pending assignments on the Home dashboard to take you straight to the upload page.
+
+### Attendance, Marks & Assignments
+- **Attendance Bunk Calculator:** Shows your overall attendance, OD count, and exactly how many classes you can miss—or need to attend—next to every course for your chosen target percentage (`75%` by default, adjustable from `1%` to `100%`).
+- **Marks Summary & CGPA Calculator:** Displays your total weighted marks under each course and provides a **CGPA Calculator** on the Marks page (pre-filled from your Grade History) where you can pick expected grades to preview your new SGPA and CGPA.
+- **Digital Assignment Countdowns:** Color-codes assignment due dates (**purple** if due today, **red** if due soon or overdue, **green** if safe or submitted) and adds a **Next Assignment** status column to the assignment overview table.
+
+### Navigation, Login & Appearance
+- **Top Bar Shortcuts:** 1-click buttons in the header to open **Course Page**, **Attendance**, **Time Table**, **Digital Assignments**, and **Marks**, along with a badge when new marks are posted.
+- **Quick Page Search (`Ctrl + K` / `Cmd + K`):** Press `Ctrl + K` (or `Cmd + K` on Mac) anywhere on VTOP to search and jump directly to any page.
+- **Dark Mode & Light Mode:** Toggle between clean Light and Dark themes across VTOP pages, tables, menus, and the extension popup in one click.
+- **Privacy Blur:** Blur your registration number, name, CGPA, and profile photo with one click in the top bar when you're around others (hover over anything blurred to peek at it).
+- **Auto-Captcha Login:** Automatically fills in the login captcha (and selects the Student role when blank) for quicker sign-in.
+- **Session Keep-Alive:** Keeps your VTOP session active while you're working so you aren't logged out every 15 minutes. You can turn this on or off anytime from the extension icon.
 
 ---
 
@@ -31,15 +41,14 @@
 3. Go to `chrome://extensions` in the address bar.
 4. Turn on **Developer mode** (top-right corner).
 5. Click **Load unpacked** and select the **`VTOP-Plus-Plus`** folder.
-6. Visit `https://vtop.vit.ac.in` and you're all set!
+6. Visit `https://vtop.vit.ac.in` and sign in.
 
 ---
 
-## Privacy & Safety
+## Privacy
 
-- **Runs Completely in Your Browser:** Nothing is sent to any external servers—captcha solving, grade calculations, and file zipping all happen locally on your device.
-- **Never Touches Your Password:** VTOP++ never reads, saves, or shares your VTOP login password.
-- **Gentle on VTOP:** Downloads and background checks are spaced out carefully so they don't overload VTOP or trigger rate limits.
+- Everything runs locally in your browser—your grades, files, and settings are never sent to external servers.
+- VTOP++ never reads, saves, or shares your VTOP password.
 
 ---
 

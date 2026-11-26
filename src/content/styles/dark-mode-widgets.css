@@ -99,10 +99,6 @@ html.vtop-dark-theme .vtop-fat-header-row > td {
   border-color: var(--vtop-border) !important;
 }
 
-html.vtop-dark-theme .vtop-fat-header-right {
-  color: var(--vtop-accent) !important;
-}
-
 html.vtop-dark-theme #vtop-cgpa-calculator {
   background-color: var(--vtop-bg-surface) !important;
   border-color: var(--vtop-border) !important;
@@ -189,21 +185,38 @@ html.vtop-dark-theme .vtop-progress-bar-bg {
 }
 
 html.vtop-dark-theme .vtop-download-btn {
-  background: #16a34a !important;
-  color: var(--vtop-text-inverse) !important;
+  background: #2c6d99 !important;
+  border: 1px solid #3c8dbc !important;
+  color: #f8fafc !important;
 }
 
 html.vtop-dark-theme .vtop-download-btn:hover:not(:disabled) {
-  background: #15803d !important;
+  background: #357fae !important;
+  border-color: #4a96c4 !important;
+  color: #ffffff !important;
+}
+
+html.vtop-dark-theme .vtop-progress-bar-fill {
+  background: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme .vtop-cancel-btn {
   background: #dc2626 !important;
+  border: 1px solid #b91c1c !important;
   color: var(--vtop-text-inverse) !important;
 }
 
 html.vtop-dark-theme .vtop-cancel-btn:hover {
   background: #b91c1c !important;
+  border-color: #991b1b !important;
+}
+
+html.vtop-dark-theme .vtop-dl-option-row {
+  color: var(--vtop-text-body) !important;
+}
+
+html.vtop-dark-theme .vtop-dl-option-row input[type="checkbox"] {
+  accent-color: var(--vtop-accent) !important;
 }
 
 html.vtop-dark-theme .vtop-status-msg {
@@ -239,10 +252,6 @@ html.vtop-dark-theme .vtop-palette-esc {
   background: var(--vtop-bg-elevated) !important;
   border-color: var(--vtop-border) !important;
   color: var(--vtop-text-muted) !important;
-}
-
-html.vtop-dark-theme .vtop-palette-list::-webkit-scrollbar-thumb {
-  background: var(--vtop-scrollbar-thumb) !important;
 }
 
 html.vtop-dark-theme .vtop-palette-item:hover,
@@ -429,6 +438,7 @@ html.vtop-dark-theme .vtop-marks-home-code {
 html.vtop-dark-theme .vtop-tt-meta,
 html.vtop-dark-theme .vtop-tt-slot,
 html.vtop-dark-theme .vtop-tt-state,
+html.vtop-dark-theme .vtop-tt-exam-range-pill,
 html.vtop-dark-theme .vtop-marks-home-sub {
   color: var(--vtop-text-muted) !important;
 }
@@ -527,10 +537,6 @@ html.vtop-dark-theme .vtop-tt-notify-row label {
 
 html.vtop-dark-theme .vtop-tt-notify-suffix {
   color: var(--vtop-text-muted) !important;
-}
-
-html.vtop-dark-theme tr.vtop-marks-row-changed > td {
-  background-color: var(--vtop-success-bg-soft) !important;
 }
 
 html.vtop-dark-theme .vtop-marks-home-score {

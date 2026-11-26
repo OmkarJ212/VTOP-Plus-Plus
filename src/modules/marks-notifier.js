@@ -199,15 +199,13 @@
         chrome.runtime.onMessage.addListener(this._onMessage);
       }
 
-      if (!this._onStorageChanged && chrome?.storage?.onChanged) {
-        this._onStorageChanged = (changes, area) => {
-          if (area !== 'local') return;
-          const key = this.getStorageKey();
-          if (changes[key]?.newValue) {
-            this.syncUiFromState(changes[key].newValue);
+      if (!this._unsubStorage && window.VTOP_PLUS?.Storage?.onKeysChanged) {
+        const key = this.getStorageKey();
+        this._unsubStorage = window.VTOP_PLUS.Storage.onKeysChanged([key], (matched) => {
+          if (matched[key]) {
+            this.syncUiFromState(matched[key]);
           }
-        };
-        chrome.storage.onChanged.addListener(this._onStorageChanged);
+        });
       }
 
       // 1. Handle StudentMarkView page (auto-jump, passive capture, row highlights)
@@ -245,9 +243,9 @@
         chrome.runtime.onMessage.removeListener(this._onMessage);
         this._onMessage = null;
       }
-      if (this._onStorageChanged && chrome?.storage?.onChanged) {
-        chrome.storage.onChanged.removeListener(this._onStorageChanged);
-        this._onStorageChanged = null;
+      if (this._unsubStorage) {
+        this._unsubStorage();
+        this._unsubStorage = null;
       }
       document.getElementById(HOME_CARD_ID)?.remove();
       document.getElementById(TOAST_ID)?.remove();
@@ -400,20 +398,19 @@
             state.pairResolvedAt = Date.now();
           } else {
             // Fallback: fetch StudentMarkView shell & skip empty Summer/Tri terms
-            const shellRes = await VtopApi.postHtml('examinations/StudentMarkView', {
-              verifyMenu: 'true',
-              nocache: `@(${new Date().toUTCString()})`
+            const shell = await VtopApi.fetchSemesterShell({
+              pageUrl: 'examinations/StudentMarkView',
+              formSelector: '#studentMarkView'
             });
-            if (shellRes.rateLimited || shellRes.expired || !shellRes.ok || !shellRes.html) {
+            if (shell.rateLimited || shell.expired || !shell.ok) {
               aborted = true;
               return;
             }
 
-            const shellDoc = new DOMParser().parseFromString(shellRes.html, 'text/html');
-            const options = VtopApi.extractSelectOptions(shellDoc, 'semesterSubId');
+            const { options } = shell;
             formMeta = {
-              csrf: shellDoc.querySelector('#studentMarkView input[name="_csrf"]')?.value,
-              authId: shellDoc.querySelector('#studentMarkView #authorizedID')?.value
+              csrf: shell.csrf || undefined,
+              authId: shell.authId || undefined
             };
 
             if (options.length > 0) {
@@ -591,14 +588,17 @@
           const opt = Array.from(semSelect.options).find((o) => o.value === targetId);
           if (opt) {
             this._pendingJump = null;
-            const DOM = window.VTOP_PLUS?.DOM;
-            if (DOM?.waitForBlockUIClear) {
-              await DOM.waitForBlockUIClear();
+            const VtopApi = window.VTOP_PLUS?.VtopApi;
+            if (
+              await VtopApi?.autoSelectSemesterOnPage?.({
+                formSelector: '#studentMarkView',
+                targetSemesterId: targetId,
+                forceWhenNonEmpty: true,
+                autoFlag: ''
+              })
+            ) {
+              return;
             }
-            if (!semSelect.isConnected) return;
-            semSelect.value = targetId;
-            semSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            return;
           }
         } else {
           this._pendingJump = null;
@@ -702,9 +702,8 @@
 
         this.syncDockBadge(unread.length);
 
-        const rightCol =
-          document.getElementById('proctor-message')?.closest('.col-md-4') ||
-          document.getElementById('edu-status')?.closest('.col-md-4');
+        const UI = window.VTOP_PLUS?.UI;
+        const rightCol = UI?.getHomeRightColumn ? UI.getHomeRightColumn() : null;
 
         if (!rightCol) {
           document.getElementById(HOME_CARD_ID)?.remove();
@@ -738,13 +737,9 @@
 
         let badgeClass = 'vtop-msg-badge vtop-msg-badge-muted';
         let badgeText = 'Up to date';
-        if (isChecking) {
-          badgeText = 'Checking...';
-        } else if (unread.length > 0) {
+        if (unread.length > 0) {
           badgeClass = 'vtop-msg-badge vtop-msg-badge-active';
           badgeText = `${unread.length} New`;
-        } else if (!state.lastCheckAt) {
-          badgeText = 'Pending';
         }
 
         const bodyHtml =
@@ -769,13 +764,9 @@
                   `;
                 })
                 .join('')
-            : `
-              <div class="vtop-dashboard-empty">
-                <div class="vtop-dashboard-empty-title">${isChecking ? 'Checking for marks updates...' : 'No new marks updates'}</div>
-              </div>
-            `;
-
-        const dotModifier = isChecking ? 'is-checking' : !state.lastCheckAt ? 'is-idle' : '';
+            : UI?.emptyState
+              ? UI.emptyState('No new marks updates')
+              : '';
 
         card.innerHTML = `
           <div class="card-header d-flex primaryBorderTop vtop-marks-home-header">
@@ -787,34 +778,20 @@
               ${
                 unread.length > 0
                   ? `<button type="button" class="vtop-msg-icon-btn" id="vtop-marks-home-dismiss" title="Mark all as read" aria-label="Mark all as read">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
+                      ${UI?.icon('check', 14) || ''}
                     </button>`
                   : ''
               }
-              <button type="button" class="vtop-msg-icon-btn ${isChecking ? 'vtop-msg-spinning' : ''}" id="vtop-marks-check-now" title="Check Now" aria-label="Check for Marks Updates" ${isChecking ? 'disabled' : ''}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="23 4 23 10 17 10"></polyline>
-                  <polyline points="1 20 1 14 7 14"></polyline>
-                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                </svg>
+              <button type="button" class="vtop-msg-icon-btn ${isChecking ? 'vtop-msg-spinning' : ''}" id="vtop-marks-check-now" title="Refresh Marks" aria-label="Refresh Marks" ${isChecking ? 'disabled' : ''}>
+                ${UI?.icon('refresh', 14) || ''}
               </button>
               <button type="button" class="vtop-msg-icon-btn" id="vtop-marks-open-btn" title="Open Marks Page" aria-label="Open Marks Page">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                  <polyline points="15 3 21 3 21 9"></polyline>
-                  <line x1="10" y1="14" x2="21" y2="3"></line>
-                </svg>
+                ${UI?.icon('external-link', 14) || ''}
               </button>
             </div>
           </div>
           <div class="card-body vtop-marks-home-body">
             ${bodyHtml}
-          </div>
-          <div class="vtop-marks-home-footer">
-            <span class="vtop-marks-status-dot ${dotModifier}"></span>
-            <span class="vtop-marks-home-footer-text">Checked ${escapeHtml(lastChecked)}</span>
           </div>
         `;
 
@@ -916,8 +893,8 @@
       const firstName = first.courseTitle || first.courseCode;
       const title =
         changes.length === 1
-          ? `VTOP++ Marks Updated: ${firstName}`
-          : `VTOP++: ${changes.length} Marks Updated`;
+          ? `Marks Updated: ${firstName}`
+          : `${changes.length} Marks Updated`;
       const message =
         changes.length === 1
           ? `${first.componentTitle}: ${first.newVal}${first.maxMark ? `/${first.maxMark}` : ''} (${first.semesterLabel || first.semesterSubId})`

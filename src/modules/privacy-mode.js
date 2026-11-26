@@ -15,25 +15,27 @@
   const PrivacyMode = {
     isActive: false,
     _initialized: false,
-    _observer: null,
 
     init() {
       if (this._initialized) return;
       this._initialized = true;
 
-      if (chrome?.storage?.local) {
-        chrome.storage.local.get(['enablePrivacyMode'], (res) => {
-          if (chrome.runtime.lastError) return;
-          if (res?.enablePrivacyMode) {
-            this.set(true, false);
+      const Storage = window.VTOP_PLUS?.Storage;
+      if (Storage?.getCachedSettingsSync) {
+        const cached = Storage.getCachedSettingsSync();
+        if (cached.enablePrivacyMode) {
+          this.set(true, false);
+        }
+      }
+      if (Storage) {
+        Storage.get(['enablePrivacyMode']).then((res) => {
+          if (res?.enablePrivacyMode !== undefined && Boolean(res.enablePrivacyMode) !== this.isActive) {
+            this.set(Boolean(res.enablePrivacyMode), false);
           }
         });
-      }
-
-      if (chrome?.storage?.onChanged) {
-        chrome.storage.onChanged.addListener((changes, area) => {
-          if (area === 'local' && changes.enablePrivacyMode !== undefined) {
-            this.set(Boolean(changes.enablePrivacyMode.newValue), false);
+        Storage.onKeysChanged(['enablePrivacyMode'], (matched) => {
+          if (matched.enablePrivacyMode !== undefined) {
+            this.set(Boolean(matched.enablePrivacyMode), false);
           }
         });
       }
@@ -47,41 +49,23 @@
       this.isActive = Boolean(active);
       document.documentElement.classList.toggle('vtop-privacy-active', this.isActive);
 
-      if (saveStorage && chrome?.storage?.local) {
-        chrome.storage.local.set({ enablePrivacyMode: this.isActive });
+      if (saveStorage) {
+        window.VTOP_PLUS?.Storage?.set({ enablePrivacyMode: this.isActive });
       }
 
       if (this.isActive) {
         this.tagSensitiveElements(document);
-        this.startObserver();
-      } else {
-        this.stopObserver();
       }
     },
 
-    startObserver() {
-      if (this._observer) return;
-      const root = document.body || document.documentElement;
-      if (!root) return;
-
-      this._observer = new MutationObserver((mutations) => {
-        if (!this.isActive) return;
-        for (const m of mutations) {
-          for (const node of m.addedNodes) {
-            if (node.nodeType !== 1) continue;
-            if (typeof node.id === 'string' && node.id.startsWith('vtop-')) continue;
-            this.tagSensitiveElements(node);
-          }
+    handleMutations(mutations) {
+      if (!this.isActive || !Array.isArray(mutations)) return;
+      for (const m of mutations) {
+        for (const node of m.addedNodes) {
+          if (node.nodeType !== 1) continue;
+          if (typeof node.id === 'string' && node.id.startsWith('vtop-')) continue;
+          this.tagSensitiveElements(node);
         }
-      });
-
-      this._observer.observe(root, { childList: true, subtree: true });
-    },
-
-    stopObserver() {
-      if (this._observer) {
-        this._observer.disconnect();
-        this._observer = null;
       }
     },
 

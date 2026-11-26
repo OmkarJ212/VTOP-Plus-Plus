@@ -28,41 +28,50 @@
         return;
       }
 
-      if (this._settingsLoaded) {
-        this.renderSummaryWidget(table);
-        this.augmentTable(table);
-        return;
+      if (!this._settingsLoaded) {
+        try {
+          const cachedTarget = parseInt(localStorage.getItem('vtop_att_target_v1') || '', 10);
+          if (!isNaN(cachedTarget)) {
+            this.targetPercent = Math.max(1, Math.min(100, cachedTarget));
+          }
+        } catch (_) {}
+
+        if (!this._settingsPromise) {
+          this._settingsPromise = this.loadTargetSettings().then((changed) => {
+            this._settingsLoaded = true;
+            if (changed) {
+              const latestTable = this.findAttendanceTable();
+              if (latestTable) {
+                this.renderSummaryWidget(latestTable);
+                this.augmentTable(latestTable);
+              }
+            }
+          });
+        }
       }
 
-      if (!this._settingsPromise) {
-        this._settingsPromise = this.loadTargetSettings().then(() => {
-          this._settingsLoaded = true;
-        });
-      }
-      this._settingsPromise.then(() => {
-        this.renderSummaryWidget(table);
-        this.augmentTable(table);
-      });
+      this.renderSummaryWidget(table);
+      this.augmentTable(table);
     },
 
     async loadTargetSettings() {
-      if (chrome?.storage?.local) {
-        return new Promise((resolve) => {
-          chrome.storage.local.get(['attendanceTarget'], (res) => {
-            if (chrome.runtime.lastError) {
-              resolve();
-              return;
-            }
-            if (res && res.attendanceTarget !== undefined) {
-              const val = parseInt(res.attendanceTarget, 10);
-              if (!isNaN(val)) {
-                this.targetPercent = Math.max(1, Math.min(100, val));
-              }
-            }
-            resolve();
-          });
-        });
+      const Storage = window.VTOP_PLUS?.Storage;
+      if (!Storage) return false;
+      const res = await Storage.get(['attendanceTarget']);
+      if (res && res.attendanceTarget !== undefined) {
+        const val = parseInt(res.attendanceTarget, 10);
+        if (!isNaN(val)) {
+          const clamped = Math.max(1, Math.min(100, val));
+          try {
+            localStorage.setItem('vtop_att_target_v1', String(clamped));
+          } catch (_) {}
+          if (clamped !== this.targetPercent) {
+            this.targetPercent = clamped;
+            return true;
+          }
+        }
       }
+      return false;
     },
 
     findAttendanceTable() {
@@ -144,7 +153,10 @@
         }
         if (debouncedStorageTimer) clearTimeout(debouncedStorageTimer);
         debouncedStorageTimer = setTimeout(() => {
-          if (chrome?.storage?.local) chrome.storage.local.set({ attendanceTarget: val });
+          try {
+            localStorage.setItem('vtop_att_target_v1', String(val));
+          } catch (_) {}
+          window.VTOP_PLUS?.Storage?.set({ attendanceTarget: val });
         }, 300);
 
         const currentTable = this.findAttendanceTable() || table;
@@ -282,7 +294,7 @@
         newTh.id = 'vtop-th-bunk-meter';
         newTh.className = 'vtop-th-bunk fixedContent tableHeader';
         newTh.style.cssText = 'text-align: center; vertical-align: middle; min-width: 160px;';
-        newTh.textContent = 'VTOP++ Bunk Status';
+        newTh.textContent = 'Bunk Status';
         headerRow.appendChild(newTh);
       }
 
@@ -340,13 +352,13 @@
           if (data.attended < data.total) {
             const missed = data.total - data.attended;
             statusHtml = `
-              <span class="vtop-badge vtop-badge-danger" title="Cannot achieve 100% attendance as ${missed} class${missed === 1 ? ' was' : 'es were'} missed">
+              <span class="vtop-badge vtop-badge-danger">
                 Impossible (missed ${missed})
               </span>
             `;
           } else {
             statusHtml = `
-              <span class="vtop-badge vtop-badge-warn" title="Must attend every remaining class to stay at 100%">
+              <span class="vtop-badge vtop-badge-warn">
                 Need to attend all
               </span>
             `;
@@ -356,13 +368,13 @@
           const badgeClass = currentPct >= 80 ? 'vtop-badge-safe' : 'vtop-badge-warn';
           if (safeBunks === 0) {
             statusHtml = `
-              <span class="vtop-badge ${badgeClass}" title="Current attendance is right at target. Bunking the next class will drop you below ${targetPct}%">
+              <span class="vtop-badge ${badgeClass}">
                 On target (0 bunks left)
               </span>
             `;
           } else if (safeBunks > maxRemaining || safeBunks > HARD_MAX_NEEDED) {
             statusHtml = `
-              <span class="vtop-badge ${badgeClass}" title="Mathematically ${safeBunks} bunks above ${targetPct}%, covering all remaining classes in the semester">
+              <span class="vtop-badge ${badgeClass}">
                 Can bunk all remaining
               </span>
             `;
@@ -382,7 +394,7 @@
 
           if (needed > maxRemaining || needed > HARD_MAX_NEEDED || maxPossiblePct < targetPct) {
             statusHtml = `
-              <span class="vtop-badge vtop-badge-danger" title="Need to attend ${needed} consecutive classes to reach ${targetPct}%, which exceeds realistic remaining classes in a semester">
+              <span class="vtop-badge vtop-badge-danger">
                 Impossible
               </span>
             `;

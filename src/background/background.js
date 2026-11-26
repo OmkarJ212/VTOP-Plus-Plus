@@ -96,7 +96,7 @@ async function handleMarksNotification({ title, message, semesterSubId }, sender
       {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('icons/icon128.png'),
-        title: title || 'VTOP++ Marks Updated',
+        title: title || 'Marks Updated',
         message: message || 'New marks were uploaded on VTOP.'
       },
       () => {

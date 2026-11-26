@@ -54,6 +54,38 @@ body.vtop-dark-theme {
 }
 
 /* 7.1 Root & Foundation Structural Canvases */
+/* Synchronized full-page theme cross-fade (eliminates per-element transition stagger) */
+html.vtop-theme-snap *,
+html.vtop-theme-snap *::before,
+html.vtop-theme-snap *::after {
+  transition: none !important;
+}
+
+::view-transition-group(root) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: vtopThemeFadeIn 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  mix-blend-mode: normal;
+}
+
+@keyframes vtopThemeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+html.vtop-theme-transitioning,
+html.vtop-theme-transitioning * {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease !important;
+}
+
 html.vtop-dark-theme,
 html.vtop-dark-theme body,
 html.vtop-dark-theme #page_outline,
@@ -261,197 +293,6 @@ html.vtop-dark-theme #quickLinks .dropdown-menu .deleteQuickLinkBtn {
 #quickLinks #favouriteBtn:hover {
   background-color: var(--vtop-glass-12) !important;
   border: none !important;
-}
-
-/* ==========================================================================
-   7.2e VTOP Navigation Menu Buttons (Academics, Examinations, Feedback, etc.)
-   Standardize zero-outline/borderless button geometry across Light & Dark modes
-   ========================================================================== */
-.hmenuItem,
-.hmenuItem.btn,
-.hmenuItem.btn-outline,
-.btn-outline.hmenuItem,
-.hmenu .btn,
-.hmenu .btn-outline,
-.hmenu a,
-#top-hmenu-bar .btn,
-#top-hmenu-bar .btn-outline,
-#top-hmenu-bar a,
-.hmenubox .btn,
-.hmenubox .btn-outline,
-.sidebar .btn,
-.sidebar .btn-outline,
-.sidebar-menu .btn,
-.sidebar-menu .btn-outline,
-.main-sidebar .btn,
-.main-sidebar .btn-outline,
-nav .hmenuItem,
-nav .btn-outline,
-.navbar-nav .btn-outline,
-div[id^="MG0"] .btn,
-div[id^="MG0"] .btn-outline,
-div[id^="MG0"] a,
-a[data-bs-toggle="collapse"].hmenuItem,
-button[data-bs-toggle="collapse"].hmenuItem,
-a[data-bs-toggle="collapse"].btn-outline,
-button[data-bs-toggle="collapse"].btn-outline,
-a[href^="#MG0"].btn,
-a[href^="#MG0"].btn-outline,
-.systemB5BtnMenu,
-.systemBtnMenu {
-  border: none !important;
-  border-width: 0 !important;
-  border-color: transparent !important;
-  outline: none !important;
-  outline-width: 0 !important;
-  box-shadow: none !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  --bs-btn-border-color: transparent !important;
-  --bs-btn-border-width: 0 !important;
-  --bs-btn-focus-box-shadow: none !important;
-  --bs-btn-active-shadow: none !important;
-}
-
-.hmenuItem:hover,
-.hmenuItem.btn:hover,
-.hmenuItem.btn-outline:hover,
-.btn-outline.hmenuItem:hover,
-.hmenu .btn:hover,
-.hmenu .btn-outline:hover,
-#top-hmenu-bar .btn:hover,
-#top-hmenu-bar .btn-outline:hover,
-.sidebar .btn:hover,
-.sidebar-menu .btn:hover,
-.main-sidebar .btn:hover,
-div[id^="MG0"] .btn:hover,
-a[data-bs-toggle="collapse"].hmenuItem:hover,
-a[href^="#MG0"].btn:hover,
-.systemB5BtnMenu:hover,
-.systemBtnMenu:hover {
-  border: none !important;
-  border-width: 0 !important;
-  border-color: transparent !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background-color: var(--vtop-bg-hover-light) !important;
-}
-
-html.vtop-dark-theme .hmenuItem:hover,
-html.vtop-dark-theme .hmenuItem.btn:hover,
-html.vtop-dark-theme .hmenuItem.btn-outline:hover,
-html.vtop-dark-theme .btn-outline.hmenuItem:hover,
-html.vtop-dark-theme .hmenu .btn:hover,
-html.vtop-dark-theme .hmenu .btn-outline:hover,
-html.vtop-dark-theme #top-hmenu-bar .btn:hover,
-html.vtop-dark-theme #top-hmenu-bar .btn-outline:hover,
-html.vtop-dark-theme .sidebar .btn:hover,
-html.vtop-dark-theme .sidebar-menu .btn:hover,
-html.vtop-dark-theme .main-sidebar .btn:hover,
-html.vtop-dark-theme div[id^="MG0"] .btn:hover,
-html.vtop-dark-theme a[data-bs-toggle="collapse"].hmenuItem:hover,
-html.vtop-dark-theme a[href^="#MG0"].btn:hover,
-html.vtop-dark-theme .systemB5BtnMenu:hover,
-html.vtop-dark-theme .systemBtnMenu:hover {
-  background-color: var(--vtop-bg-hover-dark) !important;
-}
-
-.hmenuItem:focus,
-.hmenuItem:active,
-.hmenuItem:focus-visible,
-.hmenuItem[aria-expanded="true"],
-a[href^="#MG0"]:focus,
-a[href^="#MG0"]:active,
-a[href^="#MG0"][aria-expanded="true"] {
-  border: none !important;
-  border-width: 0 !important;
-  border-color: transparent !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background-color: var(--vtop-accent-soft-light) !important;
-}
-
-html.vtop-dark-theme .hmenuItem:focus,
-html.vtop-dark-theme .hmenuItem:active,
-html.vtop-dark-theme .hmenuItem:focus-visible,
-html.vtop-dark-theme .hmenuItem[aria-expanded="true"],
-html.vtop-dark-theme a[href^="#MG0"]:focus,
-html.vtop-dark-theme a[href^="#MG0"]:active,
-html.vtop-dark-theme a[href^="#MG0"][aria-expanded="true"] {
-  background-color: var(--vtop-bg-hover) !important;
-}
-
-/* Ensure typography and icons inside navigation items stay vibrant and visible in dark mode */
-html.vtop-dark-theme .hmenuItem .primaryColor1,
-html.vtop-dark-theme .hmenuItem .primaryColor1 *,
-html.vtop-dark-theme .hmenuItem span,
-html.vtop-dark-theme .hmenuItem i:not(.rotate-caret),
-html.vtop-dark-theme #top-hmenu-bar span,
-html.vtop-dark-theme .sidebar-menu span,
-html.vtop-dark-theme div[id^="MG0"] span {
-  color: var(--vtop-text-primary) !important;
-}
-
-html.vtop-dark-theme .hmenuItem:hover .primaryColor1,
-html.vtop-dark-theme .hmenuItem:hover span,
-html.vtop-dark-theme .hmenuItem:hover i:not(.rotate-caret) {
-  color: var(--vtop-text-inverse) !important;
-}
-
-html:not(.vtop-dark-theme) #top-hmenu-bar .navbar-brand,
-html:not(.vtop-dark-theme) #top-hmenu-bar a.hmenuItem i,
-html:not(.vtop-dark-theme) .hmenuItem .rotate-caret,
-html:not(.vtop-dark-theme) .hmenuItem i.bi-chevron-right,
-html:not(.vtop-dark-theme) i.bi-chevron-right.rotate-caret.text-danger {
-  color: var(--vtop-text-primary) !important;
-}
-
-html.vtop-dark-theme .hmenuItem .rotate-caret,
-html.vtop-dark-theme .hmenuItem .text-primary,
-html.vtop-dark-theme .hmenuItem i.bi-chevron-right {
-  color: var(--vtop-accent) !important;
-}
-
-/* Submenu dropdown drawer boxes (inside #MG0001, #MG0002, #MG0008, etc.) */
-div[id^="MG0"],
-.hmenubox {
-  border: 1px solid var(--vtop-border) !important;
-  box-shadow: none !important;
-}
-
-html.vtop-dark-theme div[id^="MG0"],
-html.vtop-dark-theme .hmenubox {
-  background-color: var(--vtop-bg-input) !important;
-  border-color: var(--vtop-border) !important;
-}
-
-div[id^="MG0"] a,
-div[id^="MG0"] button,
-div[id^="MG0"] .menuFontStyle,
-div[id^="MG0"] .quickMainMenu {
-  border: none !important;
-  outline: none !important;
-  background-color: transparent !important;
-}
-
-html.vtop-dark-theme div[id^="MG0"] a,
-html.vtop-dark-theme div[id^="MG0"] button,
-html.vtop-dark-theme div[id^="MG0"] .menuFontStyle,
-html.vtop-dark-theme div[id^="MG0"] .quickMainMenu {
-  color: var(--vtop-text-secondary) !important;
-}
-
-div[id^="MG0"] a:hover,
-div[id^="MG0"] button:hover {
-  border: none !important;
-  outline: none !important;
-  background-color: var(--vtop-accent-soft-light) !important;
-}
-
-html.vtop-dark-theme div[id^="MG0"] a:hover,
-html.vtop-dark-theme div[id^="MG0"] button:hover {
-  background-color: var(--vtop-accent-soft) !important;
-  color: var(--vtop-accent) !important;
 }
 
 /* 7.2d Navbar Icons (Bootstrap Icons bi, FontAwesome fa, SVGs — scoped away from .navbar-light / #top-hmenu-bar & light dropdowns) */

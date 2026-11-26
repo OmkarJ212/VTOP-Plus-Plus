@@ -86,6 +86,16 @@ fieldset:has(#materialTable_wrapper) > .container-fluid {
   box-sizing: border-box !important;
 }
 
+/* Keep native VTOP Course Page dropdown permanently hidden whenever CourseFilter is enabled */
+html.vtop-course-filter-enabled select#courseId,
+html.vtop-course-filter-enabled select[name="courseId"],
+html.vtop-course-filter-enabled select#courseId + .select2,
+html.vtop-course-filter-enabled select#courseId + .chosen-container,
+html.vtop-course-filter-enabled select#courseId + .bootstrap-select,
+html.vtop-course-filter-enabled select#courseId + .ms-parent {
+  display: none !important;
+}
+
 fieldset div[class*="col-"]:has(#courseAccordion),
 .card-body div[class*="col-"]:has(#courseAccordion),
 .box-body div[class*="col-"]:has(#courseAccordion) {

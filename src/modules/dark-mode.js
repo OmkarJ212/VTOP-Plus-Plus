@@ -25,63 +25,129 @@
 
   const WHITE_BG_REGEX = /background(?:-color)?:\s*(?:#fff(?:fff)?|#f8f9fa|#f4f6f9|#f1f5f9|#e9ecef|#fafafa|white|rgb\(\s*(?:24[0-9]|25[0-5])\s*,\s*(?:24[0-9]|25[0-5])\s*,\s*(?:24[0-9]|25[0-5])\s*\))/i;
   const DARK_TEXT_REGEX = /color\s*:\s*(?:#000(?:000)?|#111|#222|#333|#444|#555|#212529|#2c3e50|#34495e|black|rgb\(\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*\))/i;
+  const NAV_HEADER_SELECTOR = '#vtop-header, .navbar, #quickLinks, #navbarDropdown';
+  const SANITIZE_SELECTOR = '[bgcolor], [class*="WhiteBackground" i], [style*="background"], [style*="color"]';
+  const RESTORE_SELECTOR = '[data-vtop-orig-bgcolor], [data-vtop-orig-bg], [data-vtop-orig-background], [data-vtop-orig-color]';
 
   const DarkMode = {
     isActive: false,
     _observer: null,
     _debounceTimer: null,
+    _fallbackTransitionTimer: null,
+    _activeTransition: null,
     _isInitialized: false,
+    _hasAppliedOnce: false,
 
     init() {
       if (this._isInitialized) return;
       this._isInitialized = true;
 
-      if (chrome?.storage?.local) {
-        chrome.storage.local.get(['enableDarkMode'], (res) => {
+      const Storage = window.VTOP_PLUS?.Storage;
+      if (Storage) {
+        Storage.get(['enableDarkMode']).then((res) => {
           if (res?.enableDarkMode !== undefined) {
-            this.set(Boolean(res.enableDarkMode), false);
+            this.set(Boolean(res.enableDarkMode), false, false);
           }
         });
-      }
-
-      // Sync across open tabs in real-time
-      if (chrome?.storage?.onChanged) {
-        chrome.storage.onChanged.addListener((changes, area) => {
-          if (area === 'local' && changes.enableDarkMode !== undefined) {
-            this.set(Boolean(changes.enableDarkMode.newValue), false);
+        // Sync across open tabs in real-time
+        Storage.onKeysChanged(['enableDarkMode'], (matched) => {
+          if (matched.enableDarkMode !== undefined) {
+            const next = Boolean(matched.enableDarkMode);
+            const isVisible = document.visibilityState === 'visible' && Boolean(document.body);
+            this.set(next, false, isVisible);
           }
         });
       }
     },
 
     toggle() {
-      this.set(!this.isActive, true);
+      this.set(!this.isActive, true, true);
     },
 
-    set(active, saveStorage = true) {
-      this.isActive = Boolean(active);
-
-      if (document.documentElement) {
-        document.documentElement.classList.toggle('vtop-dark-theme', this.isActive);
+    _applyThemeState(nextActive) {
+      const rootEl = document.documentElement;
+      if (rootEl) {
+        rootEl.classList.toggle('vtop-dark-theme', nextActive);
       }
       if (document.body) {
-        document.body.classList.toggle('vtop-dark-theme', this.isActive);
+        document.body.classList.toggle('vtop-dark-theme', nextActive);
       }
 
-      // Update Quick Dock button visual if present
       this.syncDockButton();
 
-      if (saveStorage && chrome?.storage?.local) {
-        chrome.storage.local.set({ enableDarkMode: this.isActive });
-      }
-
-      if (this.isActive) {
+      if (nextActive) {
         this.sanitizeDynamicElements();
         this.startObserver();
       } else {
         this.stopObserver();
         this.restoreSanitizedElements();
       }
+    },
+
+    set(active, saveStorage = true, animate = false) {
+      const nextActive = Boolean(active);
+      if (this._hasAppliedOnce && this.isActive === nextActive) {
+        if (saveStorage) {
+          window.VTOP_PLUS?.Storage?.set({ enableDarkMode: nextActive });
+        }
+        return;
+      }
+
+      this.isActive = nextActive;
+      this._hasAppliedOnce = true;
+
+      if (saveStorage) {
+        window.VTOP_PLUS?.Storage?.set({ enableDarkMode: nextActive });
+      }
+
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+      const shouldAnimate = animate && !reducedMotion && Boolean(document.body) && document.visibilityState === 'visible';
+      const rootEl = document.documentElement;
+
+      if (shouldAnimate && typeof document.startViewTransition === 'function') {
+        if (this._activeTransition) {
+          try {
+            this._activeTransition.skipTransition();
+          } catch (_) {}
+          this._activeTransition = null;
+        }
+
+        // Freeze per-element CSS transitions while capturing the new theme frame
+        // so every element dissolves together in one unified GPU cross-fade.
+        rootEl?.classList.add('vtop-theme-snap');
+        try {
+          const transition = document.startViewTransition(() => {
+            this._applyThemeState(nextActive);
+          });
+          this._activeTransition = transition;
+          const cleanup = () => {
+            rootEl?.classList.remove('vtop-theme-snap');
+            if (this._activeTransition === transition) {
+              this._activeTransition = null;
+            }
+          };
+          transition.finished.then(cleanup, cleanup);
+          setTimeout(cleanup, 400);
+          return;
+        } catch (_) {
+          rootEl?.classList.remove('vtop-theme-snap');
+        }
+      }
+
+      if (shouldAnimate && rootEl) {
+        if (this._fallbackTransitionTimer) {
+          clearTimeout(this._fallbackTransitionTimer);
+        }
+        rootEl.classList.add('vtop-theme-transitioning');
+        this._applyThemeState(nextActive);
+        this._fallbackTransitionTimer = setTimeout(() => {
+          rootEl.classList.remove('vtop-theme-transitioning');
+          this._fallbackTransitionTimer = null;
+        }, 210);
+        return;
+      }
+
+      this._applyThemeState(nextActive);
     },
 
     syncDockButton() {
@@ -162,73 +228,81 @@
 
     /**
      * Universal Dynamic Cleaner: Sanitizes hardcoded legacy inline backgrounds
-     * and black text from freshly injected AJAX chunks without touching captcha or status indicators.
+     * and black text in a single DOM pass without layout-thrashing loops.
      */
     sanitizeDynamicElements(root = document) {
       if (!this.isActive || this._isSanitizing || !root) return;
       this._isSanitizing = true;
 
       try {
-        const queryAll = (sel) => {
-          const list = root.querySelectorAll ? Array.from(root.querySelectorAll(sel)) : [];
-          if (root !== document && root.matches?.(sel)) list.unshift(root);
-          return list;
-        };
-
-        // 1. Remove legacy HTML bgcolor attributes across all elements (preserving original for Light Mode switch-back)
-        const bgElements = queryAll('[bgcolor]');
-        for (let i = 0; i < bgElements.length; i++) {
-          const el = bgElements[i];
-          if (this._isProtectedElement(el)) continue;
-          if (!el.hasAttribute('data-vtop-orig-bgcolor')) {
-            el.setAttribute('data-vtop-orig-bgcolor', el.getAttribute('bgcolor') || '');
-          }
-          el.removeAttribute('bgcolor');
+        const candidates = root.querySelectorAll ? Array.from(root.querySelectorAll(SANITIZE_SELECTOR)) : [];
+        if (root !== document && root.matches?.(SANITIZE_SELECTOR)) {
+          candidates.unshift(root);
         }
+        if (candidates.length === 0) return;
 
-        // 1b. Clear WhiteBackground wrappers inline backgrounds
-        const whiteWrappers = queryAll('.WhiteBackground, [class*="WhiteBackground" i]');
-        for (let i = 0; i < whiteWrappers.length; i++) {
-          const w = whiteWrappers[i];
-          if (w.style.backgroundColor && !w.hasAttribute('data-vtop-orig-bg')) {
-            w.setAttribute('data-vtop-orig-bg', w.style.backgroundColor);
-          }
-          if (w.style.background && !w.hasAttribute('data-vtop-orig-background')) {
-            w.setAttribute('data-vtop-orig-background', w.style.background);
-          }
-          w.style.backgroundColor = '';
-          w.style.background = '';
-        }
-
-        // Dynamic DOM elements handled below
-
-        // 1d. Clear any hardcoded blue/inline text colors from navbar elements to ensure pure white text
-        const headerElements = queryAll('#vtop-header [style*="color"], .navbar [style*="color"], #quickLinks [style*="color"], #navbarDropdown [style*="color"]');
-        for (let i = 0; i < headerElements.length; i++) {
-          const h = headerElements[i];
-          if (h.style.color && !h.hasAttribute('data-vtop-orig-color')) {
-            h.setAttribute('data-vtop-orig-color', h.style.color);
-          }
-          h.style.color = '';
-        }
-
-        // 2. Clear hardcoded white/near-white inline background styles and near-black text
-        const styledElements = queryAll('[style*="background"], [style*="color"]');
-        for (let i = 0; i < styledElements.length; i++) {
-          const el = styledElements[i];
+        // Read phase first, then batch writes
+        const ops = [];
+        for (let i = 0; i < candidates.length; i++) {
+          const el = candidates[i];
           if (this._isProtectedElement(el)) continue;
 
-          const css = el.style.cssText;
-          if (WHITE_BG_REGEX.test(css)) {
-            if (el.style.backgroundColor && !el.hasAttribute('data-vtop-orig-bg')) {
-              el.setAttribute('data-vtop-orig-bg', el.style.backgroundColor);
-            }
+          const hasBgAttr = el.hasAttribute('bgcolor');
+          const bgAttrVal = hasBgAttr ? (el.getAttribute('bgcolor') || '') : '';
+          const classNameStr = typeof el.className === 'string' ? el.className : '';
+          const isWhiteWrapper = /WhiteBackground/i.test(classNameStr);
+          const styleAttr = el.getAttribute('style') || '';
+          const isNavHeader = Boolean(styleAttr && el.closest?.(NAV_HEADER_SELECTOR));
+
+          const inlineBg = el.style.backgroundColor || '';
+          const inlineBgShort = el.style.background || '';
+          const inlineColor = el.style.color || '';
+          const cssText = styleAttr ? el.style.cssText : '';
+
+          const clearWhiteWrapperBg = isWhiteWrapper && (inlineBg || inlineBgShort);
+          const clearHeaderColor = isNavHeader && inlineColor;
+          const clearInlineBg = !clearWhiteWrapperBg && cssText && WHITE_BG_REGEX.test(cssText) && inlineBg;
+          const clearInlineColor = !clearHeaderColor && cssText && DARK_TEXT_REGEX.test(cssText) && inlineColor;
+
+          if (hasBgAttr || clearWhiteWrapperBg || clearHeaderColor || clearInlineBg || clearInlineColor) {
+            ops.push({
+              el,
+              hasBgAttr,
+              bgAttrVal,
+              hasOrigBgAttr: hasBgAttr && el.hasAttribute('data-vtop-orig-bgcolor'),
+              clearWhiteWrapperBg,
+              clearHeaderColor,
+              clearInlineBg,
+              clearInlineColor,
+              inlineBg,
+              inlineBgShort,
+              inlineColor,
+              hasOrigBg: el.hasAttribute('data-vtop-orig-bg'),
+              hasOrigBackground: el.hasAttribute('data-vtop-orig-background'),
+              hasOrigColor: el.hasAttribute('data-vtop-orig-color')
+            });
+          }
+        }
+
+        for (let i = 0; i < ops.length; i++) {
+          const op = ops[i];
+          const el = op.el;
+
+          if (op.hasBgAttr) {
+            if (!op.hasOrigBgAttr) el.setAttribute('data-vtop-orig-bgcolor', op.bgAttrVal);
+            el.removeAttribute('bgcolor');
+          }
+          if (op.clearWhiteWrapperBg) {
+            if (op.inlineBg && !op.hasOrigBg) el.setAttribute('data-vtop-orig-bg', op.inlineBg);
+            if (op.inlineBgShort && !op.hasOrigBackground) el.setAttribute('data-vtop-orig-background', op.inlineBgShort);
+            el.style.backgroundColor = '';
+            el.style.background = '';
+          } else if (op.clearInlineBg) {
+            if (!op.hasOrigBg) el.setAttribute('data-vtop-orig-bg', op.inlineBg);
             el.style.backgroundColor = '';
           }
-          if (DARK_TEXT_REGEX.test(css)) {
-            if (el.style.color && !el.hasAttribute('data-vtop-orig-color')) {
-              el.setAttribute('data-vtop-orig-color', el.style.color);
-            }
+          if (op.clearHeaderColor || op.clearInlineColor) {
+            if (!op.hasOrigColor) el.setAttribute('data-vtop-orig-color', op.inlineColor);
             el.style.color = '';
           }
         }
@@ -239,25 +313,29 @@
 
     /**
      * Restore original inline attributes/styles cleared by sanitizeDynamicElements
-     * so live switching from Dark Mode back to Light Mode never leaves broken contrast.
+     * in a single DOM pass so Light Mode restores cleanly.
      */
     restoreSanitizedElements() {
-      document.querySelectorAll('[data-vtop-orig-bgcolor]').forEach((el) => {
-        el.setAttribute('bgcolor', el.getAttribute('data-vtop-orig-bgcolor') || '');
-        el.removeAttribute('data-vtop-orig-bgcolor');
-      });
-      document.querySelectorAll('[data-vtop-orig-bg]').forEach((el) => {
-        el.style.backgroundColor = el.getAttribute('data-vtop-orig-bg') || '';
-        el.removeAttribute('data-vtop-orig-bg');
-      });
-      document.querySelectorAll('[data-vtop-orig-background]').forEach((el) => {
-        el.style.background = el.getAttribute('data-vtop-orig-background') || '';
-        el.removeAttribute('data-vtop-orig-background');
-      });
-      document.querySelectorAll('[data-vtop-orig-color]').forEach((el) => {
-        el.style.color = el.getAttribute('data-vtop-orig-color') || '';
-        el.removeAttribute('data-vtop-orig-color');
-      });
+      const els = document.querySelectorAll(RESTORE_SELECTOR);
+      for (let i = 0; i < els.length; i++) {
+        const el = els[i];
+        if (el.hasAttribute('data-vtop-orig-bgcolor')) {
+          el.setAttribute('bgcolor', el.getAttribute('data-vtop-orig-bgcolor') || '');
+          el.removeAttribute('data-vtop-orig-bgcolor');
+        }
+        if (el.hasAttribute('data-vtop-orig-bg')) {
+          el.style.backgroundColor = el.getAttribute('data-vtop-orig-bg') || '';
+          el.removeAttribute('data-vtop-orig-bg');
+        }
+        if (el.hasAttribute('data-vtop-orig-background')) {
+          el.style.background = el.getAttribute('data-vtop-orig-background') || '';
+          el.removeAttribute('data-vtop-orig-background');
+        }
+        if (el.hasAttribute('data-vtop-orig-color')) {
+          el.style.color = el.getAttribute('data-vtop-orig-color') || '';
+          el.removeAttribute('data-vtop-orig-color');
+        }
+      }
     },
 
     _isProtectedElement(el) {
