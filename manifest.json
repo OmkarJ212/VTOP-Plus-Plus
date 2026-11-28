@@ -26,7 +26,7 @@
       ],
       "css": [
         "src/content/styles/themes.css",
-        "src/content/styles/privacy-and-navigation.css",
+        "src/content/styles/navigation.css",
         "src/content/styles/widgets-tools.css",
         "src/content/styles/widgets-dashboard.css",
         "src/content/styles/dark-mode-core.css",
@@ -75,7 +75,6 @@
         "src/modules/marks-notifier.js",
         "src/modules/quick-dock.js",
         "src/modules/command-palette.js",
-        "src/modules/privacy-mode.js",
         "src/modules/home-messages.js",
         "src/modules/error-page.js",
         "src/content/content.js"

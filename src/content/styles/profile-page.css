@@ -397,21 +397,3 @@ html.vtop-dark-theme #accordionExample .accordion-button::after {
   display: block !important;
   margin: 0 auto !important;
 }
-
-/* 6. Privacy Mode Protection for Profile Hero & Proctor Photo */
-.vtop-privacy-active .card:has(#accordionExample) > .row > .col-4 img,
-.vtop-privacy-active .card:has(#accordionExample) > .row > .col-4 p,
-.vtop-privacy-active .card:has(#accordionExample) label[for="no"],
-.vtop-privacy-active .card:has(#accordionExample) label[for="vmail"],
-.vtop-privacy-active #accordionExample table.table td img {
-  filter: blur(8px) !important;
-  user-select: none !important;
-}
-
-.vtop-privacy-active .card:has(#accordionExample) > .row > .col-4 img:hover,
-.vtop-privacy-active .card:has(#accordionExample) > .row > .col-4 p:hover,
-.vtop-privacy-active .card:has(#accordionExample) label[for="no"]:hover,
-.vtop-privacy-active .card:has(#accordionExample) label[for="vmail"]:hover,
-.vtop-privacy-active #accordionExample table.table td img:hover {
-  filter: blur(0px) !important;
-}

@@ -24,7 +24,6 @@
     MarksFatPredictor,
     CommandPalette,
     QuickDock,
-    PrivacyMode,
     DarkMode,
     HomeMessages,
     TimetableCalendar,
@@ -68,8 +67,7 @@
       AutoCaptcha.init();
     }
 
-    // 2. Privacy Mode & Universal Dark Mode
-    if (PrivacyMode) PrivacyMode.init();
+    // 2. Universal Dark Mode
     if (DarkMode) DarkMode.init();
 
     // 4. Search Pages (Ctrl+K)
@@ -222,11 +220,6 @@
       QuickDock.destroy();
     }
 
-    // 0d. Privacy Mode element re-tagger
-    if (PrivacyMode?.isActive) {
-      PrivacyMode.tagSensitiveElements();
-    }
-
     // 6. Course Materials Filter & Downloader
     if (currentSettings.enableCourseFilter !== false && CourseFilter) {
       CourseFilter.init();
@@ -303,11 +296,6 @@
         return changedEls.length > 0 && changedEls.every(isExtensionNode);
       });
       if (isInternal) return;
-
-      // Immediately tag newly added DOM nodes when PrivacyMode is active
-      if (PrivacyMode?.isActive && PrivacyMode.handleMutations) {
-        PrivacyMode.handleMutations(mutations);
-      }
 
       // Immediately mount/refresh CourseFilter if VTOP injected or populated #courseId so native dropdown never flashes
       if (currentSettings.enableCourseFilter !== false && CourseFilter) {
@@ -444,9 +432,6 @@
     document.documentElement?.classList.toggle('vtop-course-filter-enabled', currentSettings.enableCourseFilter !== false);
     if (DarkMode && typeof currentSettings.enableDarkMode === 'boolean') {
       DarkMode.set(currentSettings.enableDarkMode, false, false);
-    }
-    if (PrivacyMode && typeof currentSettings.enablePrivacyMode === 'boolean') {
-      PrivacyMode.set(currentSettings.enablePrivacyMode);
     }
 
     if (currentSettings.enableQuickDock !== false) QuickDock?.init();

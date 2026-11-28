@@ -1,68 +1,7 @@
-/* VTOP++ - Privacy Mode, Navbar Quick Dock & Mega-Menu Drawer Styles */
+/* VTOP++ - Navbar Quick Dock & Top Progress Bar Styles */
 
 /* ==========================================================================
-   1. PRIVACY MODE (Blur sensitive data in public spaces)
-   ========================================================================== */
-.vtop-privacy-active #authorizedID,
-.vtop-privacy-active #authorizedIDX,
-.vtop-privacy-active input[name*="regNo" i],
-.vtop-privacy-active .student-photo,
-.vtop-privacy-active img[src*="StudentPhoto" i],
-.vtop-privacy-active img[src*="photo" i],
-.vtop-privacy-active .cgpa-score,
-.vtop-privacy-active td[aria-describedby*="cgpa"],
-.vtop-privacy-active #navbarDropdown,
-.vtop-privacy-active .navbar-nav .dropdown-toggle,
-.vtop-privacy-active .user-profile,
-.vtop-privacy-active .img-circle,
-.vtop-privacy-active .user-image,
-.vtop-privacy-active .profile-user-img,
-.vtop-privacy-active img[class*="avatar" i],
-.vtop-privacy-active img[class*="circle" i],
-.vtop-privacy-active .navbar-custom-menu img:not([src*="logo" i]):not([src*="icon" i]),
-.vtop-privacy-active .navbar-nav img:not([src*="logo" i]):not([src*="icon" i]),
-.vtop-privacy-active .user-menu img,
-.vtop-privacy-active .user-panel img,
-.vtop-privacy-active img[alt*="student" i],
-.vtop-privacy-active img[alt*="user" i],
-.vtop-privacy-active img[alt*="profile" i],
-.vtop-privacy-active .vtop-privacy-blur-photo,
-.vtop-privacy-active .vtop-privacy-blur-target {
-  filter: blur(8px) !important;
-  user-select: none !important;
-}
-
-/* Smooth hover-to-reveal for convenience */
-.vtop-privacy-active #authorizedID:hover,
-.vtop-privacy-active #authorizedIDX:hover,
-.vtop-privacy-active input[name*="regNo" i]:hover,
-.vtop-privacy-active .student-photo:hover,
-.vtop-privacy-active img[src*="StudentPhoto" i]:hover,
-.vtop-privacy-active img[src*="photo" i]:hover,
-.vtop-privacy-active .cgpa-score:hover,
-.vtop-privacy-active td[aria-describedby*="cgpa"]:hover,
-.vtop-privacy-active #navbarDropdown:hover,
-.vtop-privacy-active .navbar-nav .dropdown-toggle:hover,
-.vtop-privacy-active .user-profile:hover,
-.vtop-privacy-active .img-circle:hover,
-.vtop-privacy-active .user-image:hover,
-.vtop-privacy-active .profile-user-img:hover,
-.vtop-privacy-active img[class*="avatar" i]:hover,
-.vtop-privacy-active img[class*="circle" i]:hover,
-.vtop-privacy-active .navbar-custom-menu img:not([src*="logo" i]):not([src*="icon" i]):hover,
-.vtop-privacy-active .navbar-nav img:not([src*="logo" i]):not([src*="icon" i]):hover,
-.vtop-privacy-active .user-menu img:hover,
-.vtop-privacy-active .user-panel img:hover,
-.vtop-privacy-active img[alt*="student" i]:hover,
-.vtop-privacy-active img[alt*="user" i]:hover,
-.vtop-privacy-active img[alt*="profile" i]:hover,
-.vtop-privacy-active .vtop-privacy-blur-photo:hover,
-.vtop-privacy-active .vtop-privacy-blur-target:hover {
-  filter: blur(0px) !important;
-}
-
-/* ==========================================================================
-   2. NAVBAR INTEGRATED QUICK DOCK & TOP LINEAR PROGRESS BAR
+   1. NAVBAR INTEGRATED QUICK DOCK & TOP LINEAR PROGRESS BAR
    ========================================================================== */
 .vtop-top-progress {
   position: fixed;
@@ -276,14 +215,12 @@ a[href*="campusEtiquette" i] {
   color: var(--vtop-text-inverse);
 }
 
-#vtop-dock-dark-btn.active,
-html.vtop-privacy-active #vtop-dock-priv-btn {
+#vtop-dock-dark-btn.active {
   color: var(--vtop-navbar-accent);
   background: transparent;
 }
 
-#vtop-dock-dark-btn.active:hover,
-html.vtop-privacy-active #vtop-dock-priv-btn:hover {
+#vtop-dock-dark-btn.active:hover {
   color: var(--vtop-navbar-active-hover);
   background: var(--vtop-navbar-active-bg);
 }

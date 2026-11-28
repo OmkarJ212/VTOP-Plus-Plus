@@ -16,7 +16,6 @@
     enableAutoCaptcha: true,
     enableSpotlight: true,
     enableQuickDock: true,
-    enablePrivacyMode: false,
     enableDarkMode: false
   };
 
@@ -272,9 +271,6 @@
   ) {
     const cached = Storage.getCachedSettingsSync();
     document.documentElement.classList.toggle('vtop-course-filter-enabled', cached.enableCourseFilter !== false);
-    if (cached.enablePrivacyMode) {
-      document.documentElement.classList.add('vtop-privacy-active');
-    }
     if (cached.enableDarkMode) {
       document.documentElement.classList.add('vtop-dark-theme');
     }

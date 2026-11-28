@@ -214,7 +214,6 @@
         'marks-grades': ['target', 14],
         'search': ['search', 14],
         'downloader': ['download', 15],
-        'privacy': ['lock', 15],
         'dark-mode': ['moon', 15],
         'moon': ['moon', 15],
         'sun': ['sun', 15]
@@ -345,7 +344,7 @@
       sep.setAttribute('aria-hidden', 'true');
       elements.push(sep);
 
-      // 4. Utility Icon Buttons: Downloader, Privacy, Dark Mode
+      // 4. Utility Icon Buttons: Downloader, Dark Mode
       const dlBtn = document.createElement('button');
       dlBtn.id = 'vtop-dock-dl-btn';
       dlBtn.type = 'button';
@@ -355,15 +354,6 @@
       dlBtn.innerHTML = this.getDockIconSvg('downloader');
       dlBtn.addEventListener('click', () => window.VTOP_PLUS.CourseDownloader?.openPanel());
       elements.push(dlBtn);
-
-      const privBtn = document.createElement('button');
-      privBtn.id = 'vtop-dock-priv-btn';
-      privBtn.type = 'button';
-      privBtn.className = 'vtop-nav-item vtop-dock-icon-btn';
-      privBtn.title = 'Toggle Privacy Mode (Blur Sensitive Info)';
-      privBtn.innerHTML = this.getDockIconSvg('privacy');
-      privBtn.addEventListener('click', () => window.VTOP_PLUS.PrivacyMode?.toggle());
-      elements.push(privBtn);
 
       const isDark = Boolean(window.VTOP_PLUS.DarkMode?.isActive);
       const darkBtn = document.createElement('button');

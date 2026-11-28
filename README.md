@@ -28,7 +28,6 @@
 - **Top Bar Shortcuts:** 1-click buttons in the header to open **Course Page**, **Attendance**, **Time Table**, **Digital Assignments**, and **Marks**, along with a badge when new marks are posted.
 - **Quick Page Search (`Ctrl + K` / `Cmd + K`):** Press `Ctrl + K` (or `Cmd + K` on Mac) anywhere on VTOP to search and jump directly to any page.
 - **Dark Mode & Light Mode:** Toggle between clean Light and Dark themes across VTOP pages, tables, menus, and the extension popup in one click.
-- **Privacy Blur:** Blur your registration number, name, CGPA, and profile photo with one click in the top bar when you're around others (hover over anything blurred to peek at it).
 - **Auto-Captcha Login:** Automatically fills in the login captcha (and selects the Student role when blank) for quicker sign-in.
 
 ---
