@@ -40,27 +40,6 @@ body {
   box-shadow: none;
 }
 
-.header-logo .logo-bg-light {
-  fill: var(--vtop-bg-surface);
-}
-
-.header-logo .logo-fg-light {
-  fill: var(--vtop-navy);
-}
-
-.header-logo .logo-bg-dark {
-  fill: var(--vtop-navy);
-}
-
-.header-logo .logo-fg-dark {
-  fill: var(--vtop-bg-surface);
-}
-
-.header-logo .logo-ring {
-  stroke: var(--vtop-border);
-  stroke-width: 1.5;
-}
-
 .header-title {
   font-size: 16px;
   font-weight: 700;
