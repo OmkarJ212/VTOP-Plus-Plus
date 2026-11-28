@@ -1,12 +1,9 @@
-/**
- * VTOP++ - Popup Control Script
- * Syncs Session Keep-Alive setting with storage and active VTOP tab.
- */
+// Popup script: syncs dashboard widget visibility toggles with storage and active VTOP tab.
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const statusBadge = document.getElementById('vtop-status-badge');
-  const sessionToggle = document.getElementById('toggle-session');
-  const sessionMeta = document.getElementById('session-meta-text');
+  const toggles = Array.from(document.querySelectorAll('input[data-setting]'));
+  const settingKeys = toggles.map((el) => el.dataset.setting).filter(Boolean);
+  const POPUP_THEME_KEY = 'vtop_plus_popup_dark_v1';
 
   let activeTab = null;
 
@@ -14,14 +11,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const active = Boolean(isDark);
     document.documentElement.classList.toggle('vtop-dark-theme', active);
     document.body?.classList.toggle('vtop-dark-theme', active);
+    try {
+      localStorage.setItem(POPUP_THEME_KEY, active ? '1' : '0');
+    } catch { /* ignore */ }
   }
 
-  function renderSessionMeta(enabled) {
-    if (!sessionMeta) return;
-    sessionMeta.classList.toggle('is-paused', !enabled);
-    const label = sessionMeta.querySelector('span:last-child');
-    if (label) {
-      label.textContent = enabled ? 'Active' : 'Paused';
+  try {
+    if (localStorage.getItem(POPUP_THEME_KEY) === '1') {
+      applyPopupTheme(true);
+    }
+  } catch { /* ignore */ }
+
+  function syncToggleValues(values) {
+    if (!values) return;
+    for (const input of toggles) {
+      const key = input.dataset.setting;
+      if (key && values[key] !== undefined) {
+        input.checked = Boolean(values[key]);
+      }
     }
   }
 
@@ -29,16 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (chrome?.tabs?.query) {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       activeTab = tab;
-      const url = activeTab?.url || '';
-      const isVelloreVtop = /^https?:\/\/vtop\.vit\.ac\.in(\/|$)/i.test(url);
-
-      if (isVelloreVtop) {
-        statusBadge.textContent = '● Connected';
-        statusBadge.classList.remove('is-warn');
-      } else {
-        statusBadge.textContent = '○ Open VTOP';
-        statusBadge.classList.add('is-warn');
-      }
     }
   } catch (err) {
     console.warn('[VTOP++] Popup tab error:', err);
@@ -46,40 +43,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const Storage = window.VTOP_PLUS?.Storage;
   if (Storage) {
-    Storage.get(['enableSessionKeeper', 'enableDarkMode']).then((items) => {
+    Storage.get([...settingKeys, 'enableDarkMode']).then((items) => {
       if (!items) return;
-      const enabled = items.enableSessionKeeper !== undefined ? Boolean(items.enableSessionKeeper) : true;
-      if (sessionToggle) sessionToggle.checked = enabled;
-      renderSessionMeta(enabled);
+      for (const input of toggles) {
+        const key = input.dataset.setting;
+        input.checked = items[key] !== undefined ? Boolean(items[key]) : true;
+      }
       applyPopupTheme(Boolean(items.enableDarkMode));
     });
 
-    Storage.onKeysChanged(['enableDarkMode', 'enableSessionKeeper'], (matched) => {
+    Storage.onKeysChanged([...settingKeys, 'enableDarkMode'], (matched) => {
       if (matched.enableDarkMode !== undefined) {
         applyPopupTheme(Boolean(matched.enableDarkMode));
       }
-      if (matched.enableSessionKeeper !== undefined) {
-        const enabled = Boolean(matched.enableSessionKeeper);
-        if (sessionToggle) sessionToggle.checked = enabled;
-        renderSessionMeta(enabled);
-      }
+      syncToggleValues(matched);
     });
   }
 
-  sessionToggle?.addEventListener('change', () => {
-    const enabled = sessionToggle.checked;
-    renderSessionMeta(enabled);
+  for (const input of toggles) {
+    input.addEventListener('change', () => {
+      const key = input.dataset.setting;
+      if (!key) return;
+      const patch = { [key]: input.checked };
+      window.VTOP_PLUS?.Storage?.set(patch);
 
-    window.VTOP_PLUS?.Storage?.set({ enableSessionKeeper: enabled });
-
-    if (activeTab?.id && chrome?.tabs?.sendMessage) {
-      chrome.tabs.sendMessage(
-        activeTab.id,
-        { action: 'APPLY_SETTINGS', settings: { enableSessionKeeper: enabled } },
-        () => {
+      if (activeTab?.id && chrome?.tabs?.sendMessage) {
+        chrome.tabs.sendMessage(activeTab.id, { action: 'APPLY_SETTINGS', settings: patch }, () => {
           void chrome.runtime.lastError;
-        }
-      );
-    }
-  });
+        });
+      }
+    });
+  }
 });

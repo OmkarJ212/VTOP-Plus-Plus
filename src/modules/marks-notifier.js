@@ -1,16 +1,4 @@
-/**
- * VTOP++ - Marks Changed / Uploaded Notifier
- * Tracks both the current semester AND the last registered semester in StudentMarkView,
- * so late FAT / re-eval updates from last semester are caught even after the next
- * semester starts.
- *
- * Optimizations & Rate-Limit Safeguards:
- * - Reuses shared registeredSemesters (from StudentTimeTable / StudentAttendance) +
- *   activeSemesterSubId (from StudentDA) to pick [current, previous] with 0 extra shell/probe hits.
- * - Falls back to StudentMarkView probe only if registeredSemesters is unavailable.
- * - 30-minute persistent cooldown + 45s cross-tab lock + cross-tab storage.onChanged sync.
- * - Response validity guard prevents transient HTML errors from wiping saved baselines.
- */
+// Marks Notifier: tracks current + previous registered semesters with 30m cooldown, 45s tab lock, and baseline guards.
 
 (function () {
   'use strict';
@@ -27,17 +15,6 @@
 
   const escapeHtml = (str) => window.VTOP_PLUS.DOM.escapeHtml(str);
   const cleanText = (el) => window.VTOP_PLUS.DOM.cleanText(el);
-
-  function formatRelativeTime(ts) {
-    if (!ts) return 'Never';
-    const diffSec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
-    if (diffSec < 60) return 'Just now';
-    const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHr = Math.floor(diffMin / 60);
-    if (diffHr < 24) return `${diffHr}h ago`;
-    return `${Math.floor(diffHr / 24)}d ago`;
-  }
 
   function looksLikeValidMarksHtml(html) {
     if (!html || typeof html !== 'string') return false;
@@ -189,10 +166,7 @@
 
       if (!this._onMessage && chrome?.runtime?.onMessage) {
         this._onMessage = (msg) => {
-          if (!msg || typeof msg.action !== 'string') return;
-          if (msg.action === 'HEARTBEAT_PING') {
-            this.maybeScheduleCheck(600);
-          } else if (msg.action === 'OPEN_MARKS_PAGE') {
+          if (msg?.action === 'OPEN_MARKS_PAGE') {
             this.openMarksPage(msg.semesterSubId || '');
           }
         };
@@ -711,9 +685,8 @@
         }
 
         const currentSemId = state.trackedPair?.[0]?.semesterSubId || '';
-        const lastChecked = formatRelativeTime(state.lastCheckAt);
         const isChecking = Boolean(this._isChecking);
-        const sig = `${isChecking ? '1' : '0'}|${lastChecked}|${currentSemId}|${unread.map((u) => `${u.id}:${u.newVal}`).join('|')}`;
+        const sig = `${isChecking ? '1' : '0'}|${currentSemId}|${unread.map((u) => `${u.id}:${u.newVal}`).join('|')}`;
 
         const ttWidget = document.getElementById('vtop-home-today-schedule');
         let card = document.getElementById(HOME_CARD_ID);
@@ -821,7 +794,7 @@
     },
 
     syncDockBadge(count) {
-      const pills = document.querySelectorAll('#vtop-quick-dock .vtop-dock-pill');
+      const pills = document.querySelectorAll('#vtop-header .vtop-dock-pill, #vtop-plus-quick-dock .vtop-dock-pill');
       for (const pill of pills) {
         const labelText = (pill.querySelector('.vtop-pill-text')?.textContent || pill.textContent || '').trim();
         if (!/marks\s*&\s*grades/i.test(labelText)) continue;

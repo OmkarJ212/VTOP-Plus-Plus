@@ -1,9 +1,4 @@
-/**
- * VTOP++ - Universal Dark Mode Module
- * Deep obsidian/slate dark theme engine covering 100% of VTOP pages.
- * Handles instant FOUC prevention, storage synchronization,
- * dynamic AJAX element sanitization, and manual toggles.
- */
+// Universal Dark Mode: instant FOUC prevention, storage sync, AJAX sanitizer, manual toggle.
 
 (function () {
   'use strict';
@@ -44,6 +39,10 @@
 
       const Storage = window.VTOP_PLUS?.Storage;
       if (Storage) {
+        if (Storage.getCachedSettingsSync) {
+          const cached = Storage.getCachedSettingsSync();
+          this.set(Boolean(cached?.enableDarkMode), false, false);
+        }
         Storage.get(['enableDarkMode']).then((res) => {
           if (res?.enableDarkMode !== undefined) {
             this.set(Boolean(res.enableDarkMode), false, false);

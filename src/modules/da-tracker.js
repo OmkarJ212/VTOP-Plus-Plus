@@ -1,16 +1,4 @@
-/**
- * VTOP++ - Digital Assignment (DA) Tracker Module
- * Comprehensive DA Deadline & Countdown Tracker for VIT VTOP.
- * Supports:
- * 1. Single-Course Assignment Upload Page: Injects a high-visibility countdown banner
- *    and inline deadline badges directly into the Due Date column.
- * 2. Course Overview Page: Injects the "Next Assignment" column into VTOP's Course Overview table.
- * 
- * Dynamic color coding:
- * - Purple: Due today (0 days left or <24h remaining)
- * - Red: 3 or fewer days left (or overdue)
- * - Green: More than 3 days left OR submitted
- */
+// Digital Assignment Tracker: due-date countdowns & badges (purple: due today, red: <=3d/overdue, green: >3d/submitted).
 
 (function () {
   'use strict';
@@ -104,8 +92,8 @@
     _scanToken: 0,
     _rescanPending: false,
 
-    init() {
-      this.checkAndTrack();
+    init(opts = {}) {
+      this.checkAndTrack(opts);
     },
 
     destroy() {
@@ -127,14 +115,18 @@
       window.VTOP_PLUS?.Storage?.removeWebCacheByPrefix?.('vtop_da_status_', 'session');
     },
 
-    checkAndTrack() {
+    checkAndTrack({ augmentHomeCard = true } = {}) {
       // Never inject DA columns on unrelated pages such as Additional Learning (#addLeanForm)
       if (document.getElementById('addLeanForm')) return;
 
-      // 0. Home page Forthcoming Digital Assignments card (#digital-assignments)
+      // Home page Forthcoming Digital Assignments card (#digital-assignments)
       const homeDaContainer = document.getElementById('digital-assignments');
       if (homeDaContainer) {
-        window.VTOP_PLUS?.DaHomeCard?.augmentHomeDaCard?.(homeDaContainer);
+        if (augmentHomeCard) {
+          window.VTOP_PLUS?.DaHomeCard?.augmentHomeDaCard?.(homeDaContainer);
+        } else {
+          window.VTOP_PLUS?.DaHomeCard?.destroy?.();
+        }
       }
 
       // 0b. Handle auto-select semester & direct course jump on StudentDA page

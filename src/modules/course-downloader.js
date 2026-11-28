@@ -1,9 +1,4 @@
-/**
- * VTOP++ - Course Material Downloader Module
- * High-speed, rate-limit-safe batch downloader with teacher grouping,
- * instant STORE ZIP packaging, multi-page auto-traversal, and resilient DOM table observation.
- * Fully ported & integrated from vtop-downloader-extension.
- */
+// Course Material Downloader: teacher grouping, STORE ZIP packaging, multi-page DataTables traversal.
 
 (function () {
   'use strict';
@@ -13,7 +8,6 @@
   const REGEX_COURSE_CODE = /([A-Z]{3,4}\d{3,4}[A-Z]?)/;
   const REGEX_CLEAN_TEACHER = /[^a-zA-Z0-9_\-\. ]/g;
   const REGEX_WHITESPACE = /[\r\n\t]+/g;
-  const REGEX_SAFE_FILENAME = /[^a-zA-Z0-9_\- ]/g;
   const REGEX_SPACES = /\s+/g;
   const REGEX_ILLEGAL_FS = /[\/\\:*?"<>|]/g;
   const REGEX_CTRL_CHARS = /[\x00-\x1f\x7f]/g;
@@ -46,6 +40,31 @@
     return code.replace(/[PEL]$/i, '');
   }
 
+  /**
+   * Formats VTOP faculty labels like "18842 - VETRISELVI T - SCOPE" into "VETRISELVI T [18842]"
+   * for ZIP filenames, entry filenames, and faculty folders.
+   */
+  function formatFacultyForPath(rawTeacher) {
+    const raw = String(rawTeacher || '').replace(REGEX_SPACES, ' ').trim();
+    if (!raw) return '';
+
+    let parts = raw.split(/\s+[-–—]\s+/).map((p) => p.trim()).filter(Boolean);
+    if (parts.length < 2) {
+      parts = raw.split(/\s*[-–—]\s*/).map((p) => p.trim()).filter(Boolean);
+    }
+
+    if (parts.length >= 2 && /^\d+$/.test(parts[0])) {
+      const code = parts[0];
+      const nameParts = parts.length >= 3 ? parts.slice(1, -1) : parts.slice(1);
+      const cleanName = nameParts.join(' - ').replace(REGEX_CLEAN_TEACHER, '').replace(REGEX_SPACES, ' ').trim();
+      if (cleanName) {
+        return `${cleanName} [${code}]`;
+      }
+    }
+
+    return raw.replace(REGEX_CLEAN_TEACHER, '').replace(REGEX_SPACES, ' ').trim();
+  }
+
   const SEGREGATE_STORAGE_KEY = 'vtop_dl_segregate_faculty';
 
   function loadSegregatePref() {
@@ -63,14 +82,6 @@
     _observer: null,
     _statusTimer: null,
 
-    getFileCount() {
-      return allCourseFiles.size;
-    },
-
-    getActiveCourseCode() {
-      return activeBaseCourseCode || 'Course';
-    },
-
     resetCourse() {
       crawlGen++;
       isCrawlingPages = false;
@@ -78,10 +89,6 @@
       hasAutoCrawled = false;
       activeBaseCourseCode = null;
       this.selectedFaculty = '__ALL__';
-    },
-
-    isBusy() {
-      return isCrawlingPages || isDownloading;
     },
 
     init() {
@@ -214,7 +221,7 @@
 
         const courseMatch = courseText.match(REGEX_COURSE_CODE);
         const courseCode = courseMatch ? courseMatch[1] : (activeBaseCourseCode || 'Course');
-        const cleanTeacherName = teacherText.replace(REGEX_CLEAN_TEACHER, '').trim();
+        const cleanTeacherName = formatFacultyForPath(teacherText);
 
         allCourseFiles.set(fileId, {
           fileId,
@@ -584,7 +591,7 @@
 
       const cleanTopic = this.formatPathPart(rawTopic, `Material_${fileInfo?.fileId || 'File'}`);
       const cleanSubject = this.formatPathPart(subjectName, fileInfo?.courseCode || 'Subject');
-      const cleanFaculty = this.formatPathPart(fileInfo?.cleanTeacher || fileInfo?.teacher, 'Faculty');
+      const cleanFaculty = this.formatPathPart(fileInfo?.cleanTeacher || formatFacultyForPath(fileInfo?.teacher), 'Faculty');
       const finalFileName = this.sanitizeFileName(`${cleanTopic}-${cleanSubject}-${cleanFaculty}.${ext}`) || `Material_${fileInfo?.fileId || 'File'}.${ext}`;
 
       return {
@@ -676,7 +683,7 @@
       const subjectPart = this.formatPathPart(rawSubject, filesToDownload[0]?.courseCode || 'Subject');
       const facultyPart = isAllFaculty
         ? 'All_Faculty'
-        : this.formatPathPart(filesToDownload[0]?.cleanTeacher || filesToDownload[0]?.teacher, 'Faculty');
+        : this.formatPathPart(filesToDownload[0]?.cleanTeacher || formatFacultyForPath(filesToDownload[0]?.teacher), 'Faculty');
 
       try {
         for (let i = 0; i < filesToDownload.length; i++) {

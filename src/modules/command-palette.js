@@ -221,10 +221,26 @@
       const subIdx = title.indexOf(queryLower);
       if (subIdx !== -1) return 500 - subIdx * 5;
 
-      // 7. Category match (e.g. "Academics", "Examinations", "Hostels")
+      // 7. Multi-word token match (e.g. "proj mark", "project view", "arrear exam")
+      const queryTokens = queryLower.split(/\s+/).filter(Boolean);
+      if (queryTokens.length > 1) {
+        const words = item.words || title.split(/[\s\-_/]+/).filter(Boolean);
+        const allInTitle = queryTokens.every((tok) => words.some((w) => w.startsWith(tok)) || title.includes(tok));
+        if (allInTitle) {
+          const prefixCount = queryTokens.filter((tok) => words.some((w) => w.startsWith(tok))).length;
+          return 620 + prefixCount * 20;
+        }
+        const synText = (item.synonyms || []).join(' ').toLowerCase();
+        const combined = `${title} ${item.lowerCat || ''} ${synText}`;
+        if (queryTokens.every((tok) => combined.includes(tok))) {
+          return 420;
+        }
+      }
+
+      // 8. Category match (e.g. "Academics", "Examinations", "Hostels")
       if (item.lowerCat && item.lowerCat.includes(queryLower)) return 220;
 
-      // 8. Fuzzy subsequence match
+      // 9. Fuzzy subsequence match
       if (queryLower.length >= 3) {
         let qIdx = 0;
         let score = 0;
@@ -285,24 +301,47 @@
 
       const lower = text.toLowerCase();
       const idx = lower.indexOf(queryLower);
-      if (idx === -1) {
-        container.textContent = text;
+      if (idx !== -1) {
+        container.textContent = '';
+        if (idx > 0) {
+          container.appendChild(document.createTextNode(text.slice(0, idx)));
+        }
+        const mark = document.createElement('mark');
+        mark.className = 'vtop-match';
+        mark.textContent = text.slice(idx, idx + queryLower.length);
+        container.appendChild(mark);
+        if (idx + queryLower.length < text.length) {
+          container.appendChild(document.createTextNode(text.slice(idx + queryLower.length)));
+        }
         return;
       }
 
-      container.textContent = '';
-      if (idx > 0) {
-        container.appendChild(document.createTextNode(text.slice(0, idx)));
+      // Multi-word token highlighting (e.g. "project view" highlights "Project" and "View")
+      const tokens = Array.from(new Set(queryLower.split(/\s+/).filter((t) => t.length >= 2)));
+      if (tokens.length > 1) {
+        const escaped = tokens
+          .sort((a, b) => b.length - a.length)
+          .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const re = new RegExp(`(${escaped.join('|')})`, 'ig');
+        const parts = text.split(re);
+        if (parts.length > 1) {
+          container.textContent = '';
+          for (let i = 0; i < parts.length; i++) {
+            if (!parts[i]) continue;
+            if (i % 2 === 1) {
+              const mark = document.createElement('mark');
+              mark.className = 'vtop-match';
+              mark.textContent = parts[i];
+              container.appendChild(mark);
+            } else {
+              container.appendChild(document.createTextNode(parts[i]));
+            }
+          }
+          return;
+        }
       }
 
-      const mark = document.createElement('mark');
-      mark.className = 'vtop-match';
-      mark.textContent = text.slice(idx, idx + queryLower.length);
-      container.appendChild(mark);
-
-      if (idx + queryLower.length < text.length) {
-        container.appendChild(document.createTextNode(text.slice(idx + queryLower.length)));
-      }
+      container.textContent = text;
     }
 
     renderResults(queryLower = '') {

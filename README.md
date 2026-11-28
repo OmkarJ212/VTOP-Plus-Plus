@@ -30,7 +30,6 @@
 - **Dark Mode & Light Mode:** Toggle between clean Light and Dark themes across VTOP pages, tables, menus, and the extension popup in one click.
 - **Privacy Blur:** Blur your registration number, name, CGPA, and profile photo with one click in the top bar when you're around others (hover over anything blurred to peek at it).
 - **Auto-Captcha Login:** Automatically fills in the login captcha (and selects the Student role when blank) for quicker sign-in.
-- **Session Keep-Alive:** Keeps your VTOP session active while you're working so you aren't logged out every 15 minutes. You can turn this on or off anytime from the extension icon.
 
 ---
 

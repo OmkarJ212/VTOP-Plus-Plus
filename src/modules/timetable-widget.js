@@ -34,7 +34,7 @@
     _liveTickTimer: null,
     _cachedData: null,
 
-    init() {
+    init({ showHomeWidget = true } = {}) {
       const VtopApi = window.VTOP_PLUS?.VtopApi;
       if (!VtopApi?.isAuthenticated()) {
         this.destroy();
@@ -42,23 +42,17 @@
       }
       window.VTOP_PLUS?.TimetableIcs?.loadReminderPreference?.();
 
-      // 1. Timetable Page: auto-select true active semester & inject export toolbar
       if (document.getElementById('studentTimeTable')) {
         this.handleTimetablePage();
       }
-
-      // 1b. Attendance Page: passively capture registered semesters list & reset dropdown after table loads
       if (document.getElementById('viewStudentAttendance')) {
         this.handleAttendancePage(VtopApi);
       }
-
-      // 1c. Exam Schedule Page: passively cache active semester exam schedule when rendered
       if (document.getElementById('examSchedule')) {
         window.VTOP_PLUS?.ExamSchedule?.handleExamSchedulePage?.(VtopApi);
       }
 
-      // 2. Home Dashboard: mount Today's Schedule widget at top of right column (col-md-4)
-      const rightCol = window.VTOP_PLUS?.UI?.getHomeRightColumn?.() || null;
+      const rightCol = showHomeWidget ? window.VTOP_PLUS?.UI?.getHomeRightColumn?.() || null : null;
       if (rightCol) {
         this.mountHomeWidget(rightCol);
       } else {
@@ -615,6 +609,5 @@
     }
   };
 
-  window.VTOP_PLUS.TimetableWidget = TimetableWidget;
   window.VTOP_PLUS.TimetableCalendar = TimetableWidget;
 })();

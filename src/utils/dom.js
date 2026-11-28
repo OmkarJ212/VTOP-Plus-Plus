@@ -160,36 +160,6 @@
     },
 
     /**
-     * Auto-expands DataTables page length selector to 100 / All if available
-     */
-    expandDataTableLength() {
-      const lengthSelect = document.querySelector('select[name="materialTable_length"], select[name$="_length"]');
-      if (!lengthSelect || lengthSelect.value === '100' || lengthSelect.value === '-1') return false;
-
-      let targetOption =
-        lengthSelect.querySelector('option[value="100"]') ||
-        lengthSelect.querySelector('option[value="-1"]');
-
-      if (!targetOption) {
-        let maxVal = 0;
-        for (const opt of lengthSelect.options) {
-          const val = parseInt(opt.value, 10);
-          if (val > maxVal) {
-            maxVal = val;
-            targetOption = opt;
-          }
-        }
-      }
-
-      if (targetOption && lengthSelect.value !== targetOption.value) {
-        lengthSelect.value = targetOption.value;
-        lengthSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        return true;
-      }
-      return false;
-    },
-
-    /**
      * Resets a <select> back to its default "-- Choose --" option without firing change,
      * preserving the previously selected value in dataset.vtopLastSem.
      */
@@ -263,8 +233,6 @@
       const raw = typeof input === 'string' ? input : input?.textContent || '';
       return raw.replace(/\s+/g, ' ').trim();
     },
-
-    MONTH_INDEX,
 
     MONTH_SHORT,
 

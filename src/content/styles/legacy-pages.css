@@ -11,7 +11,7 @@ html:not(.vtop-dark-theme) .btn-default:hover {
   background-color: var(--vtop-bg-elevated-hover) !important;
 }
 
-/* 12. Grade History (37_grade-history.html) Inline Orange Box, Containment & Table Row */
+/* 12. Grade History (040_grade-history.html) Inline Orange Box, Containment & Table Row */
 #studentGradeView .col-sm-12,
 #studentGradeView .col-md-12 {
   float: none !important;
@@ -73,7 +73,7 @@ html.vtop-dark-theme tr[style*="background-color:orange" i] > td {
   color: var(--vtop-accent) !important;
 }
 
-/* 13. Convocation / Registration (66_registration.html) Buttons & Oversized Text */
+/* 13. Convocation / Registration (069_registration.html) Buttons & Oversized Text */
 .butn,
 .successBtn,
 .failBtn,
@@ -122,7 +122,7 @@ html.vtop-dark-theme tr[style*="background-color:orange" i] > td {
   line-height: 1.6 !important;
 }
 
-/* 14. Feedback Form (113_feedback-form.html / 115_feedback_form.html) & Legacy Custom Headers */
+/* 14. Feedback Form (116_feedback-form.html / 118_feedback_form.html) & Legacy Custom Headers */
 body:has(#genericFeedbackApproval) {
   background-color: var(--vtop-bg-canvas) !important;
   color: var(--vtop-text-primary) !important;
@@ -578,7 +578,7 @@ fieldset > legend:empty {
   color: var(--vtop-text-heading) !important;
 }
 
-/* 15. Counselling Slot Details (110_know-your-rank.html) — Replace BS5 .table-success green wash with theme-consistent table & card tokens */
+/* 15. Counselling Slot Details (113_know-your-rank.html) — Replace BS5 .table-success green wash with theme-consistent table & card tokens */
 .card:has(table.table-success) {
   background-color: var(--vtop-bg-surface) !important;
 }
@@ -656,7 +656,7 @@ table.table.table-success td:first-child {
   width: 45% !important;
 }
 
-/* 16. Health Center Feedback Form (100_health-center-feedback.html) — Override inline #f8f9fa / #007bff / #ccc */
+/* 16. Health Center Feedback Form (103_health-center-feedback.html) — Override inline #f8f9fa / #007bff / #ccc */
 .card:has(#feedbackForm) {
   background-color: var(--vtop-bg-surface) !important;
   border: 1px solid var(--vtop-border) !important;

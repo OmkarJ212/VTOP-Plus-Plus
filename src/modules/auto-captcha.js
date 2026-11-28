@@ -1,8 +1,4 @@
-/**
- * VTOP++ - High-Precision Offline Captcha Solver & Smart Login Helper
- * Exclusively calibrated for VIT Vellore VTOP (vtop.vit.ac.in).
- * 100% client-side, zero latency, sub-millisecond inference, works completely offline.
- */
+// Offline Captcha Solver & Login Helper for VIT VTOP.
 
 (function () {
   'use strict';
@@ -239,19 +235,12 @@
   async function getVelloreWeights() {
     if (cachedWeights) return cachedWeights;
 
-    window.VTOP_PLUS.CAPTCHA_WEIGHTS = window.VTOP_PLUS.CAPTCHA_WEIGHTS || {};
-    if (window.VTOP_PLUS.CAPTCHA_WEIGHTS.vellore) {
-      cachedWeights = window.VTOP_PLUS.CAPTCHA_WEIGHTS.vellore;
-      return cachedWeights;
-    }
-
     try {
       const url = chrome.runtime.getURL('models/velloreWeights.json');
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         cachedWeights = data;
-        window.VTOP_PLUS.CAPTCHA_WEIGHTS.vellore = data;
         return data;
       }
     } catch (_) {}
@@ -264,7 +253,6 @@
         }
         if (response?.success && response.data) {
           cachedWeights = response.data;
-          window.VTOP_PLUS.CAPTCHA_WEIGHTS.vellore = response.data;
           resolve(response.data);
         } else {
           reject(new Error(response?.error || 'Failed to load Vellore weights'));
@@ -273,12 +261,7 @@
     });
   }
 
-  /**
-   * Sub-millisecond neural solver:
-   * Computes saturation + luminance maps on a 200x40 offscreen canvas,
-   * applies Otsu thresholding + despeckling, micro-shift alignment rescue,
-   * and returns the solved text with per-character softmax confidence.
-   */
+  // Neural solver on 200x40 canvas: Otsu threshold, despeckle, micro-shift rescue, softmax confidence.
   async function solveCaptchaFromImage(img) {
     const weights = await getVelloreWeights();
     if (!weights?.weights || !weights?.biases) return null;

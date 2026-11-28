@@ -32,7 +32,7 @@
       category: 'Examinations',
       dataUrl: 'examinations/StudentMarkView',
       fallbackDataUrls: ['examinations/StudentMarks'],
-      patterns: [/student\s*mark/i, /^marks$/i, /mark\s*view/i, /marks\s*&\s*grades/i],
+      patterns: [/^student\s*mark(?:\s*view)?$/i, /^marks$/i, /^mark\s*view$/i, /^marks\s*&\s*grades$/i],
       synonyms: ['marks', 'cat', 'fat', 'grades', 'score', 'results', 'mark', 'internals', 'assessment']
     },
     {
@@ -76,8 +76,8 @@
       title: 'Exam Schedule',
       category: 'Examinations',
       dataUrl: 'examinations/ExamSchedule',
-      fallbackDataUrls: ['examinations/StudentExamSchedule'],
-      patterns: [/exam\s*schedule/i, /examination\s*schedule/i],
+      fallbackDataUrls: ['examinations/StudExamSchedule', 'examinations/StudentExamSchedule'],
+      patterns: [/^(?:student\s*)?exam(?:ination)?\s*schedule$/i],
       synonyms: ['exam', 'cat', 'fat', 'schedule', 'dates', 'timings', 'hall ticket', 'seating']
     },
     {
@@ -85,8 +85,8 @@
       title: 'Hostel Leave Application',
       category: 'Hostels',
       dataUrl: 'hostels/StudentLeave',
-      fallbackDataUrls: ['hostels/LeaveApplication', 'hostels/StudentLeaveApply'],
-      patterns: [/hostel\s*leave/i, /leave\s*application/i, /^leave$/i],
+      fallbackDataUrls: ['hostels/student/leave/1', 'hostels/LeaveApplication', 'hostels/StudentLeaveApply'],
+      patterns: [/^hostel\s*leave$/i, /^leave\s*application$/i, /^leave(?:\s*request)?$/i],
       synonyms: ['leave', 'hostel', 'outing', 'home', 'permission', 'night out', 'vacation', 'pass']
     },
     {
@@ -95,7 +95,7 @@
       category: 'Academics',
       dataUrl: 'academics/common/Curriculum',
       fallbackDataUrls: ['academics/common/StudentCurriculum'],
-      patterns: [/curriculum/i, /credits/i],
+      patterns: [/^(?:my\s*)?curriculum$/i, /curriculum\s*&\s*credit/i],
       synonyms: ['curriculum', 'basket', 'credits', 'degree', 'audit', 'syllabus', 'courses']
     },
     {
@@ -103,8 +103,8 @@
       title: 'Faculty Advisor & Proctor Details',
       category: 'Academics',
       dataUrl: 'academics/common/FacultyAdvisor',
-      fallbackDataUrls: ['academics/common/StudentFacultyAdvisor', 'academics/common/ProctorDetails'],
-      patterns: [/faculty\s*advisor/i, /proctor/i],
+      fallbackDataUrls: ['proctor/viewProctorDetails', 'academics/common/StudentFacultyAdvisor', 'academics/common/ProctorDetails'],
+      patterns: [/^faculty\s*advisor$/i, /^proctor\s*details$/i],
       synonyms: ['faculty', 'teacher', 'prof', 'professor', 'cabin', 'proctor', 'mentor', 'advisor']
     },
     {
@@ -112,8 +112,8 @@
       title: 'Academic Calendar',
       category: 'Academics',
       dataUrl: 'academics/common/AcademicCalendar',
-      fallbackDataUrls: ['academics/common/Calendar'],
-      patterns: [/academic\s*calendar/i, /calendar/i],
+      fallbackDataUrls: ['academics/common/CalendarPreview', 'academics/common/Calendar'],
+      patterns: [/^academics?\s*calendar$/i, /^calendar$/i],
       synonyms: ['calendar', 'holidays', 'academic calendar', 'schedule', 'semester dates']
     },
     {
@@ -121,8 +121,8 @@
       title: 'Biometric Log',
       category: 'Hostels',
       dataUrl: 'hostels/BiometricLog',
-      fallbackDataUrls: ['hostels/StudentBiometricLog'],
-      patterns: [/biometric/i, /in\s*out\s*log/i],
+      fallbackDataUrls: ['academics/common/BiometricInfo', 'hostels/StudentBiometricLog'],
+      patterns: [/^biometric(?:\s*(?:info|log))?$/i, /^in\s*out\s*log$/i],
       synonyms: ['biometric', 'punch', 'in out', 'timing', 'gate']
     }
   ];
@@ -147,8 +147,32 @@
     mooc: ['nptel', 'coursera', 'online courses'],
     pat: ['placement', 'cdc', 'internship', 'jobs', 'recruitment'],
     calendar: ['holidays', 'academic calendar', 'schedule'],
-    profile: ['student profile', 'personal', 'details', 'info', 'address']
+    profile: ['student profile', 'personal', 'details', 'info', 'address'],
+    project: ['pjt', 'capstone', 'multidisciplinary', 'internship']
   };
+
+  function buildLinkCategoryMap() {
+    const map = new WeakMap();
+    const megaBoxes = document.querySelectorAll('div[id^="MG0"]');
+    for (const mg of megaBoxes) {
+      const topEl = mg.querySelector('.fw-bold.h5, h5');
+      const topCat = topEl ? topEl.textContent.replace(/\s+/g, ' ').trim() : '';
+      let subCat = '';
+      const nodes = mg.querySelectorAll('.card-title, a[data-url], button[data-url], .systemB5BtnMenu, .systemBtnMenu');
+      for (const node of nodes) {
+        if (node.classList.contains('card-title')) {
+          subCat = node.textContent.replace(/\s+/g, ' ').trim();
+          continue;
+        }
+        const label =
+          topCat && subCat && subCat.toLowerCase() !== 'general' && subCat.toLowerCase() !== topCat.toLowerCase()
+            ? `${topCat} · ${subCat}`
+            : topCat || subCat || 'Academics';
+        map.set(node, label);
+      }
+    }
+    return map;
+  }
 
   function extractAcronym(str) {
     return str
@@ -214,19 +238,24 @@
           'a[data-url], button[data-url], .systemB5BtnMenu, .systemBtnMenu, #top-hmenu-bar a, #quickLinks a, nav a, .sidebar-menu a, .nav a, div[id^="MG0"] a'
         )
       );
+      const linkCategoryMap = buildLinkCategoryMap();
 
-      // Start with our core catalog - register primary and all fallback URLs
-      const itemsMap = new Map();
+      // Build core lookup maps (cloned per scan so state never leaks across rescans)
+      const coreItems = [];
+      const coreByUrl = new Map();
       for (const core of CORE_PAGES) {
         const enriched = enrichItemMetadata({ ...core, element: null });
-        itemsMap.set(core.dataUrl.toLowerCase(), enriched);
+        coreItems.push(enriched);
+        coreByUrl.set(core.dataUrl.toLowerCase(), enriched);
         if (Array.isArray(core.fallbackDataUrls)) {
           for (const fallback of core.fallbackDataUrls) {
-            itemsMap.set(fallback.toLowerCase(), enriched);
+            coreByUrl.set(fallback.toLowerCase(), enriched);
           }
         }
       }
 
+      // Filter valid navigation links up front
+      const candidates = [];
       for (const link of links) {
         const rawText = (link.textContent || '').replace(/\s+/g, ' ').trim();
         const dataUrl = (link.getAttribute('data-url') || '').trim();
@@ -240,46 +269,62 @@
         if (href && href.startsWith('#MG')) continue;
         if (!dataUrl && (!href || href === '#' || href === 'javascript:void(0);') && !link.getAttribute('onclick')) continue;
 
-        // Check if this matches any of our core pages
-        let matchedCore = null;
-        if (dataUrl) {
-          matchedCore = itemsMap.get(dataUrl.toLowerCase());
-        }
-        if (!matchedCore) {
-          for (const item of itemsMap.values()) {
-            // Do not overwrite an already-bound core page with a different data-url
-            if (item.element && dataUrl && item.dataUrl && item.dataUrl.toLowerCase() !== dataUrl.toLowerCase()) {
-              continue;
-            }
-            if (item.patterns && item.patterns.some((p) => p.test(rawText))) {
-              matchedCore = item;
-              break;
-            }
-          }
-        }
+        candidates.push({ link, rawText, dataUrl, href, consumed: false });
+      }
 
-        if (matchedCore) {
-          matchedCore.element = link;
-          // Crucial fix: preserve the authentic, working data-url and title from the active DOM!
-          if (dataUrl) {
-            matchedCore.dataUrl = dataUrl;
-          }
-          if (rawText && rawText.length >= 3) {
-            matchedCore.title = rawText;
-          }
-          Object.assign(matchedCore, enrichItemMetadata(matchedCore));
-          continue;
-        }
+      const bindCore = (coreItem, c) => {
+        coreItem.element = c.link;
+        if (c.dataUrl) coreItem.dataUrl = c.dataUrl;
+        if (c.rawText && c.rawText.length >= 3) coreItem.title = c.rawText;
+        Object.assign(coreItem, enrichItemMetadata(coreItem));
+        c.consumed = true;
+      };
 
-        // New page discovered from VTOP menus
-        let category = 'Academics';
-        const collapseParent = link.closest('.hmenubox, .collapse, .card, .dropdown-menu, div[id^="MG0"]');
-        if (collapseParent) {
-          const header = collapseParent.querySelector('.fw-bold.h5, h4, .card-title, .dropdown-header, .panel-title');
-          if (header && header.textContent) {
-            category = header.textContent.trim();
+      // Pass 1: Bind exact data-url matches first so unrelated menus (e.g. Project Mark View) never hijack core entries
+      for (const c of candidates) {
+        if (!c.dataUrl) continue;
+        const matchedCore = coreByUrl.get(c.dataUrl.toLowerCase());
+        if (!matchedCore) continue;
+        if (!matchedCore.element || c.link.closest('div[id^="MG0"]')) {
+          bindCore(matchedCore, c);
+        } else {
+          c.consumed = true;
+        }
+      }
+
+      // Pass 2: Pattern fallback ONLY for core entries still unbound after Pass 1
+      for (const c of candidates) {
+        if (c.consumed) continue;
+        for (const coreItem of coreItems) {
+          if (coreItem.element) continue;
+          if (coreItem.patterns && coreItem.patterns.some((p) => p.test(c.rawText))) {
+            bindCore(coreItem, c);
+            break;
           }
         }
+      }
+
+      // Pass 3: Index all remaining links as distinct dynamic pages (never overwrite or drop)
+      const itemsMap = new Map();
+      for (const coreItem of coreItems) {
+        itemsMap.set((coreItem.dataUrl || coreItem.id).toLowerCase(), coreItem);
+      }
+
+      for (const c of candidates) {
+        if (c.consumed) continue;
+        const { link, rawText, dataUrl, href } = c;
+
+        let category = linkCategoryMap.get(link) || '';
+        if (!category) {
+          const collapseParent = link.closest('.hmenubox, .collapse, .card, .dropdown-menu, div[id^="MG0"]');
+          if (collapseParent) {
+            const header = collapseParent.querySelector('.fw-bold.h5, h4, .dropdown-header, .panel-title, .card-title');
+            if (header && header.textContent) {
+              category = header.textContent.replace(/\s+/g, ' ').trim();
+            }
+          }
+        }
+        if (!category) category = 'Academics';
 
         const dedupeKey = (dataUrl || rawText).toLowerCase();
         if (!itemsMap.has(dedupeKey)) {
@@ -295,7 +340,7 @@
         }
       }
 
-      this.indexedItems = Array.from(new Set(itemsMap.values()));
+      this.indexedItems = Array.from(itemsMap.values());
       this.lastScanned = Date.now();
       this._resolveQuickDockTargets();
       return this.indexedItems;

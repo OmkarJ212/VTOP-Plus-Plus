@@ -1,9 +1,4 @@
-/**
- * VTOP++ - Shared VTOP API, Serialized Request Queue & Active Semester Resolver
- * Prevents simultaneous burst requests to VTOP, enforces cross-tab HTTP 429 backoff,
- * and shares both activeSemesterSubId (from StudentDA) and registeredSemesters
- * (from StudentTimeTable / StudentAttendance) across modules.
- */
+// Shared VTOP API: serialized request queue, 429 backoff, active/registered semester resolvers.
 
 (function () {
   'use strict';
@@ -136,12 +131,8 @@
     storageGet,
     storageSet,
     isLoginScreen,
-    isSessionExpiredHtml,
-    isRateLimited,
     isRateLimitedAsync,
-    markRateLimited,
     getHomeSemesterBadgeText,
-    matchOptionByBadge,
     extractSelectOptions,
 
     isAuthenticated() {
@@ -150,10 +141,7 @@
       return Boolean(authId) && !isLoginScreen();
     },
 
-    /**
-     * Serializes background requests across modules with polite spacing + jitter
-     * so VTOP never receives simultaneous multi-module bursts.
-     */
+    // Serialize background requests with spacing + jitter to avoid bursts.
     enqueue(taskFn, minGapMs = 450) {
       const run = async () => {
         const waitMs = Math.max(0, lastRequestEndedAt + minGapMs - Date.now());
@@ -255,10 +243,7 @@
       await storageSet({ [`vtop_active_sem_v1_${authId}`]: record });
     },
 
-    /**
-     * Resolves the authoritative current active semesterSubId using StudentDA's
-     * first #semesterSubId option (which never lists upcoming next-semester shells).
-     */
+    // Resolve active semesterSubId from StudentDA's first #semesterSubId option.
     async resolveActiveSemesterId({ forceRefresh = false } = {}) {
       if (!this.isAuthenticated()) return null;
 

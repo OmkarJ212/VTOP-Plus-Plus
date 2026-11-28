@@ -1,7 +1,4 @@
-/**
- * VTOP++ - Storage Utility
- * Persistent configuration, storage wrappers, and TTL-scoped caching for all VTOP++ modules.
- */
+// Storage Utility: persistent settings, localStorage mirror, and TTL-scoped caches.
 
 (function () {
   window.VTOP_PLUS = window.VTOP_PLUS || {};
@@ -12,10 +9,11 @@
     enableAttendanceCalc: true,
     enableFatPredictor: true,
     enableDaTracker: true,
+    enableDaHomeCard: true,
     enableScheduleWidget: true,
+    enableHomeMessages: true,
     enableMarksNotifier: true,
     enableAutoCaptcha: true,
-    enableSessionKeeper: true,
     enableSpotlight: true,
     enableQuickDock: true,
     enablePrivacyMode: false,
@@ -276,6 +274,9 @@
     document.documentElement.classList.toggle('vtop-course-filter-enabled', cached.enableCourseFilter !== false);
     if (cached.enablePrivacyMode) {
       document.documentElement.classList.add('vtop-privacy-active');
+    }
+    if (cached.enableDarkMode) {
+      document.documentElement.classList.add('vtop-dark-theme');
     }
   }
 })();

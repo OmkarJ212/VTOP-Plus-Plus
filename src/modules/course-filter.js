@@ -1,15 +1,4 @@
-/**
- * VTOP++ - Live Course Materials Filter Module
- * Fully ported & enhanced from vtop-course-filter.
- * 
- * Features:
- * 1. Segregates VTOP Course Page Consolidated by Semester (Recent First), Subject, and Faculty.
- * 2. Instant localStorage faculty cache per subject.
- * 3. Multi-page DataTables traversal to extract all professors across 15-25 pages.
- * 4. Real-time table filter by faculty across all pages (DataTables search hook).
- * 5. In-table instant filter bar for topic, lecture keywords, and Theory / Lab type pills.
- * 6. Clean lifecycle management with full destroy/unmount support.
- */
+// Live Course Materials Filter: semester/subject/faculty grouping, multi-page DataTables search, in-table topic/type bar.
 
 (function () {
   'use strict';

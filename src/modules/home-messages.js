@@ -149,8 +149,13 @@
   const HomeMessages = {
     isFetching: false,
 
-    init() {
+    init({ showCard = true } = {}) {
       this.syncDashboardEmptyStates();
+
+      if (!showCard) {
+        this.destroy();
+        return;
+      }
 
       const courseData = document.getElementById('course-data');
       if (!courseData) {

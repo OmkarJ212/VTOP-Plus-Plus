@@ -9,41 +9,122 @@
 <body>
   <div class="popup-container">
     <header class="popup-header">
-      <div class="header-left">
-        <img src="../../icons/icon48.png" alt="VTOP++ Logo" class="header-logo">
-        <div class="header-text">
-          <div class="title-row">
-            <h1>VTOP++</h1>
-          </div>
-        </div>
-      </div>
-      <div class="status-badge" id="vtop-status-badge">● Active</div>
+      <svg class="header-logo" viewBox="0 0 48 48" width="32" height="32" role="img" aria-label="VTOP++ Logo">
+        <defs>
+          <clipPath id="vpp-clip-tl">
+            <polygon points="0,0 48,0 0,48" />
+          </clipPath>
+          <clipPath id="vpp-clip-br">
+            <polygon points="48,0 48,48 0,48" />
+          </clipPath>
+          <g id="vpp-mark">
+            <!-- V -->
+            <path d="M7.2 15h4l2.8 11.8L16.8 15h4l-4.8 16.5h-4z" />
+            <!-- + (center, split by diagonal) -->
+            <path d="M23.5 18.25h3v3.5h3.5v3h-3.5v3.5h-3v-3.5h-3.5v-3h3.5z" />
+            <!-- + (right) -->
+            <path d="M34.5 18.25h3v3.5h3.5v3h-3.5v3.5h-3v-3.5h-3.5v-3h3.5z" />
+          </g>
+        </defs>
+        <g clip-path="url(#vpp-clip-tl)">
+          <rect x="0" y="0" width="48" height="48" rx="11" class="logo-bg-light" />
+          <use href="#vpp-mark" class="logo-fg-light" />
+        </g>
+        <g clip-path="url(#vpp-clip-br)">
+          <rect x="0" y="0" width="48" height="48" rx="11" class="logo-bg-dark" />
+          <use href="#vpp-mark" class="logo-fg-dark" />
+        </g>
+        <rect x="0.75" y="0.75" width="46.5" height="46.5" rx="10.25" fill="none" class="logo-ring" />
+      </svg>
+      <h1 class="header-title">VTOP++</h1>
     </header>
 
-    <label class="session-card" for="toggle-session">
-      <div class="session-top">
-        <div class="session-info">
-          <div class="session-icon-wrap">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
+    <section class="widgets-card" aria-label="Dashboard Widgets">
+      <div class="widgets-head">
+        <span class="widgets-title">Dashboard Widgets</span>
+        <span class="widgets-note">Default cards stay</span>
+      </div>
+
+      <label class="widget-row" for="toggle-schedule">
+        <div class="widget-info">
+          <div class="widget-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
           </div>
-          <div class="session-copy">
-            <strong>Session Keep-Alive</strong>
-            <small>Prevents 15-minute idle logout</small>
+          <div class="widget-copy">
+            <strong>Today's Schedule</strong>
+            <small>Classes &amp; exam countdown</small>
           </div>
         </div>
         <span class="switch-wrap">
-          <input type="checkbox" id="toggle-session" checked>
+          <input type="checkbox" id="toggle-schedule" data-setting="enableScheduleWidget" checked>
           <span class="slider"></span>
         </span>
-      </div>
-      <div class="session-meta" id="session-meta-text">
-        <span class="session-dot"></span>
-        <span>Active</span>
-      </div>
-    </label>
+      </label>
+
+      <label class="widget-row" for="toggle-messages">
+        <div class="widget-info">
+          <div class="widget-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div class="widget-copy">
+            <strong>Class Messages</strong>
+            <small>Faculty announcements feed</small>
+          </div>
+        </div>
+        <span class="switch-wrap">
+          <input type="checkbox" id="toggle-messages" data-setting="enableHomeMessages" checked>
+          <span class="slider"></span>
+        </span>
+      </label>
+
+      <label class="widget-row" for="toggle-marks">
+        <div class="widget-info">
+          <div class="widget-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <div class="widget-copy">
+            <strong>Marks Notifier</strong>
+            <small>Recent grade &amp; mark updates</small>
+          </div>
+        </div>
+        <span class="switch-wrap">
+          <input type="checkbox" id="toggle-marks" data-setting="enableMarksNotifier" checked>
+          <span class="slider"></span>
+        </span>
+      </label>
+
+      <label class="widget-row" for="toggle-da-home">
+        <div class="widget-info">
+          <div class="widget-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <div class="widget-copy">
+            <strong>DA Quick Upload</strong>
+            <small>Upload buttons on DA card</small>
+          </div>
+        </div>
+        <span class="switch-wrap">
+          <input type="checkbox" id="toggle-da-home" data-setting="enableDaHomeCard" checked>
+          <span class="slider"></span>
+        </span>
+      </label>
+    </section>
   </div>
 
   <script src="../utils/storage.js"></script>

@@ -1,8 +1,4 @@
-/**
- * VTOP++ - Home Forthcoming DA Card & Direct Upload Launcher
- * Prefetches active semester DA courses and injects "Upload Now" actions
- * into the Home dashboard's #digital-assignments card.
- */
+// Home Forthcoming DA Card: prefetches active semester DA courses and injects Upload Now actions.
 
 (function () {
   'use strict';
@@ -22,6 +18,10 @@
 
     clearPendingTarget() {
       this._pendingTarget = null;
+    },
+
+    destroy() {
+      document.querySelectorAll('.vtop-da-home-col, .vtop-da-home-cell').forEach((el) => el.remove());
     },
 
     async fetchLatestSemesterCourses() {

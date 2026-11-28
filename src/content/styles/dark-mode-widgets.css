@@ -481,12 +481,6 @@ html.vtop-dark-theme .vtop-tt-page-bar-info {
   color: var(--vtop-text-secondary) !important;
 }
 
-html.vtop-dark-theme .vtop-marks-home-footer {
-  background-color: var(--vtop-bg-surface-alt) !important;
-  border-top-color: var(--vtop-dark-border) !important;
-  color: var(--vtop-text-muted) !important;
-}
-
 html.vtop-dark-theme .vtop-tt-btn {
   background-color: var(--vtop-bg-elevated) !important;
   border-color: var(--vtop-border-strong) !important;

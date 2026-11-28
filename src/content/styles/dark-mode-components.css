@@ -765,3 +765,55 @@ html.vtop-dark-theme .label-danger {
   background-color: var(--vtop-danger-alert-bg) !important;
   color: var(--vtop-danger-text) !important;
 }
+
+/* Bootstrap Datetimepicker & SweetAlert v1 (Dark Mode) */
+html.vtop-dark-theme .bootstrap-datetimepicker-widget,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget.dropdown-menu {
+  background-color: var(--vtop-bg-elevated) !important;
+  border: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
+  box-shadow: none !important;
+}
+
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table th {
+  background-color: transparent !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: transparent !important;
+}
+
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td.day:hover,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td span:hover,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table th.prev:hover,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table th.next:hover,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table th.picker-switch:hover {
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td.active,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td.active:hover,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td span.active {
+  background-color: var(--vtop-accent-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td.old,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td.new,
+html.vtop-dark-theme .bootstrap-datetimepicker-widget table td.disabled {
+  color: var(--vtop-text-dim) !important;
+}
+
+html.vtop-dark-theme .sweet-alert {
+  background-color: var(--vtop-bg-surface) !important;
+  border: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme .sweet-alert h2 {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .sweet-alert p {
+  color: var(--vtop-text-body) !important;
+}

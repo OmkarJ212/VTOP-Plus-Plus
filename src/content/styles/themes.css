@@ -67,7 +67,6 @@
   /* Semantic Status */
   --vtop-success: #15803d;
   --vtop-success-bright: #27ae60;
-  --vtop-success-hover: #219653;
   --vtop-success-text: #166534;
   --vtop-success-bg: rgba(22, 163, 74, 0.12);
   --vtop-success-bg-soft: #ecfdf5;
@@ -101,28 +100,6 @@
   --vtop-overlay-modal: rgba(15, 23, 42, 0.72);
   --vtop-muted-bg: rgba(100, 116, 139, 0.12);
   --vtop-muted-border: rgba(100, 116, 139, 0.22);
-
-  /* Popup Icon Tints */
-  --vtop-icon-dark-bg: #0f172a;
-  --vtop-icon-dark-fg: #38bdf8;
-  --vtop-icon-blue-bg: #e0f2fe;
-  --vtop-icon-blue-fg: #0284c7;
-  --vtop-icon-green-bg: #f0fdf4;
-  --vtop-icon-green-fg: #16a34a;
-  --vtop-icon-indigo-bg: #e0e7ff;
-  --vtop-icon-indigo-fg: #4f46e5;
-  --vtop-icon-amber-bg: #fef3c7;
-  --vtop-icon-amber-fg: #d97706;
-  --vtop-icon-purple-bg: #fae8ff;
-  --vtop-icon-purple-fg: #a855f7;
-  --vtop-icon-red-bg: #fee2e2;
-  --vtop-icon-red-fg: #dc2626;
-  --vtop-icon-yellow-bg: #fef9c3;
-  --vtop-icon-yellow-fg: #ca8a04;
-  --vtop-icon-slate-bg: #f1f5f9;
-  --vtop-icon-slate-fg: #475569;
-  --vtop-icon-teal-bg: #ccfbf1;
-  --vtop-icon-teal-fg: #0d9488;
 }
 
 html.vtop-dark-theme,
@@ -178,7 +155,6 @@ body.vtop-dark-theme,
   /* Semantic Status */
   --vtop-success: #4ade80;
   --vtop-success-bright: #4ade80;
-  --vtop-success-hover: #22c55e;
   --vtop-success-text: #86efac;
   --vtop-success-bg: rgba(22, 163, 74, 0.18);
   --vtop-success-bg-soft: rgba(22, 163, 74, 0.15);

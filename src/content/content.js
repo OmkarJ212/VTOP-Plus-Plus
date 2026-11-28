@@ -17,7 +17,6 @@
     Crawler,
     MenuDrawer,
     AutoCaptcha,
-    SessionKeeper,
     CourseFilter,
     CourseDownloader,
     AttendanceCalculator,
@@ -29,7 +28,8 @@
     DarkMode,
     HomeMessages,
     TimetableCalendar,
-    MarksNotifier
+    MarksNotifier,
+    ErrorPage
   } = window.VTOP_PLUS;
 
   let currentSettings = { ...Storage.DEFAULT_SETTINGS };
@@ -58,7 +58,8 @@
   }
 
   function bootModules() {
-    // 0. Pre-crawl VTOP routes and initialize mega-menu drawer dismiss
+    // 0. Pre-crawl VTOP routes, upgrade raw Tomcat error pages, and initialize mega-menu drawer dismiss
+    if (ErrorPage) ErrorPage.init();
     if (Crawler) Crawler.scan();
     if (MenuDrawer) MenuDrawer.init();
 
@@ -67,12 +68,7 @@
       AutoCaptcha.init();
     }
 
-    // 2. Session Keep-Alive
-    if (currentSettings.enableSessionKeeper !== false && SessionKeeper) {
-      SessionKeeper.init();
-    }
-
-    // 3. Privacy Mode & Universal Dark Mode
+    // 2. Privacy Mode & Universal Dark Mode
     if (PrivacyMode) PrivacyMode.init();
     if (DarkMode) DarkMode.init();
 
@@ -108,9 +104,12 @@
       }
     }
 
-    // Fix VTOP's Course Outcome accordion button missing `.collapsed` when collapsed (`aria-expanded="false"`)
+    // Remove stray <br> spacers between Student Profile accordion items
+    document.querySelectorAll('#accordionExample > br').forEach((br) => br.remove());
+
+    // Fix VTOP's accordion buttons missing `.collapsed` when collapsed (`aria-expanded="false"`)
     document
-      .querySelectorAll('#courseAccordion .accordion-button[aria-expanded="false"]:not(.collapsed)')
+      .querySelectorAll('#courseAccordion .accordion-button[aria-expanded="false"]:not(.collapsed), #accordionExample .accordion-button[aria-expanded="false"]:not(.collapsed)')
       .forEach((btn) => {
         const targetSel = btn.getAttribute('data-bs-target');
         const target = targetSel ? document.querySelector(targetSel) : null;
@@ -248,7 +247,7 @@
 
     // 8. Digital Assignment Tracker
     if (currentSettings.enableDaTracker !== false && DaTracker) {
-      DaTracker.init();
+      DaTracker.init({ augmentHomeCard: currentSettings.enableDaHomeCard !== false });
     } else if (DaTracker) {
       DaTracker.destroy();
     }
@@ -263,16 +262,14 @@
       MarksFatPredictor.destroy();
     }
 
-    // 10. Home Page Class Messages Widget
+    // 10. Home Page Class Messages Widget & Default Empty States
     if (HomeMessages) {
-      HomeMessages.init();
+      HomeMessages.init({ showCard: currentSettings.enableHomeMessages !== false });
     }
 
     // 11. Today's Schedule Widget & Timetable .ics Export
-    if (currentSettings.enableScheduleWidget !== false && TimetableCalendar) {
-      TimetableCalendar.init();
-    } else if (TimetableCalendar?.destroy) {
-      TimetableCalendar.destroy();
+    if (TimetableCalendar) {
+      TimetableCalendar.init({ showHomeWidget: currentSettings.enableScheduleWidget !== false });
     }
 
     // 12. Marks Changed / Uploaded Notifier
@@ -373,12 +370,15 @@
       const hasHomeRightAnchor = Boolean(document.getElementById('proctor-message') || document.getElementById('edu-status'));
       const hasUnaugmentedHomeDa =
         currentSettings.enableDaTracker !== false &&
+        currentSettings.enableDaHomeCard !== false &&
         Array.from(document.querySelectorAll('#digital-assignments table tbody tr')).some(
           (tr) => tr.textContent.trim().length > 0 && !tr.querySelector('.vtop-da-home-cell')
         );
 
       const needsDashboard =
-        (Boolean(document.getElementById('course-data')) && !document.getElementById('vtop-home-class-messages')) ||
+        (currentSettings.enableHomeMessages !== false &&
+          Boolean(document.getElementById('course-data')) &&
+          !document.getElementById('vtop-home-class-messages')) ||
         (currentSettings.enableScheduleWidget !== false &&
           hasHomeRightAnchor &&
           !document.getElementById('vtop-home-today-schedule')) ||
@@ -430,15 +430,11 @@
       }
 
       // Check DA Tracker if on DA view but status column/cell badges are not yet mounted
-      if (
-        currentSettings.enableDaTracker !== false &&
-        (currentPageType === 'DIGITAL_ASSIGNMENT' || Boolean(document.getElementById('digitalAssignment'))) &&
-        DaTracker
-      ) {
+      if (currentSettings.enableDaTracker !== false && DaTracker) {
         const hasOverviewAugment = Boolean(document.querySelector('.vtop-th-da-status'));
         const hasCellAugment = Boolean(document.querySelector('.vtop-da-cell-augmented'));
         if (!hasOverviewAugment && !hasCellAugment) {
-          DaTracker.init();
+          DaTracker.init({ augmentHomeCard: currentSettings.enableDaHomeCard !== false });
         }
       }
     }, 1500);
@@ -462,92 +458,46 @@
     if (currentSettings.enableSpotlight !== false) CommandPalette?.init();
     else CommandPalette?.destroy();
 
-    if (currentSettings.enableSessionKeeper !== false) SessionKeeper?.init();
-    else SessionKeeper?.destroy();
-
     if (currentSettings.enableDownloader !== false) CourseDownloader?.init();
     else CourseDownloader?.destroy();
 
     if (currentSettings.enableDaTracker === false) DaTracker?.destroy();
-    if (currentSettings.enableScheduleWidget === false) TimetableCalendar?.destroy();
+    else if (currentSettings.enableDaHomeCard === false) window.VTOP_PLUS?.DaHomeCard?.destroy?.();
+
+    if (currentSettings.enableHomeMessages === false) HomeMessages?.destroy?.();
+    if (currentSettings.enableScheduleWidget === false) TimetableCalendar?.destroyHomeWidget?.();
     if (currentSettings.enableMarksNotifier === false) MarksNotifier?.destroy();
 
     runPageScanners();
   }
 
-  /**
-   * Listen for communication from popup.js and cross-tab storage
-   */
+  function applySettingsPatch(patch) {
+    if (!patch || typeof patch !== 'object') return false;
+    const changed = Object.keys(patch).some((k) => patch[k] !== currentSettings[k]);
+    if (!changed) return false;
+    currentSettings = { ...currentSettings, ...patch };
+    applyModuleStates();
+    return true;
+  }
+
+  // Listen for popup APPLY_SETTINGS and cross-tab storage changes
   function setupMessageListener() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (!message || typeof message.action !== 'string') return;
-
-      if (message.action === 'FORCE_SCAN') {
-        const scanPromise = CourseDownloader?.scanPageForMaterials
-          ? CourseDownloader.scanPageForMaterials()
-          : Promise.resolve();
-
-        scanPromise
-          .then(() => {
-            CourseDownloader?.openPanel();
-            runPageScanners();
-            const buttons = document.querySelectorAll(
-              'button[data-fileid], .download-btn[data-fileid], [data-fileid], [data-file-id], button[onclick*="downloadCourseMaterialFacultyPdf"], a[onclick*="downloadCourseMaterialFacultyPdf"], input[onclick*="downloadCourseMaterialFacultyPdf"]'
-            );
-            sendResponse({
-              success: true,
-              fileCount: CourseDownloader?.getFileCount ? CourseDownloader.getFileCount() : 0,
-              activeCourse: CourseDownloader?.getActiveCourseCode ? CourseDownloader.getActiveCourseCode() : 'Course',
-              hasButtons: buttons.length > 0
-            });
-          })
-          .catch((err) => {
-            sendResponse({ success: false, error: err.message });
-          });
-        return true;
-      }
-
-      if (message.action === 'OPEN_SEARCH_PAGES') {
-        if (CommandPalette) {
-          CommandPalette.open();
-          sendResponse({ success: true });
-        } else {
-          sendResponse({ success: false, error: 'CommandPalette not loaded' });
-        }
-        return true;
-      }
-
-      if (message.action === 'TOGGLE_PRIVACY') {
-        if (typeof message.active === 'boolean') PrivacyMode?.set(message.active);
-        else PrivacyMode?.toggle();
-        sendResponse({ success: true, active: PrivacyMode?.isActive });
-        return true;
-      }
-
-      if (message.action === 'TOGGLE_DARK_MODE') {
-        if (typeof message.active === 'boolean') DarkMode?.set(message.active);
-        else DarkMode?.toggle();
-        sendResponse({ success: true, active: DarkMode?.isActive });
-        return true;
-      }
 
       if (message.action === 'APPLY_SETTINGS') {
         if (!message.settings || typeof message.settings !== 'object') {
           sendResponse({ success: false, error: 'Invalid settings payload' });
           return true;
         }
-        currentSettings = { ...currentSettings, ...message.settings };
-
-        applyModuleStates();
+        applySettingsPatch(message.settings);
         sendResponse({ success: true });
         return true;
       }
     });
 
-    // Listen for storage changes across tabs
     Storage.onChanged((newSettings) => {
-      currentSettings = { ...currentSettings, ...newSettings };
-      applyModuleStates();
+      applySettingsPatch(newSettings);
     });
   }
 })();
