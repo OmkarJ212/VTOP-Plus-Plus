@@ -73,7 +73,45 @@ html.vtop-dark-theme tr[style*="background-color:orange" i] > td {
   color: var(--vtop-accent) !important;
 }
 
-/* 13. Convocation / Registration (069_registration.html) Buttons & Oversized Text */
+/* 13. Convocation / Registration (070_registration.html) Dates, Buttons & Oversized Text */
+#convRegistration #dateDisplay.animated-dates,
+#convRegistration #dateDisplay.animated-dates.show {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: calc(100% - 32px) !important;
+  margin: 12px 16px 4px !important;
+  padding: 7px 12px !important;
+  border-radius: 6px !important;
+  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  background-color: var(--vtop-accent-tint-bg-soft) !important;
+  color: var(--vtop-navy) !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+@media (min-width: 768px) {
+  #convRegistration #dateDisplay.animated-dates,
+  #convRegistration #dateDisplay.animated-dates.show {
+    max-width: min(50%, calc(100% - 32px)) !important;
+  }
+}
+
+#convRegistration h3[style*="color: red" i] {
+  color: var(--vtop-danger-text) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin: 12px 16px 16px !important;
+}
+
 .butn,
 .successBtn,
 .failBtn,
@@ -656,8 +694,31 @@ table.table.table-success td:first-child {
   width: 45% !important;
 }
 
-/* 16. Health Center Feedback Form (103_health-center-feedback.html) — Override inline #f8f9fa / #007bff / #ccc */
+/* 16. Health Center Feedback Form (104_health-center-feedback.html) — Full-flow layout, options & Light/Dark parity */
+#mainFrag > #main-section.topPosition:has(#feedbackForm) {
+  position: static !important;
+  top: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+#mainFrag > #main-section:has(#feedbackForm) > .row {
+  margin: 0 !important;
+}
+
+#mainFrag > #main-section:has(#feedbackForm) > .row > div[class*="col-"] {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: 860px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
 .card:has(#feedbackForm) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   background-color: var(--vtop-bg-surface) !important;
   border: 1px solid var(--vtop-border) !important;
 }
@@ -673,18 +734,33 @@ table.table.table-success td:first-child {
 
 .card:has(#feedbackForm) > .card-header strong,
 .card:has(#feedbackForm) > .card-header .text-secondary {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
   color: var(--vtop-text-heading) !important;
 }
 
+html.vtop-dark-theme .card:has(#feedbackForm) > .card-header strong,
+html.vtop-dark-theme .card:has(#feedbackForm) > .card-header .text-secondary {
+  color: var(--vtop-accent) !important;
+}
+
 .card:has(#feedbackForm) > .card-body.scrollable-card-body {
+  max-height: none !important;
+  max-width: 100% !important;
+  overflow-y: visible !important;
+  margin: 0 !important;
+  padding: 16px 20px !important;
   background-color: var(--vtop-bg-surface) !important;
   color: var(--vtop-text-primary) !important;
 }
 
 .question-container {
+  padding: 12px 16px !important;
   background-color: var(--vtop-bg-surface-alt) !important;
   border: 1px solid var(--vtop-border) !important;
   border-radius: 6px !important;
+  margin-bottom: 10px !important;
   color: var(--vtop-text-primary) !important;
 }
 
@@ -699,11 +775,42 @@ html.vtop-dark-theme .question-container {
   color: var(--vtop-text-heading) !important;
 }
 
+#feedbackForm .question-container .question-text p {
+  margin: 0 0 8px !important;
+  font-size: 0.92rem !important;
+  line-height: 1.45 !important;
+}
+
+#feedbackForm .question-container .options-container > div {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px 18px !important;
+  padding-left: 4px !important;
+}
+
+#feedbackForm .question-container .form-check {
+  margin-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+#feedbackForm .question-container .form-check-input {
+  margin-top: 0 !important;
+  cursor: pointer !important;
+}
+
 .question-container .form-check-label {
   color: var(--vtop-text-body) !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
 }
 
 #feedbackForm .submit-btn {
+  margin-top: 14px !important;
+  padding: 8px 20px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
   background-color: var(--vtop-accent) !important;
   color: var(--vtop-text-inverse) !important;
   border: 1px solid var(--vtop-accent) !important;
@@ -716,7 +823,9 @@ html.vtop-dark-theme .question-container {
 }
 
 #feedbackForm .invalid-feedback {
-  color: var(--vtop-danger) !important;
+  margin-top: 6px !important;
+  font-size: 0.82rem !important;
+  color: var(--vtop-danger-text) !important;
 }
 
 /* 17. Marks & Grade (#studentMarkView) & Nested customTable-level1 Consistency */
@@ -961,4 +1070,411 @@ table.customTable-level1 output {
   font-weight: 600 !important;
   width: 165px !important;
   border-right: 1px solid var(--vtop-border) !important;
+}
+
+/* 19. Industrial Internship Day-to-Day Activities (#InternshipForm) */
+#InternshipForm > .form-group:has(button) {
+  display: flex !important;
+  justify-content: flex-end !important;
+  margin-bottom: 12px !important;
+}
+
+#InternshipForm > .form-group:has(button) > div {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+#InternshipForm table.customTable tbody td:first-child span {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #InternshipForm table.customTable tbody td:first-child span {
+  color: var(--vtop-text-inverse) !important;
+}
+
+#InternshipForm table.customTable tbody td:nth-child(2) span {
+  color: var(--vtop-text-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* 20. SET Conference Registration (#setRegistration) — Remove box around eligibility notice */
+#setRegistration div[style*="background-color: lightgray" i] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 12px 0 !important;
+  margin-bottom: 12px !important;
+}
+
+#setRegistration div[style*="background-color: lightgray" i] > h3 {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+/* 21. Open Faculty Projects (#ffpStudentform — #documentsTable & #documentsTable1) */
+#ffpStudentform .card {
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  box-shadow: none !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#ffpStudentform .card > .card-header {
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+#ffpStudentform #documentsTable,
+#ffpStudentform #documentsTable1 {
+  border: none !important;
+  border-collapse: collapse !important;
+}
+
+#ffpStudentform #documentsTable thead th,
+#ffpStudentform #documentsTable1 thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme #ffpStudentform #documentsTable thead th,
+html.vtop-dark-theme #ffpStudentform #documentsTable1 thead th {
+  color: var(--vtop-accent) !important;
+}
+
+#ffpStudentform #documentsTable th,
+#ffpStudentform #documentsTable td,
+#ffpStudentform #documentsTable1 th,
+#ffpStudentform #documentsTable1 td {
+  border-color: var(--vtop-border) !important;
+}
+
+#ffpStudentform #documentsTable tbody tr:hover td,
+#ffpStudentform #documentsTable1 tbody tr:hover td {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+#ffpStudentform #documentsTable th:first-child,
+#ffpStudentform #documentsTable td:first-child,
+#ffpStudentform #documentsTable1 th:first-child,
+#ffpStudentform #documentsTable1 td:first-child {
+  border-left: none !important;
+}
+
+#ffpStudentform #documentsTable th:last-child,
+#ffpStudentform #documentsTable td:last-child,
+#ffpStudentform #documentsTable1 th:last-child,
+#ffpStudentform #documentsTable1 td:last-child {
+  border-right: none !important;
+}
+
+#ffpStudentform #documentsTable tbody tr:last-child td,
+#ffpStudentform #documentsTable1 tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+#ffpStudentform #documentsTable .vtop-td-faculty-details {
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+
+/* 22. Library Online Book Recommendation (103_online-book-recommendation.html — #onlineBookRecom) */
+.card:has(#onlineBookRecom) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+.card:has(#onlineBookRecom) > .card-header,
+.card:has(#onlineBookRecom) > .card-header.primaryBorderTop {
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+.card:has(#onlineBookRecom) > .card-header strong,
+.card:has(#onlineBookRecom) > .card-header .h3 {
+  margin: 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .card:has(#onlineBookRecom) > .card-header strong,
+html.vtop-dark-theme .card:has(#onlineBookRecom) > .card-header .h3 {
+  color: var(--vtop-accent) !important;
+}
+
+.card:has(#onlineBookRecom) > .col-12.text-center:has(> span:empty) {
+  display: none !important;
+}
+
+.card:has(#onlineBookRecom) > div:has(> .box-header) {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 16px 16px 0 !important;
+  float: none !important;
+}
+
+.card:has(#onlineBookRecom) > div > .box-header {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.card:has(#onlineBookRecom) > div > .box-header > h5 {
+  margin: 0 !important;
+  padding: 14px 18px !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  border-radius: 0.375rem !important;
+  background-color: var(--vtop-accent-tint-bg-soft) !important;
+  color: var(--vtop-text-heading) !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  line-height: 1.55 !important;
+}
+
+.card:has(#onlineBookRecom) > div > .box-header > h5 br + br {
+  display: none !important;
+}
+
+.card:has(#onlineBookRecom) > div > .box-header > h5 > a {
+  display: inline-block !important;
+  margin-top: 8px !important;
+  padding: 5px 14px !important;
+  border-radius: 6px !important;
+  background-color: var(--vtop-accent-soft) !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  color: var(--vtop-accent) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+.card:has(#onlineBookRecom) > div > .box-header > h5 > a:hover {
+  background-color: var(--vtop-bg-active) !important;
+  color: var(--vtop-accent-hover) !important;
+}
+
+html.vtop-dark-theme .card:has(#onlineBookRecom) > div > .box-header > h5 > a:hover {
+  color: var(--vtop-accent-sky-hover) !important;
+}
+
+.card:has(#onlineBookRecom) > .card-body {
+  padding: 16px 20px !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#onlineBookRecom {
+  max-width: 780px !important;
+  margin: 0 auto !important;
+  row-gap: 12px !important;
+}
+
+#onlineBookRecom > .row {
+  margin: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#onlineBookRecom .control-label {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-secondary) !important;
+}
+
+@media (max-width: 575.98px) {
+  #onlineBookRecom .control-label {
+    text-align: left !important;
+    margin-bottom: 4px !important;
+  }
+}
+
+#onlineBookRecom .form-control {
+  background-color: var(--vtop-bg-input) !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border-strong) !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  box-shadow: none !important;
+}
+
+#onlineBookRecom .form-control:focus {
+  outline: none !important;
+  border-color: var(--vtop-accent) !important;
+  box-shadow: 0 0 0 0.2rem var(--vtop-accent-focus) !important;
+}
+
+#onlineBookRecom textarea#remarks {
+  min-height: 76px !important;
+  resize: vertical !important;
+}
+
+#onlineBookRecom button[type="submit"].btn-primary {
+  padding: 7px 24px !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  margin-top: 4px !important;
+}
+
+.card:has(#onlineBookRecom) #example2_wrapper {
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--vtop-border) !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card:has(#onlineBookRecom) #example2_wrapper > .row {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.card:has(#onlineBookRecom) #example2 {
+  width: 100% !important;
+  margin: 4px 0 !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  overflow: hidden;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+.card:has(#onlineBookRecom) #example2 thead th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  padding: 10px 10px !important;
+}
+
+html.vtop-dark-theme .card:has(#onlineBookRecom) #example2 thead th {
+  color: var(--vtop-accent) !important;
+}
+
+.card:has(#onlineBookRecom) #example2 td {
+  border-color: var(--vtop-border-subtle) !important;
+  font-size: 0.84rem !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+/* 23. Circular(s) View Portal (106_general.html — #costCentreCircularView) */
+#costCentreCircularView .box.box-info > .box-header h3 {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #costCentreCircularView .box.box-info > .box-header h3 {
+  color: var(--vtop-accent) !important;
+}
+
+#costCentreCircularView .panel-body {
+  padding: 16px 20px !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#costCentreCircularView .panel-body > .col-md-10.col-md-offset-1 {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+#costCentreCircularView .panel-body div[align="center"]:empty {
+  display: none !important;
+}
+
+#costCentreCircularView #tree1,
+#costCentreCircularView #tree1 ul {
+  list-style: none !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+}
+
+#costCentreCircularView #tree1 ul {
+  margin: 6px 0 8px 8px !important;
+  padding-left: 18px !important;
+  border-left: 1px solid var(--vtop-border) !important;
+}
+
+#costCentreCircularView #tree1 li {
+  margin: 4px 0 !important;
+  color: var(--vtop-text-primary) !important;
+  line-height: 1.45 !important;
+}
+
+#costCentreCircularView #tree1 li.branch > i,
+#costCentreCircularView #tree1 .indicator {
+  color: var(--vtop-accent) !important;
+  margin-right: 6px !important;
+  cursor: pointer !important;
+}
+
+#costCentreCircularView #tree1 li > span[style*="color: green" i] {
+  display: inline-block !important;
+  color: var(--vtop-text-heading) !important;
+  font-weight: 700 !important;
+  font-size: 0.96rem !important;
+  padding: 2px 0 !important;
+}
+
+#costCentreCircularView #tree1 li > span[style*="color: maroon" i] {
+  display: inline-block !important;
+  color: var(--vtop-accent) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 2px 0 !important;
+}
+
+#costCentreCircularView #tree1 li > span[style*="204, 102, 0"] {
+  display: inline-block !important;
+  color: var(--vtop-warn-text) !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 2px 0 !important;
+}
+
+#costCentreCircularView #tree1 a.btn-link {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  padding: 6px 10px !important;
+  margin: 2px 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid transparent !important;
+  background-color: transparent !important;
+  color: var(--vtop-accent) !important;
+  font-size: 0.84rem !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  text-decoration: none !important;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+#costCentreCircularView #tree1 a.btn-link:hover {
+  background-color: var(--vtop-bg-row-hover) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-accent-hover) !important;
+}
+
+html.vtop-dark-theme #costCentreCircularView #tree1 a.btn-link:hover {
+  color: var(--vtop-accent-sky-hover) !important;
 }

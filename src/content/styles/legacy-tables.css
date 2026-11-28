@@ -26,8 +26,11 @@ html:not(.vtop-dark-theme) .well {
 
 .box.box-info,
 .box.box-primary,
+.box.box-success,
 .panel.panel-info,
-.panel.panel-primary {
+.panel.panel-primary,
+.panel.panel-success,
+.card:has(> .card-body > #wishlistReg) > .card-header {
   border-top: 3px solid var(--vtop-accent) !important;
 }
 
@@ -37,8 +40,8 @@ html:not(.vtop-dark-theme) .well {
   border-bottom: 1px solid var(--vtop-border) !important;
 }
 
-html:not(.vtop-dark-theme) .box-header:not(.hmenubox .box-header),
-html:not(.vtop-dark-theme) .panel-heading:not([class*="vtop-"]) {
+html:not(.vtop-dark-theme) .box-header:not(.hmenubox .box-header):not([class*="bg-"]),
+html:not(.vtop-dark-theme) .panel-heading:not([class*="vtop-"]):not([class*="bg-"]) {
   background-color: var(--vtop-bg-surface-alt) !important;
   color: var(--vtop-text-heading) !important;
 }
@@ -67,6 +70,13 @@ html:not(.vtop-dark-theme) .panel-heading:not([class*="vtop-"]) {
 .card-footer:not(#course-data .card-footer):not(#vtop-home-class-messages .card-footer):not(#studentWiseCurriculum .card-footer) {
   padding: 10px 16px !important;
   border-top: 1px solid var(--vtop-border) !important;
+}
+
+.card-footer:empty,
+.box-footer:empty,
+.panel-footer:empty,
+.vtop-empty-footer-hidden {
+  display: none !important;
 }
 
 html:not(.vtop-dark-theme) .box-footer,
@@ -280,8 +290,21 @@ html.vtop-dark-theme .dataTables_wrapper .dataTables_filter label {
 #regulationsForm {
   display: flex !important;
   justify-content: center !important;
+  align-items: center !important;
   width: 100% !important;
   margin-bottom: 0 !important;
+}
+
+#regulationsForm a.btn,
+#regulationsForm .col-md-offset-3 {
+  float: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: center !important;
+}
+
+#regulationsForm br {
+  display: none !important;
 }
 
 .embed-responsive:has(#embedder),
@@ -352,9 +375,69 @@ tr[style*="171, 166, 191"] {
   border-color: var(--vtop-border) !important;
 }
 
+/* Faculty Information (006_faculty-info.html) — Center search bar vertically & horizontally */
+.card:has(#employeeProfileForm) > .col-12.text-center:has(> span:empty) {
+  display: none !important;
+}
+
+.card:has(#employeeProfileForm) > .card-body {
+  padding: 20px 16px !important;
+}
+
+#employeeProfileForm {
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+#employeeProfileForm > .row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px 12px !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+#employeeProfileForm > .row > label {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--vtop-text-heading) !important;
+  font-weight: 600 !important;
+}
+
+#employeeProfileForm > .row > .col-sm-5 {
+  flex: 0 1 380px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#employeeProfileForm > .row > .col-sm-4 {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+td[style*="#f2dede" i][rowspan]:has(> img),
+table.table td[rowspan]:has(> img.img-rounded),
+#viewProctorDetailsForm table td:has(> img) {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
 img[style*="#f2dede" i],
-img[style*="242, 222, 222"] {
-  border: 1px solid var(--vtop-border) !important;
+img[style*="242, 222, 222"],
+td[style*="#f2dede" i] > img,
+table.table td[rowspan] > img.img-rounded,
+#viewProctorDetailsForm table td img {
+  display: block !important;
+  margin: 0 auto !important;
+  border: 1px solid var(--vtop-border-strong) !important;
   border-radius: 6px !important;
   padding: 0 !important;
 }
@@ -951,13 +1034,13 @@ html.vtop-dark-theme #moocCourse .fixedTableContainer > span[style*="color: red"
 
 html.vtop-dark-theme #moocCourse .btn.btn-primary {
   background-color: var(--vtop-accent-hover) !important;
-  border-color: var(--vtop-accent-sky-hover) !important;
+  border-color: var(--vtop-accent-hover) !important;
   color: var(--vtop-text-inverse) !important;
 }
 
 html.vtop-dark-theme #moocCourse .btn.btn-primary:hover {
-  background-color: var(--vtop-accent-sky-hover) !important;
-  border-color: var(--vtop-accent) !important;
+  background-color: var(--vtop-btn-primary-hover) !important;
+  border-color: var(--vtop-btn-primary-hover) !important;
 }
 
 /* Certificate Preview Modal (#myModal) */

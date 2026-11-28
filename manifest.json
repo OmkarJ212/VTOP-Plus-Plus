@@ -38,6 +38,7 @@
         "src/content/styles/curriculum-and-course.css",
         "src/content/styles/legacy-tables.css",
         "src/content/styles/legacy-pages.css",
+        "src/content/styles/exam-and-modals.css",
         "src/content/styles/profile-page.css",
         "src/content/styles/prelogin-and-error.css"
       ],

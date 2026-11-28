@@ -36,6 +36,7 @@
   --vtop-brand-blue: #1b75bb;
   --vtop-accent: #2563eb;
   --vtop-accent-hover: #1d4ed8;
+  --vtop-btn-primary-hover: #1d4ed8;
   --vtop-accent-sky: #0284c7;
   --vtop-accent-sky-hover: #0369a1;
   --vtop-accent-light: #60a5fa;
@@ -142,6 +143,7 @@ body.vtop-dark-theme,
   --vtop-brand-blue: #38bdf8;
   --vtop-accent: #38bdf8;
   --vtop-accent-hover: #0284c7;
+  --vtop-btn-primary-hover: #0369a1;
   --vtop-accent-sky: #38bdf8;
   --vtop-accent-sky-hover: #7dd3fc;
   --vtop-accent-light: #60a5fa;

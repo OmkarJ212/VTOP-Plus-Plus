@@ -453,4 +453,12 @@ html.vtop-dark-theme div[id^="MG0"] button:hover {
 
 html.vtop-dark-theme div[id^="MG0"] a.list-group-item-action:hover span {
   color: var(--vtop-accent) !important;
+  background-color: transparent !important;
+}
+
+html .hmenubox a.list-group-item-action:hover span,
+html .hmenubox a.list-group-item-action:focus span,
+html div[id^="MG0"] a.list-group-item-action:hover span,
+html div[id^="MG0"] a.list-group-item-action:focus span {
+  background-color: transparent !important;
 }

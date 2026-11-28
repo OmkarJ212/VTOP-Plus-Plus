@@ -1,0 +1,1165 @@
+/* VTOP++ - Grades Detail Tables, Confirm/Error Modal & Make-Up Exam Registration */
+
+/* ==========================================================================
+   1. GRADES VIEW & GRADE DETAILS (#studentGradeView, #DCDCDC, <output>, color:green)
+   ========================================================================== */
+
+/* Normalize Bootstrap 3 <output> inside tables (prevents #555 gray text & 7px top offset) */
+table output,
+.bootstrap3-iso table output {
+  display: inline !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Legacy gray sub-header rows inside <tbody> (Grade Details & Range of Grades) */
+tr[style*="background-color: #DCDCDC" i],
+tr[style*="background-color:#DCDCDC" i],
+tr[style*="background-color: #DCDCDC" i] > th,
+tr[style*="background-color:#DCDCDC" i] > th,
+tr[style*="background-color: #DCDCDC" i] > td,
+tr[style*="background-color:#DCDCDC" i] > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+  font-weight: 600 !important;
+}
+
+html.vtop-dark-theme tr[style*="background-color: #DCDCDC" i],
+html.vtop-dark-theme tr[style*="background-color:#DCDCDC" i],
+html.vtop-dark-theme tr[style*="background-color: #DCDCDC" i] > th,
+html.vtop-dark-theme tr[style*="background-color:#DCDCDC" i] > th,
+html.vtop-dark-theme tr[style*="background-color: #DCDCDC" i] > td,
+html.vtop-dark-theme tr[style*="background-color:#DCDCDC" i] > td,
+html.vtop-dark-theme table > tbody > tr[style*="background-color: #DCDCDC" i]:hover > th,
+html.vtop-dark-theme table > tbody > tr[style*="background-color:#DCDCDC" i]:hover > th,
+html.vtop-dark-theme table > tbody > tr[style*="background-color: #DCDCDC" i]:hover > td,
+html.vtop-dark-theme table > tbody > tr[style*="background-color:#DCDCDC" i]:hover > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+/* Grade Details "Completed | Total | Score" summary row */
+tr[style*="color: green" i],
+tr[style*="color:green" i],
+tr[style*="color: green" i] > th,
+tr[style*="color:green" i] > th,
+tr[style*="color: green" i] > td,
+tr[style*="color:green" i] > td,
+table > tbody > tr[style*="color: green" i]:hover > th,
+table > tbody > tr[style*="color:green" i]:hover > th,
+table > tbody > tr[style*="color: green" i]:hover > td,
+table > tbody > tr[style*="color:green" i]:hover > td {
+  background-color: var(--vtop-success-bg-soft) !important;
+  color: var(--vtop-success-text) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme tr[style*="color: green" i],
+html.vtop-dark-theme tr[style*="color:green" i],
+html.vtop-dark-theme tr[style*="color: green" i] > th,
+html.vtop-dark-theme tr[style*="color:green" i] > th,
+html.vtop-dark-theme tr[style*="color: green" i] > td,
+html.vtop-dark-theme tr[style*="color:green" i] > td,
+html.vtop-dark-theme table > tbody > tr[style*="color: green" i]:hover > th,
+html.vtop-dark-theme table > tbody > tr[style*="color:green" i]:hover > th,
+html.vtop-dark-theme table > tbody > tr[style*="color: green" i]:hover > td,
+html.vtop-dark-theme table > tbody > tr[style*="color:green" i]:hover > td {
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-success-text) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+tr[style*="color: green" i] span,
+tr[style*="color:green" i] span {
+  color: inherit !important;
+}
+
+/* Grades View outer & detail table parity (#studentGradeView) */
+#studentGradeView table[style*="border-bottom-color: #b1dfff" i],
+#studentArrearGradeView table[style*="border-bottom-color: #DCDCDC" i] {
+  border-color: var(--vtop-border) !important;
+}
+
+#studentGradeView tr[style*="background-color: #3c8dbc" i],
+#studentGradeView tr[style*="background-color:#3c8dbc" i],
+#studentGradeView tr[style*="background-color: #3c8dbc" i] > th,
+#studentGradeView tr[style*="background-color:#3c8dbc" i] > th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme #studentGradeView tr[style*="background-color: #3c8dbc" i],
+html.vtop-dark-theme #studentGradeView tr[style*="background-color:#3c8dbc" i],
+html.vtop-dark-theme #studentGradeView tr[style*="background-color: #3c8dbc" i] > th,
+html.vtop-dark-theme #studentGradeView tr[style*="background-color:#3c8dbc" i] > th {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-accent) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+#studentGradeView tbody > tr:not([style*="#DCDCDC" i]):not([style*="#3c8dbc" i]):not([style*="color: green" i]):not([style*="color:green" i]):not([style*="#C0D8C0" i]) > td {
+  color: var(--vtop-text-primary) !important;
+}
+
+#studentGradeView tr[style*="background-color: #C0D8C0" i] > td,
+#studentGradeView tr[style*="background-color:#C0D8C0" i] > td {
+  background-color: var(--vtop-success-bg-soft) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme #studentGradeView tr[style*="background-color: #C0D8C0" i] > td,
+html.vtop-dark-theme #studentGradeView tr[style*="background-color:#C0D8C0" i] > td {
+  background-color: var(--vtop-success-bg) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+#studentGradeView .box.green {
+  background-color: var(--vtop-success-bg-soft) !important;
+  border-color: var(--vtop-success-border) !important;
+}
+
+html.vtop-dark-theme #studentGradeView .box.green {
+  background-color: var(--vtop-success-bg) !important;
+  border-color: var(--vtop-success-border) !important;
+}
+
+/* ==========================================================================
+   2. VTOP CONFIRM / ERROR MODAL (#confirmBox / #confirmModal)
+   ========================================================================== */
+
+#confirmBox {
+  z-index: 10070 !important;
+}
+
+#confirmModal .modal-content {
+  border: 1px solid var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+  border-radius: 0.5rem !important;
+  background-color: var(--vtop-bg-surface) !important;
+  overflow: hidden !important;
+}
+
+#confirmModal #boxHeader {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 12px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+#confirmModal #boxTitle {
+  margin: 0 !important;
+  text-transform: capitalize !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0.01em;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #confirmModal #boxTitle {
+  color: var(--vtop-accent) !important;
+}
+
+#confirmModal #ccbModalBody {
+  padding: 18px 20px !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+#confirmModal #confrimTextArea {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#confirmModal #confrimTextArea > .mx-2 {
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+#confirmModal #confrimTextArea > .mx-2:has(> #tickIcon.d-none):has(> #errorIcon.d-none) {
+  display: none !important;
+}
+
+#confirmModal #confrimTextArea i.bi {
+  font-size: 1.5rem !important;
+  line-height: 1 !important;
+}
+
+#confirmModal #boxMessage {
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  font-weight: 600 !important;
+  word-break: break-word;
+}
+
+#confirmModal #boxMessage.text-danger {
+  color: var(--vtop-danger) !important;
+}
+
+html.vtop-dark-theme #confirmModal #boxMessage.text-danger {
+  color: var(--vtop-danger-bright) !important;
+}
+
+#confirmModal #boxMessage.text-success {
+  color: var(--vtop-success) !important;
+}
+
+html.vtop-dark-theme #confirmModal #boxMessage.text-success {
+  color: var(--vtop-success-bright) !important;
+}
+
+#confirmModal #boxFooter {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  padding: 10px 16px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-primary) !important;
+  border-top: 1px solid var(--vtop-border) !important;
+}
+
+#confirmModal #boxFooter > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+#confirmModal #boxFooter .btn.invisible {
+  display: none !important;
+}
+
+#confirmModal #boxFooter .btn {
+  margin: 0 !important;
+  min-width: 68px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  padding: 5px 14px !important;
+}
+
+/* ==========================================================================
+   3. MAKE-UP EXAM REGISTRATION (057_registration.html) & OFFCANVAS RULES
+   ========================================================================== */
+
+/* Prevent Bootstrap .row negative gutter margins on .card-body.row from sliding over .card-header */
+.card:not(.hmenubox .card):not([class*="vtop-"]) > .card-body.row {
+  margin: 0 !important;
+  padding: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) > .mb-4.d-flex {
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) h2.fw-bold {
+  margin: 0 !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) .card > .card-header {
+  padding: 12px 16px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme #main-section:has(#RegularArrearRegForm1) .card > .card-header {
+  color: var(--vtop-accent) !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) .card-body.row.g-4 {
+  row-gap: 14px !important;
+  --bs-gutter-y: 0;
+}
+
+#main-section:has(#RegularArrearRegForm1) .card-body.row p.mb-1 {
+  font-size: 0.78rem !important;
+  color: var(--vtop-text-muted) !important;
+  margin-bottom: 2px !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) .card-body.row p.fw-semibold {
+  font-size: 0.92rem !important;
+  color: var(--vtop-text-primary) !important;
+  margin-bottom: 0 !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) .badge-closed {
+  background-color: var(--vtop-danger-bright) !important;
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+}
+
+#main-section:has(#RegularArrearRegForm1) .badge-open {
+  background-color: var(--vtop-success-bright) !important;
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+}
+
+html.vtop-dark-theme #main-section:has(#RegularArrearRegForm1) .badge-closed {
+  background-color: var(--vtop-danger-alert-bg) !important;
+  color: var(--vtop-danger-text) !important;
+  border: 1px solid var(--vtop-danger-alert-border) !important;
+}
+
+html.vtop-dark-theme #main-section:has(#RegularArrearRegForm1) .badge-open {
+  background-color: var(--vtop-success-alert-bg) !important;
+  color: var(--vtop-success-text) !important;
+  border: 1px solid var(--vtop-success-alert-border) !important;
+}
+
+#RegularArrearRegForm1 table.table thead th {
+  padding: 10px 12px !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme #RegularArrearRegForm1 table.table thead th {
+  color: var(--vtop-accent) !important;
+}
+
+#RegularArrearRegForm1 tbody tr:has(> td > div > #myInfo:empty) {
+  display: none !important;
+}
+
+#RegularArrearRegForm1 .form-group strong[style*="color:red" i],
+section.content .box.box-primary .panel-body h3.text-danger {
+  display: inline-block !important;
+  margin: 4px auto !important;
+  padding: 10px 18px !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  background-color: var(--vtop-danger-bg-soft) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+/* Keep BS5 Offcanvas above fixed VTOP navbar (#vtop-header) so top header & Rule 1 stay visible */
+#vtop-body-content:has(.offcanvas.show),
+#core-container:has(.offcanvas.show),
+#b5wrapper:has(.offcanvas.show),
+#b5-pagewrapper:has(.offcanvas.show) {
+  z-index: 10050 !important;
+}
+
+.offcanvas-backdrop {
+  z-index: 10040 !important;
+}
+
+.offcanvas {
+  z-index: 10050 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-primary) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+.offcanvas-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 14px 18px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+}
+
+.offcanvas-header h5,
+.offcanvas-header .offcanvas-title {
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .offcanvas-header h5,
+html.vtop-dark-theme .offcanvas-header .offcanvas-title {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .offcanvas-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(180%) !important;
+  opacity: 0.8 !important;
+}
+
+html.vtop-dark-theme .offcanvas-header .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.offcanvas-body {
+  padding: 16px 18px !important;
+  overflow-y: auto !important;
+}
+
+/* Format Registration Rules as cleanly separated bullet items */
+#rulesOffcanvas .rules-list {
+  margin: 0 !important;
+  padding: 0 0 0 1.25rem !important;
+  list-style-type: disc !important;
+  list-style-position: outside !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+#rulesOffcanvas .rules-list > li {
+  display: list-item !important;
+  margin: 0 !important;
+  padding: 9px 12px !important;
+  border-radius: 6px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border: 1px solid var(--vtop-border-subtle) !important;
+  color: var(--vtop-text-primary) !important;
+  font-size: 0.88rem !important;
+  line-height: 1.55 !important;
+}
+
+#rulesOffcanvas .rules-list > li::marker {
+  color: var(--vtop-accent) !important;
+  font-size: 1rem !important;
+}
+
+/* ==========================================================================
+   4. COMPREHENSIVE EXAM (054_comprehensive-exam.html) & QUESTION PREVIEW (055)
+   ========================================================================== */
+
+/* Restore thin blue top streak in Light & Dark modes (beats dark-mode-core .box specificity) */
+.box.box-info,
+.box.box-primary,
+.box.box-success,
+.panel.panel-info,
+.panel.panel-primary,
+.panel.panel-success,
+html.vtop-dark-theme .box.box-info,
+html.vtop-dark-theme .box.box-primary,
+html.vtop-dark-theme .box.box-success,
+html.vtop-dark-theme .panel.panel-info,
+html.vtop-dark-theme .panel.panel-primary,
+html.vtop-dark-theme .panel.panel-success {
+  border-color: var(--vtop-border) !important;
+  border-top: 3px solid var(--vtop-accent) !important;
+}
+
+section.content > .col-sm-12[style*="margin-top: 50px" i] {
+  float: none !important;
+  width: 100% !important;
+  margin-top: 12px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.box-heading.panel-head-custom,
+.panel-heading.panel-head-custom {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme .box-heading.panel-head-custom,
+html.vtop-dark-theme .panel-heading.panel-head-custom {
+  color: var(--vtop-accent) !important;
+}
+
+.box-heading.panel-head-custom > h3,
+.panel-heading.panel-head-custom > h3 {
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  color: inherit !important;
+}
+
+section.content .box.box-primary > .panel-body .form-group.text-center:has(> strong:empty),
+section.content .box.box-primary > .panel-body div[align="center"]:empty {
+  display: none !important;
+}
+
+/* Comprehensive Question Preview (#SemDetails / #example) */
+#SemDetails > .box.box-primary > .panel-body {
+  padding: 16px !important;
+}
+
+#SemDetails #example_wrapper {
+  width: 100% !important;
+  overflow-x: auto !important;
+}
+
+#SemDetails #example_wrapper .dt-buttons:empty {
+  display: none !important;
+}
+
+#SemDetails #example {
+  width: 100% !important;
+  margin: 8px 0 12px !important;
+  border-collapse: collapse !important;
+  border: 1px solid var(--vtop-border) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  background-color: var(--vtop-bg-surface) !important;
+  font-family: inherit !important;
+  table-layout: fixed !important;
+}
+
+@media (max-width: 768px) {
+  #SemDetails #example {
+    table-layout: auto !important;
+  }
+}
+
+#SemDetails #example > thead > tr > th:first-child {
+  width: 56% !important;
+}
+
+#SemDetails #example > thead > tr > th:nth-child(2) {
+  width: 44% !important;
+}
+
+#SemDetails #example > thead > tr > th {
+  padding: 11px 14px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  text-align: left !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border: none !important;
+  border-bottom: 2px solid var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme #SemDetails #example > thead > tr > th {
+  color: var(--vtop-accent) !important;
+}
+
+#SemDetails #example > tbody > tr > td {
+  padding: 12px 14px !important;
+  vertical-align: top !important;
+  text-align: left !important;
+  border: none !important;
+  border-bottom: 1px solid var(--vtop-border) !important;
+  border-right: 1px solid var(--vtop-border-subtle) !important;
+  background-color: transparent !important;
+  color: var(--vtop-text-primary) !important;
+  font-size: 0.88rem !important;
+  line-height: 1.55 !important;
+  word-break: break-word;
+}
+
+#SemDetails #example > tbody > tr > td:last-child {
+  border-right: none !important;
+}
+
+#SemDetails #example > tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+#SemDetails #example > tbody > tr:nth-of-type(even) > td {
+  background-color: var(--vtop-bg-table-stripe) !important;
+}
+
+#SemDetails #example > tbody > tr:hover > td {
+  background-color: var(--vtop-bg-row-hover) !important;
+}
+
+/* Strip pasted MS Word inline fonts, dark grays, white backgrounds & 1in indents */
+#SemDetails #example > tbody > tr > td *:not(table):not(tr):not(th):not(td) {
+  font-family: inherit !important;
+  font-size: 0.88rem !important;
+  line-height: 1.5 !important;
+  color: inherit !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+#SemDetails #example > tbody > tr > td p {
+  margin: 0 0 6px 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  text-indent: 0 !important;
+}
+
+#SemDetails #example > tbody > tr > td p:last-child {
+  margin-bottom: 0 !important;
+}
+
+#SemDetails #example > tbody > tr > td br + br {
+  display: none !important;
+}
+
+#SemDetails #example > tbody > tr > td table {
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 6px 0 !important;
+  border-collapse: collapse !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+#SemDetails #example > tbody > tr > td table td,
+#SemDetails #example > tbody > tr > td table th {
+  padding: 5px 8px !important;
+  border: 1px solid var(--vtop-border) !important;
+}
+
+/* Format Choices column as clean separated option cards */
+#SemDetails #example > tbody > tr > td:nth-child(2) > span {
+  display: block !important;
+  padding: 6px 10px !important;
+  margin: 0 0 6px 0 !important;
+  border-radius: 6px !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  border: 1px solid var(--vtop-border-subtle) !important;
+}
+
+#SemDetails #example > tbody > tr > td:nth-child(2) > span:last-child {
+  margin-bottom: 0 !important;
+}
+
+#SemDetails #example > tbody > tr > td:nth-child(2) > span p {
+  display: inline !important;
+  margin: 0 0 0 4px !important;
+}
+
+#SemDetails #example > tbody > tr > td:nth-child(2) > span br {
+  display: none !important;
+}
+
+/* ==========================================================================
+   5. RECEIPTS / CHALLAN (062_payment-receipts.html) & DATATABLES BUTTON DROPDOWN
+   ========================================================================== */
+
+/* DataTables Buttons (pageLength dropdown trigger & popup collection in Light + Dark) */
+html body div.dt-buttons button.dt-button,
+html body div.dt-buttons a.dt-button,
+html body div.dt-buttons div.dt-button,
+html body div.dt-buttons .btn,
+html body div.dt-buttons .btn-secondary,
+html body div.dt-buttons .btn-default {
+  background: var(--vtop-bg-surface-alt) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border: 1px solid var(--vtop-border-strong) !important;
+  border-radius: 6px !important;
+  color: var(--vtop-text-primary) !important;
+  padding: 5px 12px !important;
+  font-size: 0.84rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+
+html.vtop-dark-theme body div.dt-buttons button.dt-button,
+html.vtop-dark-theme body div.dt-buttons a.dt-button,
+html.vtop-dark-theme body div.dt-buttons div.dt-button,
+html.vtop-dark-theme body div.dt-buttons .btn,
+html.vtop-dark-theme body div.dt-buttons .btn-secondary,
+html.vtop-dark-theme body div.dt-buttons .btn-default {
+  background: var(--vtop-bg-elevated) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html body div.dt-buttons button.dt-button:is(:hover, :focus, .active, .show),
+html body div.dt-buttons a.dt-button:is(:hover, :focus, .active, .show),
+html body div.dt-buttons .btn:is(:hover, :focus, .active, .show),
+html.vtop-dark-theme body div.dt-buttons button.dt-button:is(:hover, :focus, .active, .show),
+html.vtop-dark-theme body div.dt-buttons a.dt-button:is(:hover, :focus, .active, .show),
+html.vtop-dark-theme body div.dt-buttons .btn:is(:hover, :focus, .active, .show) {
+  background: var(--vtop-bg-elevated-hover) !important;
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  background-image: none !important;
+  border-color: var(--vtop-accent) !important;
+  color: var(--vtop-accent) !important;
+}
+
+html body div.dt-buttons .dt-down-arrow,
+html body div.dt-button-collection .dt-button span,
+html body div[role="menu"] > .dt-button span {
+  color: inherit !important;
+  background: transparent !important;
+}
+
+html body div.dt-button-background {
+  background: transparent !important;
+  background-image: none !important;
+  z-index: 10040 !important;
+}
+
+html body div.dt-button-collection,
+html body div.dt-button-collection.dropdown-menu,
+html body .dropdown-menu:has(> div[role="menu"] .dt-button),
+html body .dt-buttons .dropdown-menu {
+  --bs-dropdown-bg: var(--vtop-bg-surface);
+  --bs-dropdown-color: var(--vtop-text-primary);
+  --bs-dropdown-border-color: var(--vtop-border-strong);
+  --bs-dropdown-link-color: var(--vtop-text-primary);
+  --bs-dropdown-link-hover-bg: var(--vtop-bg-elevated-hover);
+  --bs-dropdown-link-hover-color: var(--vtop-accent);
+  --bs-dropdown-link-active-bg: var(--vtop-accent-soft);
+  --bs-dropdown-link-active-color: var(--vtop-accent);
+  background: var(--vtop-bg-surface) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  background-image: none !important;
+  color: var(--vtop-text-primary) !important;
+  border: 1px solid var(--vtop-border-strong) !important;
+  border-radius: 8px !important;
+  padding: 6px !important;
+  min-width: 130px !important;
+  box-shadow: none !important;
+  z-index: 10050 !important;
+}
+
+html.vtop-dark-theme body div.dt-button-collection,
+html.vtop-dark-theme body div.dt-button-collection.dropdown-menu,
+html.vtop-dark-theme body .dropdown-menu:has(> div[role="menu"] .dt-button),
+html.vtop-dark-theme body .dt-buttons .dropdown-menu {
+  --bs-dropdown-bg: var(--vtop-bg-elevated);
+  --bs-dropdown-color: var(--vtop-text-primary);
+  --bs-dropdown-border-color: var(--vtop-border);
+  background: var(--vtop-bg-elevated) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html body div.dt-button-collection > div[role="menu"],
+html body .dropdown-menu > div[role="menu"]:has(> .dt-button) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Fallback if div[role="menu"] is rendered standalone without outer .dt-button-collection */
+html body div[role="menu"]:has(> a.dt-button.dropdown-item):not(.dt-button-collection > *):not(.dropdown-menu > *) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  background: var(--vtop-bg-surface) !important;
+  background-color: var(--vtop-bg-surface) !important;
+  border: 1px solid var(--vtop-border-strong) !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+html.vtop-dark-theme body div[role="menu"]:has(> a.dt-button.dropdown-item):not(.dt-button-collection > *):not(.dropdown-menu > *) {
+  background: var(--vtop-bg-elevated) !important;
+  background-color: var(--vtop-bg-elevated) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html body div.dt-button-collection .dt-button,
+html body div.dt-button-collection a.dt-button.dropdown-item,
+html body div[role="menu"] > a.dt-button.dropdown-item,
+html body div[role="menu"] > button.dt-button,
+html.vtop-dark-theme body div.dt-button-collection .dt-button,
+html.vtop-dark-theme body div.dt-button-collection a.dt-button.dropdown-item,
+html.vtop-dark-theme body div[role="menu"] > a.dt-button.dropdown-item,
+html.vtop-dark-theme body div[role="menu"] > button.dt-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  color: var(--vtop-text-primary) !important;
+  font-size: 0.84rem !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+html body div.dt-button-collection .dt-button:is(:hover, :focus, :focus-visible),
+html body div.dt-button-collection a.dt-button.dropdown-item:is(:hover, :focus, :focus-visible),
+html body div[role="menu"] > a.dt-button.dropdown-item:is(:hover, :focus, :focus-visible),
+html body div[role="menu"] > button.dt-button:is(:hover, :focus, :focus-visible),
+html.vtop-dark-theme body div.dt-button-collection .dt-button:is(:hover, :focus, :focus-visible),
+html.vtop-dark-theme body div.dt-button-collection a.dt-button.dropdown-item:is(:hover, :focus, :focus-visible),
+html.vtop-dark-theme body div[role="menu"] > a.dt-button.dropdown-item:is(:hover, :focus, :focus-visible),
+html.vtop-dark-theme body div[role="menu"] > button.dt-button:is(:hover, :focus, :focus-visible) {
+  background: var(--vtop-bg-elevated-hover) !important;
+  background-color: var(--vtop-bg-elevated-hover) !important;
+  background-image: none !important;
+  color: var(--vtop-accent) !important;
+}
+
+html body div.dt-button-collection .dt-button:is(.active, .dt-button-active),
+html body div.dt-button-collection a.dt-button.dropdown-item:is(.active, .dt-button-active),
+html body div[role="menu"] > a.dt-button.dropdown-item:is(.active, .dt-button-active),
+html body div[role="menu"] > button.dt-button:is(.active, .dt-button-active),
+html.vtop-dark-theme body div.dt-button-collection .dt-button:is(.active, .dt-button-active),
+html.vtop-dark-theme body div.dt-button-collection a.dt-button.dropdown-item:is(.active, .dt-button-active),
+html.vtop-dark-theme body div[role="menu"] > a.dt-button.dropdown-item:is(.active, .dt-button-active),
+html.vtop-dark-theme body div[role="menu"] > button.dt-button:is(.active, .dt-button-active) {
+  background: var(--vtop-accent-soft) !important;
+  background-color: var(--vtop-accent-soft) !important;
+  background-image: none !important;
+  color: var(--vtop-accent) !important;
+  font-weight: 600 !important;
+}
+
+/* Receipts Page (#ReceiptForm) cleanup */
+#ReceiptForm > .box-footer {
+  background-color: transparent !important;
+  border-top: none !important;
+  padding: 0 !important;
+}
+
+#ReceiptForm > .box-footer > h3 {
+  margin: 0 0 12px 0 !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+#ReceiptForm > .box-footer > h3 > u {
+  text-decoration: none !important;
+}
+
+#ReceiptForm #dataTable_wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+}
+
+#ReceiptForm #dataTable_wrapper > #dataTable,
+#ReceiptForm #dataTable_wrapper > .row {
+  flex: 0 0 100%;
+  width: 100% !important;
+  margin: 2px 0 4px !important;
+}
+
+#ReceiptForm #dataTable_wrapper > #dataTable {
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#ReceiptForm #dataTable_filter {
+  margin-left: auto !important;
+}
+
+#ReceiptForm #dataTable thead tr.table-info > th {
+  background-color: var(--vtop-bg-table-head) !important;
+  box-shadow: none !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme #ReceiptForm #dataTable thead tr.table-info > th {
+  color: var(--vtop-accent) !important;
+}
+
+/* ==========================================================================
+   6. LIBRARY PAYMENT / DUE (065_library-due.html — #paymentGateWayForm)
+   ========================================================================== */
+
+#paymentGateWayForm .box-header h3.box-title {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #paymentGateWayForm .box-header h3.box-title {
+  color: var(--vtop-accent) !important;
+}
+
+#paymentGateWayForm .box.box-info > div[align="center"] {
+  padding: 20px 16px !important;
+}
+
+#paymentGateWayForm .box.box-info br,
+#paymentGateWayForm .box.box-info .col-12:empty {
+  display: none !important;
+}
+
+#paymentGateWayForm .col-md-offset-2 {
+  float: none !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+#paymentGateWayForm .container.row {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+#paymentGateWayForm .container.row > .col {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+}
+
+#paymentGateWayForm div[style*="border-radius: 2em" i] {
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 0 auto !important;
+  border-radius: 0.5rem !important;
+  box-shadow: none !important;
+  border: 1px solid var(--vtop-border) !important;
+  background-color: var(--vtop-bg-surface-alt) !important;
+  overflow: hidden !important;
+}
+
+#paymentGateWayForm div[style*="border-radius: 2em" i] > .card-body {
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+
+#paymentGateWayForm .card-body table.table {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
+  border: none !important;
+  background-color: var(--vtop-bg-surface) !important;
+}
+
+#paymentGateWayForm .card-body table.table td {
+  padding: 11px 16px !important;
+  font-size: 0.9rem !important;
+  line-height: 1.4 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-color: var(--vtop-border) !important;
+  vertical-align: middle !important;
+}
+
+#paymentGateWayForm .card-body table.table tr:first-child td {
+  border-top: none !important;
+}
+
+#paymentGateWayForm .card-body table.table tr:last-child td {
+  border-bottom: none !important;
+  font-weight: 700 !important;
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #paymentGateWayForm .card-body table.table tr:last-child td:last-child {
+  color: var(--vtop-accent) !important;
+}
+
+#paymentGateWayForm .card-body table.table td:first-child {
+  text-align: left !important;
+  color: var(--vtop-text-secondary) !important;
+  font-weight: 500 !important;
+}
+
+#paymentGateWayForm .card-body table.table td:last-child {
+  text-align: right !important;
+  white-space: nowrap !important;
+  font-variant-numeric: tabular-nums !important;
+  font-weight: 600 !important;
+  color: var(--vtop-text-primary) !important;
+}
+
+#paymentGateWayForm p.text-danger {
+  display: inline-block !important;
+  margin: 16px auto 0 !important;
+  padding: 10px 18px !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  background-color: var(--vtop-danger-bg-soft) !important;
+  border: 1px solid var(--vtop-danger-border) !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+/* ==========================================================================
+   7. PAYMENTS (060_payments.html — #tutPayForm)
+   ========================================================================== */
+
+#main-section:has(#tutPayForm) {
+  padding: 12px 16px !important;
+}
+
+#main-section:has(#tutPayForm) .box.box-info > .box-header h3.box-title {
+  color: var(--vtop-text-heading) !important;
+}
+
+html.vtop-dark-theme #main-section:has(#tutPayForm) .box.box-info > .box-header h3.box-title {
+  color: var(--vtop-accent) !important;
+}
+
+#main-section:has(#tutPayForm) .box.box-info > br {
+  display: none !important;
+}
+
+/* Online Payment Instructions Alert Banner */
+#main-section:has(#tutPayForm) .box.box-info > .form-group.row {
+  margin: 16px 16px 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+#main-section:has(#tutPayForm) .box.box-info > .form-group.row > .alert.alert-info {
+  flex: 0 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 14px 18px !important;
+  border-radius: 0.375rem !important;
+}
+
+html:not(.vtop-dark-theme) #main-section:has(#tutPayForm) .box.box-info > .form-group.row > .alert.alert-info {
+  background-color: var(--vtop-accent-tint-bg-soft) !important;
+  border: 1px solid var(--vtop-accent-border) !important;
+  color: var(--vtop-text-body) !important;
+}
+
+#main-section:has(#tutPayForm) .alert.alert-info > br {
+  display: none !important;
+}
+
+#main-section:has(#tutPayForm) .alert.alert-info > b[style*="color: red" i] {
+  display: inline-block !important;
+  margin-bottom: 6px !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: var(--vtop-danger-text) !important;
+}
+
+#main-section:has(#tutPayForm) .alert.alert-info ul {
+  margin: 0 !important;
+  padding-left: 20px !important;
+  color: var(--vtop-text-body) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.55 !important;
+}
+
+#main-section:has(#tutPayForm) .alert.alert-info li + li {
+  margin-top: 4px !important;
+}
+
+/* Dues Body & Empty Notice */
+#tutPayForm > .box-body {
+  padding: 16px !important;
+}
+
+#tutPayForm > .box-body .col-12:empty,
+#tutPayForm > .box-body div:has(> strong:empty):not(:has(strong:not(:empty))) {
+  display: none !important;
+}
+
+#tutPayForm > .box-body .visible-lg {
+  display: block !important;
+  width: 100% !important;
+  float: none !important;
+  padding: 0 !important;
+}
+
+#tutPayForm > .box-body span.col-sm-offset-3:has(font[color="green" i]) {
+  display: block !important;
+  float: none !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 4px auto !important;
+  padding: 10px 18px !important;
+  border-radius: 0.375rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  background-color: var(--vtop-success-bg-soft) !important;
+  border: 1px solid var(--vtop-success-border) !important;
+  color: var(--vtop-success-text) !important;
+}
+
+#tutPayForm > .box-body font[color="green" i] {
+  color: inherit !important;
+}
+
+/* Modals inside #tutPayForm (#myModal, #myModalNeft, #myModalDetails) */
+#tutPayForm .modal-dialog {
+  max-width: min(92vw, 760px) !important;
+}
+
+#tutPayForm .modal-body {
+  background-color: var(--vtop-bg-surface) !important;
+  color: var(--vtop-text-body) !important;
+}
+
+#tutPayForm .modal-body tr.table-primary > td {
+  background-color: var(--vtop-bg-table-head) !important;
+  color: var(--vtop-text-heading) !important;
+  border-color: var(--vtop-border) !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+}
+
+html.vtop-dark-theme #tutPayForm .modal-body tr.table-primary > td {
+  color: var(--vtop-accent) !important;
+}
+
+#tutPayForm .modal-body h4[style*="color: red" i] {
+  color: var(--vtop-danger-text) !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  margin: 12px 0 6px !important;
+}
+
+#tutPayForm .modal-body :is(p, ul, li)[style*="color: black" i] {
+  color: var(--vtop-text-body) !important;
+}
+
+#tutPayForm .modal-body b[style*="color: red" i] {
+  color: var(--vtop-danger-text) !important;
+}

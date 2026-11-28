@@ -105,6 +105,105 @@
     // Remove stray <br> spacers between Student Profile accordion items
     document.querySelectorAll('#accordionExample > br').forEach((br) => br.remove());
 
+    // Hide empty card/box/panel footers (including whitespace-only <p> or empty wrapper divs)
+    document.querySelectorAll('.card-footer, .box-footer, .panel-footer').forEach((footer) => {
+      if (
+        footer.id?.startsWith('vtop-') ||
+        footer.closest('#vtop-zip-panel, #vtop-cgpa-calculator, #vtop-home-class-messages, #vtop-home-today-schedule, #vtop-home-marks-updates, .vtop-plus-card, .vtop-palette-dialog, .vtop-tt-modal')
+      ) {
+        return;
+      }
+      const hasText = (footer.textContent || '').trim().length > 0;
+      const hasInteractive = Boolean(footer.querySelector('a, button, input, select, textarea, img, svg, table, ul, ol'));
+      footer.classList.toggle('vtop-empty-footer-hidden', !hasText && !hasInteractive);
+    });
+
+    // Fix VTOP empty-state single-cell rows whose colspan is smaller than the table's header column count
+    document
+      .querySelectorAll(
+        'table.customTable tbody > tr > td[colspan]:only-child:not([data-vtop-colspan-checked]), table.table tbody > tr > td[colspan]:only-child:not([data-vtop-colspan-checked])'
+      )
+      .forEach((td) => {
+        td.dataset.vtopColspanChecked = '1';
+        if (td.querySelector('table')) return;
+        const table = td.closest('table');
+        const headerRows = table?.querySelectorAll('thead tr');
+        if (!headerRows || !headerRows.length) return;
+        const lastHeaderRow = headerRows[headerRows.length - 1];
+        const headerCols = Array.from(lastHeaderRow.children).reduce((sum, cell) => {
+          const cellSpan = parseInt(cell.getAttribute('colspan') || '1', 10);
+          return sum + (Number.isNaN(cellSpan) || cellSpan < 1 ? 1 : cellSpan);
+        }, 0);
+        const span = parseInt(td.getAttribute('colspan') || '1', 10);
+        if (headerCols > 1 && !Number.isNaN(span) && span >= 2 && span < headerCols) {
+          td.setAttribute('colspan', String(headerCols));
+        }
+      });
+
+    // Payments (060_payments.html): VTOP omits `</div>` on .box-header, trapping instructions & #tutPayForm inside .box-header
+    const tutPayForm = document.getElementById('tutPayForm');
+    if (tutPayForm && !tutPayForm.dataset.vtopPaymentsUnwrapped) {
+      const boxHeader = tutPayForm.closest('.box-header');
+      const box = boxHeader?.closest('.box');
+      if (boxHeader && box) {
+        Array.from(boxHeader.childNodes).forEach((node) => {
+          if (node.nodeType === 1 && node.tagName === 'BR') {
+            node.remove();
+          }
+        });
+        const titleEl = boxHeader.querySelector('h3.box-title, .box-title');
+        const toMove = Array.from(boxHeader.children).filter((el) => el !== titleEl);
+        let anchor = boxHeader;
+        for (const el of toMove) {
+          if (el.tagName === 'BR') {
+            el.remove();
+            continue;
+          }
+          anchor.after(el);
+          anchor = el;
+        }
+      }
+      tutPayForm.dataset.vtopPaymentsUnwrapped = '1';
+    }
+
+    // Open Faculty Projects (#ffpStudentform #documentsTable): split eye button into dedicated DETAILS column
+    const ffpTable = document.querySelector('#ffpStudentform #documentsTable');
+    if (ffpTable && !ffpTable.dataset.vtopFacultySplit) {
+      const headerRow = ffpTable.querySelector('thead tr');
+      const headers = headerRow ? Array.from(headerRow.querySelectorAll('th')) : [];
+      const facultyColIdx = headers.findIndex((th) => /faculty\s*details/i.test(th.textContent || ''));
+      if (facultyColIdx !== -1) {
+        const facultyTh = headers[facultyColIdx];
+        facultyTh.textContent = 'FACULTY NAME';
+        if (!headerRow.querySelector('.vtop-th-faculty-details')) {
+          const detailsTh = document.createElement('th');
+          detailsTh.className = 'vtop-th-faculty-details';
+          detailsTh.textContent = 'DETAILS';
+          facultyTh.after(detailsTh);
+        }
+        ffpTable.querySelectorAll('tbody tr').forEach((tr) => {
+          if (tr.querySelector('.vtop-td-faculty-details')) return;
+          const tds = tr.querySelectorAll('td');
+          if (tds.length === 1 && tds[0].hasAttribute('colspan')) {
+            const span = parseInt(tds[0].getAttribute('colspan'), 10);
+            if (!Number.isNaN(span) && span > 0) tds[0].setAttribute('colspan', String(span + 1));
+            return;
+          }
+          const facultyTd = tds[facultyColIdx];
+          if (!facultyTd) return;
+          const detailsTd = document.createElement('td');
+          detailsTd.className = 'text-center vtop-td-faculty-details';
+          const btn = facultyTd.querySelector('button.viewFacultyDetails');
+          if (btn) {
+            btn.classList.remove('ms-2');
+            detailsTd.appendChild(btn);
+          }
+          facultyTd.after(detailsTd);
+        });
+        ffpTable.dataset.vtopFacultySplit = '1';
+      }
+    }
+
     // Fix VTOP's accordion buttons missing `.collapsed` when collapsed (`aria-expanded="false"`)
     document
       .querySelectorAll('#courseAccordion .accordion-button[aria-expanded="false"]:not(.collapsed), #accordionExample .accordion-button[aria-expanded="false"]:not(.collapsed)')
@@ -398,7 +497,28 @@
         ((marksTableExists && !document.querySelector('.vtop-fat-inline-tfoot')) ||
           (hasCgpaHostCard && !document.getElementById('vtop-cgpa-calculator')));
 
-      if (needsCourseFilter || needsDashboard || needsQuickDock || needsAttendance || needsFatPredictor) {
+      const needsFacultySplit = Boolean(
+        document.querySelector('#ffpStudentform #documentsTable:not([data-vtop-faculty-split])')
+      );
+      const needsPaymentsUnwrap = Boolean(
+        document.querySelector('.box-header #tutPayForm:not([data-vtop-payments-unwrapped])')
+      );
+      const needsColspanFix = Boolean(
+        document.querySelector(
+          'table.customTable tbody > tr > td[colspan]:only-child:not([data-vtop-colspan-checked]), table.table tbody > tr > td[colspan]:only-child:not([data-vtop-colspan-checked])'
+        )
+      );
+      const needsEmptyFooterCheck = Array.from(
+        document.querySelectorAll('.card-footer:not(.vtop-empty-footer-hidden), .box-footer:not(.vtop-empty-footer-hidden), .panel-footer:not(.vtop-empty-footer-hidden)')
+      ).some(
+        (f) =>
+          !f.id?.startsWith('vtop-') &&
+          !f.closest('#vtop-zip-panel, #vtop-cgpa-calculator, #vtop-home-class-messages, #vtop-home-today-schedule, #vtop-home-marks-updates, .vtop-plus-card, .vtop-palette-dialog, .vtop-tt-modal') &&
+          (f.textContent || '').trim().length === 0 &&
+          !f.querySelector('a, button, input, select, textarea, img, svg, table, ul, ol')
+      );
+
+      if (needsCourseFilter || needsDashboard || needsQuickDock || needsAttendance || needsFatPredictor || needsFacultySplit || needsPaymentsUnwrap || needsColspanFix || needsEmptyFooterCheck) {
         runPageScanners();
         return;
       }

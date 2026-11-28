@@ -91,6 +91,7 @@
     isScanning: false,
     _scanToken: 0,
     _rescanPending: false,
+    _lastActiveClassId: '',
 
     init(opts = {}) {
       this.checkAndTrack(opts);
@@ -99,6 +100,7 @@
     destroy() {
       this._scanToken++;
       this._rescanPending = false;
+      this._lastActiveClassId = '';
       window.VTOP_PLUS?.DaHomeCard?.clearPendingTarget?.();
       document.querySelectorAll('.vtop-th-da-status, .vtop-td-da-status, .vtop-da-home-col, .vtop-da-home-cell').forEach((el) => el.remove());
       document.querySelectorAll('.vtop-da-cell-augmented').forEach((el) => {
@@ -139,7 +141,6 @@
       // 1. Check for single-course assignment upload view (where student actually views/uploads files)
       const singleTable = this.findSingleCourseDaTable(overviewTable);
       if (singleTable) {
-        this.clearCache();
         this.augmentSingleCourseDaTable(singleTable);
         return;
       }
@@ -344,6 +345,29 @@
           }
         }
       });
+
+      // Refresh only this course's cached status so returning to the overview table is instant
+      const DOM = window.VTOP_PLUS?.DOM;
+      const Storage = window.VTOP_PLUS?.Storage;
+      const authId = DOM?.getAuthId ? DOM.getAuthId() : '';
+      const activeClassId =
+        (document.querySelector('input#classId, input[name="classId"]')?.value || '').trim() ||
+        (document.querySelector('#digitalAssignment [data-classid]')?.getAttribute('data-classid') || '').trim() ||
+        this._lastActiveClassId ||
+        '';
+      if (activeClassId && Storage?.setWebCache) {
+        let nextStatus;
+        if (pendingCount === 0) {
+          nextStatus = { type: 'done', text: 'All submissions done' };
+        } else if (closestPending) {
+          nextStatus = { type: closestPending.badgeType, text: closestPending.badgeText };
+        } else {
+          nextStatus = { type: 'purple', text: 'Pending assignment' };
+        }
+        Storage.setWebCache(`vtop_da_status_${authId || 'anon'}_${activeClassId}`, { data: nextStatus }, { area: 'session' });
+      } else {
+        this.clearCache();
+      }
     },
 
     // =========================================================================
@@ -465,22 +489,27 @@
           classNbrText ||
           '';
 
+        if (button && classId && !button.dataset.vtopDaClickTracked) {
+          button.dataset.vtopDaClickTracked = '1';
+          button.addEventListener('click', () => {
+            this._lastActiveClassId = classId;
+          });
+        }
+
         if (!classId) {
           this.applyRowBadge(cell, { type: 'done', text: 'All submissions done' });
-          return false;
+          return { fatal: false };
         }
 
         const Storage = window.VTOP_PLUS?.Storage;
         const cacheKey = `vtop_da_status_${authId || 'anon'}_${classId}`;
         const cachedStatus = Storage?.getWebCache(cacheKey, { area: 'session', ttlMs: 20 * 60 * 1000 });
         let status = cachedStatus ? cachedStatus.data : null;
-        let didFetch = false;
 
         if (!status) {
-          didFetch = true;
           try {
             status = await this.fetchCourseStatus(classId, authId, csrf);
-            if (myToken !== this._scanToken) return false;
+            if (myToken !== this._scanToken) return { fatal: true };
             if (status && status.type !== 'error') {
               Storage?.setWebCache(cacheKey, { data: status }, { area: 'session' });
             }
@@ -490,23 +519,42 @@
           }
         }
 
-        if (myToken !== this._scanToken || !document.body.contains(row)) return false;
+        if (myToken !== this._scanToken || !document.body.contains(row)) return { fatal: false };
 
         if (!status) {
           status = { type: 'error', text: 'Check failed' };
         }
 
         this.applyRowBadge(cell, status);
-        return didFetch;
+        return { fatal: Boolean(status.fatal) };
+      };
+
+      const CONCURRENCY = 3;
+      let nextIdx = 0;
+      let aborted = false;
+
+      const worker = async () => {
+        while (!aborted && myToken === this._scanToken) {
+          const idx = nextIdx++;
+          if (idx >= pendingRows.length) break;
+          const res = await processRow(pendingRows[idx]);
+          if (res?.fatal) {
+            aborted = true;
+            break;
+          }
+        }
       };
 
       try {
-        for (let i = 0; i < pendingRows.length; i++) {
-          if (myToken !== this._scanToken) break;
-          const didFetch = await processRow(pendingRows[i]);
-          if (myToken !== this._scanToken) break;
-          if (didFetch && i < pendingRows.length - 1) {
-            await new Promise((r) => setTimeout(r, Math.floor(300 + Math.random() * 150)));
+        const workerCount = Math.min(CONCURRENCY, pendingRows.length);
+        await Promise.all(Array.from({ length: workerCount }, () => worker()));
+        if (aborted && myToken === this._scanToken) {
+          for (let i = nextIdx; i < pendingRows.length; i++) {
+            const cell = pendingRows[i]?.querySelector('.vtop-td-da-status');
+            const badge = cell?.querySelector('.vtop-da-badge-loading');
+            if (badge) {
+              badge.classList.remove('vtop-da-badge-loading');
+            }
           }
         }
       } finally {
@@ -536,13 +584,13 @@
       }
 
       try {
-        const res = await VtopApi.postHtml('examinations/processDigitalAssignment', extra);
+        const res = await VtopApi.postHtml('examinations/processDigitalAssignment', extra, { queued: false });
         if (res.rateLimited) {
           console.warn('[VTOP++] VTOP rate limited DA checks (HTTP 429).');
-          return { type: 'error', text: 'Rate limited' };
+          return { type: 'error', text: 'Rate limited', fatal: true };
         }
         if (res.expired) {
-          return { type: 'error', text: 'Auth expired' };
+          return { type: 'error', text: 'Auth expired', fatal: true };
         }
         if (!res.ok) {
           return { type: 'error', text: 'Check failed' };
@@ -657,7 +705,7 @@
       if (!cell) return;
       if (status.type === 'error') {
         const span = document.createElement('span');
-        span.className = 'vtop-da-badge vtop-da-badge-loading';
+        span.className = status.fatal ? 'vtop-da-badge' : 'vtop-da-badge vtop-da-badge-loading';
         span.textContent = '--';
         cell.replaceChildren(span);
         return;

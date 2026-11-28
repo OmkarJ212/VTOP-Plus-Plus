@@ -9,6 +9,8 @@ html.vtop-dark-theme [style*="color: #111"],
 html.vtop-dark-theme [style*="color: #222"],
 html.vtop-dark-theme [style*="color: #333"],
 html.vtop-dark-theme [style*="color:#333"],
+html.vtop-dark-theme [style*="color: #330000" i],
+html.vtop-dark-theme [style*="color:#330000" i],
 html.vtop-dark-theme [style*="color: #444"],
 html.vtop-dark-theme [style*="color: #555"],
 html.vtop-dark-theme [style*="color: rgb(0"],
@@ -270,6 +272,9 @@ html.vtop-dark-theme .callout-success {
   border-color: var(--vtop-success-alert-border) !important;
   color: var(--vtop-success-text) !important;
 }
+html.vtop-dark-theme :is(.alert-info, .alert-danger, .alert-warning, .alert-success, .callout-info, .callout-danger, .callout-warning, .callout-success) :is(h1, h2, h3, h4, h5, h6, p, li, strong, b):not([style*="color" i]):not([class*="text-"]) {
+  color: inherit !important;
+}
 
 /* 7.18 Bootstrap 5 Accordions & Collapsible Sections (Kills white accordion buttons) */
 html.vtop-dark-theme .accordion,
@@ -357,14 +362,18 @@ html.vtop-dark-theme .form-select optgroup {
 }
 
 /* 7.21 Home Page & Universal Text Contrast Fixes (Eliminates dark text on dark surfaces) */
-html.vtop-dark-theme .text-dark,
-html.vtop-dark-theme .text-body,
+html.vtop-dark-theme .text-dark:not(.bg-warning):not(.bg-info):not(.bg-warning *):not(.bg-info *),
+html.vtop-dark-theme .text-body:not(.bg-warning):not(.bg-info):not(.bg-warning *):not(.bg-info *),
 html.vtop-dark-theme .text-body-secondary,
 html.vtop-dark-theme .text-black,
 html.vtop-dark-theme .text-black-50,
-html.vtop-dark-theme [class*="text-dark"],
-html.vtop-dark-theme [class*="text-body"] {
+html.vtop-dark-theme [class*="text-dark"]:not(.bg-warning):not(.bg-info):not(.bg-warning *):not(.bg-info *),
+html.vtop-dark-theme [class*="text-body"]:not(.bg-warning):not(.bg-info):not(.bg-warning *):not(.bg-info *) {
   color: var(--vtop-text-primary) !important;
+}
+html.vtop-dark-theme :is(.bg-warning, .bg-info):not(#course-data *):is(.text-dark, .text-body),
+html.vtop-dark-theme :is(.bg-warning, .bg-info):not(#course-data *) :is(.text-dark, .text-body) {
+  color: #0f172a !important;
 }
 html.vtop-dark-theme .text-muted,
 html.vtop-dark-theme .text-secondary,
@@ -414,14 +423,18 @@ html.vtop-dark-theme a.list-group-item-action {
   color: var(--vtop-text-primary) !important;
 }
 
-html.vtop-dark-theme .list-group-item-action:hover,
-html.vtop-dark-theme .list-group-item-action:focus,
-html.vtop-dark-theme .list-group-item-action:hover span,
-html.vtop-dark-theme .list-group-item-action:focus span,
-html.vtop-dark-theme .list-group-item-action:hover .fg-black,
-html.vtop-dark-theme .list-group-item-action:focus .fg-black {
+html.vtop-dark-theme .list-group-item-action:not(.hmenubox *):not([id^="MG0"] *):hover,
+html.vtop-dark-theme .list-group-item-action:not(.hmenubox *):not([id^="MG0"] *):focus {
   color: var(--vtop-accent) !important;
   background-color: var(--vtop-bg-elevated) !important;
+}
+
+html.vtop-dark-theme .list-group-item-action:not(.hmenubox *):not([id^="MG0"] *):hover span,
+html.vtop-dark-theme .list-group-item-action:not(.hmenubox *):not([id^="MG0"] *):focus span,
+html.vtop-dark-theme .list-group-item-action:not(.hmenubox *):not([id^="MG0"] *):hover .fg-black,
+html.vtop-dark-theme .list-group-item-action:not(.hmenubox *):not([id^="MG0"] *):focus .fg-black {
+  color: var(--vtop-accent) !important;
+  background-color: transparent !important;
 }
 
 html.vtop-dark-theme .spotlight-background,
@@ -578,6 +591,26 @@ html.vtop-dark-theme span.text-danger {
   color: var(--vtop-danger-bright) !important;
 }
 
+html.vtop-dark-theme .text-primary:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.btn):not(.badge):not([class*="bg-"]),
+html.vtop-dark-theme span.text-primary:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.badge):not([class*="bg-"]) {
+  color: var(--vtop-accent) !important;
+}
+
+html.vtop-dark-theme .text-success:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.btn):not(.badge):not([class*="bg-"]),
+html.vtop-dark-theme span.text-success:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.badge):not([class*="bg-"]) {
+  color: var(--vtop-success-bright) !important;
+}
+
+html.vtop-dark-theme .text-warning:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.btn):not(.badge):not([class*="bg-"]),
+html.vtop-dark-theme span.text-warning:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.badge):not([class*="bg-"]) {
+  color: var(--vtop-warn-bright) !important;
+}
+
+html.vtop-dark-theme .text-info:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.btn):not(.badge):not([class*="bg-"]),
+html.vtop-dark-theme span.text-info:not(#vtop-header *):not(.hmenubox *):not(.hmenuItem *):not(.badge):not([class*="bg-"]) {
+  color: var(--vtop-accent-sky) !important;
+}
+
 /* ==========================================================================
    7.26 Additive Dark Mode Fixes for Remaining VTOP Pages & Inline Styles
    ========================================================================== */
@@ -681,13 +714,49 @@ html.vtop-dark-theme .badge.bg-light {
   border: 1px solid var(--vtop-border) !important;
 }
 
-/* Bootstrap 5 .table-primary rows */
+/* Bootstrap 5 semantic table rows & cells */
 html.vtop-dark-theme tr.table-primary,
 html.vtop-dark-theme tr.table-primary > td,
 html.vtop-dark-theme tr.table-primary > th {
   background-color: var(--vtop-bg-table-head) !important;
   color: var(--vtop-accent) !important;
   border-color: var(--vtop-border) !important;
+}
+
+html.vtop-dark-theme tr.table-info,
+html.vtop-dark-theme tr.table-info > td,
+html.vtop-dark-theme tr.table-info > th,
+html.vtop-dark-theme td.table-info {
+  background-color: var(--vtop-info-alert-bg) !important;
+  color: var(--vtop-info-alert-text) !important;
+  border-color: var(--vtop-info-alert-border) !important;
+}
+
+html.vtop-dark-theme tr.table-success,
+html.vtop-dark-theme tr.table-success > td,
+html.vtop-dark-theme tr.table-success > th,
+html.vtop-dark-theme td.table-success {
+  background-color: var(--vtop-success-alert-bg) !important;
+  color: var(--vtop-success-text) !important;
+  border-color: var(--vtop-success-alert-border) !important;
+}
+
+html.vtop-dark-theme tr.table-warning,
+html.vtop-dark-theme tr.table-warning > td,
+html.vtop-dark-theme tr.table-warning > th,
+html.vtop-dark-theme td.table-warning {
+  background-color: var(--vtop-warn-alert-bg) !important;
+  color: var(--vtop-warn-alert-text) !important;
+  border-color: var(--vtop-warn-alert-border) !important;
+}
+
+html.vtop-dark-theme tr.table-danger,
+html.vtop-dark-theme tr.table-danger > td,
+html.vtop-dark-theme tr.table-danger > th,
+html.vtop-dark-theme td.table-danger {
+  background-color: var(--vtop-danger-alert-bg) !important;
+  color: var(--vtop-danger-text) !important;
+  border-color: var(--vtop-danger-alert-border) !important;
 }
 
 /* Inline stark borders */

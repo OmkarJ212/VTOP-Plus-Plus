@@ -19,7 +19,7 @@
   }, { once: true });
 
   const WHITE_BG_REGEX = /background(?:-color)?:\s*(?:#fff(?:fff)?|#f8f9fa|#f4f6f9|#f1f5f9|#e9ecef|#fafafa|white|rgb\(\s*(?:24[0-9]|25[0-5])\s*,\s*(?:24[0-9]|25[0-5])\s*,\s*(?:24[0-9]|25[0-5])\s*\))/i;
-  const DARK_TEXT_REGEX = /color\s*:\s*(?:#000(?:000)?|#111|#222|#333|#444|#555|#212529|#2c3e50|#34495e|black|rgb\(\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*\))/i;
+  const DARK_TEXT_REGEX = /color\s*:\s*(?:#000(?:000)?|#111|#222|#333|#330000|#444|#555|#212529|#2c3e50|#34495e|black|rgb\(\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*,\s*(?:[0-9]|[1-4][0-9]|50)\s*\))/i;
   const NAV_HEADER_SELECTOR = '#vtop-header, .navbar, #quickLinks, #navbarDropdown';
   const SANITIZE_SELECTOR = '[bgcolor], [class*="WhiteBackground" i], [style*="background"], [style*="color"]';
   const RESTORE_SELECTOR = '[data-vtop-orig-bgcolor], [data-vtop-orig-bg], [data-vtop-orig-background], [data-vtop-orig-color]';

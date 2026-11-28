@@ -523,10 +523,10 @@ html.vtop-dark-theme .table-bordered > tfoot > tr > td {
 }
 
 /* 7.4 Containers (Panels, Boxes, Cards, Wells, Modals) */
-html.vtop-dark-theme .panel,
+html.vtop-dark-theme .panel:not([class*="bg-"]),
 html.vtop-dark-theme .panel-default,
 html.vtop-dark-theme .panel-body,
-html.vtop-dark-theme .card,
+html.vtop-dark-theme .card:not([class*="bg-"]),
 html.vtop-dark-theme .card-body,
 html.vtop-dark-theme .box,
 html.vtop-dark-theme .box-body,
@@ -534,17 +534,17 @@ html.vtop-dark-theme .well,
 html.vtop-dark-theme .jumbotron,
 html.vtop-dark-theme .modal-dialog,
 html.vtop-dark-theme .modal-content,
-html.vtop-dark-theme .list-group-item {
+html.vtop-dark-theme .list-group-item:not([class*="list-group-item-"]) {
   background-color: var(--vtop-dark-bg-surface) !important;
   color: var(--vtop-dark-text-main) !important;
   border-color: var(--vtop-dark-border) !important;
 }
 
-html.vtop-dark-theme .panel-heading,
+html.vtop-dark-theme .panel-heading:not([class*="bg-"]),
 html.vtop-dark-theme .panel-footer,
-html.vtop-dark-theme .card-header,
+html.vtop-dark-theme .card-header:not([class*="bg-"]),
 html.vtop-dark-theme .card-footer,
-html.vtop-dark-theme .box-header,
+html.vtop-dark-theme .box-header:not([class*="bg-"]),
 html.vtop-dark-theme .box-footer,
 html.vtop-dark-theme .modal-header,
 html.vtop-dark-theme .modal-footer {
@@ -615,9 +615,38 @@ html.vtop-dark-theme .btn-default:hover {
   background-color: var(--vtop-bg-elevated-hover) !important;
   color: var(--vtop-text-inverse) !important;
 }
-html.vtop-dark-theme .btn-primary {
+/* Strip legacy Bootstrap 3 linear-gradient + background-position hover split on Bootstrap buttons */
+.btn:not(.hmenuItem):not(.hmenubox *):not([class*="vtop-"]),
+.btn:not(.hmenuItem):not(.hmenubox *):not([class*="vtop-"]):hover,
+.btn:not(.hmenuItem):not(.hmenubox *):not([class*="vtop-"]):focus,
+.btn:not(.hmenuItem):not(.hmenubox *):not([class*="vtop-"]):active {
+  background-image: none !important;
+  background-position: 0 0 !important;
+}
+
+html:not(.vtop-dark-theme) .btn-primary:not(.hmenuItem):not(.hmenubox *) {
+  background-color: var(--vtop-accent) !important;
+  border-color: var(--vtop-accent) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html:not(.vtop-dark-theme) .btn-primary:not(.hmenuItem):not(.hmenubox *):is(:hover, :focus, :focus-visible, :active, .active),
+html:not(.vtop-dark-theme) .show > .btn-primary.dropdown-toggle {
+  background-color: var(--vtop-btn-primary-hover) !important;
+  border-color: var(--vtop-btn-primary-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .btn-primary:not(.hmenuItem):not(.hmenubox *) {
   background-color: var(--vtop-accent-hover) !important;
-  border-color: var(--vtop-accent-sky-hover) !important;
+  border-color: var(--vtop-accent-hover) !important;
+  color: var(--vtop-text-inverse) !important;
+}
+
+html.vtop-dark-theme .btn-primary:not(.hmenuItem):not(.hmenubox *):is(:hover, :focus, :focus-visible, :active, .active),
+html.vtop-dark-theme .show > .btn-primary.dropdown-toggle {
+  background-color: var(--vtop-btn-primary-hover) !important;
+  border-color: var(--vtop-btn-primary-hover) !important;
   color: var(--vtop-text-inverse) !important;
 }
 
